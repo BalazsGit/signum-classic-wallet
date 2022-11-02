@@ -89,8 +89,7 @@ export function init () {
 
     BRS.setStateInterval(30)
 
-    // on brs.login
-    // BRS.allowLoginViaEnter()
+    BRS.allowLoginViaEnter()
     // on brs.recipients
     // BRS.automaticallyCheckRecipient()
 
@@ -310,7 +309,8 @@ export function getState (callback) {
         }
     })
 
-    BRS.saveCachedAssets()
+    // TODO on assetexchange
+    // BRS.saveCachedAssets()
 }
 
 export function logoSidebarClick (e, data) {

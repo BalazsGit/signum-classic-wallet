@@ -33,6 +33,30 @@ import {
 
 import { theme } from './brs.theme'
 
+import {
+    setServerPassword,
+    getServerPassword,
+    sendOutsideRequest,
+    sendRequest,
+    processAjaxRequest,
+    verifyAndSignTransactionBytes,
+    broadcastTransactionBytes
+} from './brs.server'
+
+import {
+    allowLoginViaEnter,
+    showLoginOrWelcomeScreen,
+    showLoginScreen,
+    registerUserDefinedAccount,
+    registerAccount,
+    verifyGeneratedPassphrase,
+    evAccountPhraseCustomPanelSubmit,
+    loginCommon,
+    evLoginButtonClick,
+    showLockscreen,
+    logout
+} from './brs.login'
+
 import { addEventListeners } from './brs.eventlisteners'
 
 // import { addEvents } from './brs.addevents'
@@ -130,6 +154,13 @@ export const BRS = {
         language: 'en'
     },
 
+    // from brs.server
+    _password: '',
+    multiQueue: null,
+
+    // from login
+    newlyCreatedAccount: false,
+
     // from brs.aliases
     alias_page_elements: 500,
     is_loading_aliases: false,
@@ -160,7 +191,29 @@ export const BRS = {
     updateSettings,
 
     // From theme
-    theme
+    theme,
+
+    // From server
+    setServerPassword,
+    getServerPassword,
+    sendOutsideRequest,
+    sendRequest,
+    processAjaxRequest,
+    verifyAndSignTransactionBytes,
+    broadcastTransactionBytes,
+
+    // From login
+    allowLoginViaEnter,
+    showLoginOrWelcomeScreen,
+    showLoginScreen,
+    registerUserDefinedAccount,
+    registerAccount,
+    verifyGeneratedPassphrase,
+    evAccountPhraseCustomPanelSubmit,
+    loginCommon,
+    evLoginButtonClick,
+    showLockscreen,
+    logout
 
     // From brs.addevents.js
     // addEvents
