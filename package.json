@@ -5,7 +5,9 @@
   "main": "src/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx light-server -s src -p 1221 --no-reload"
+    "start": "npx light-server -s src -p 1221 --no-reload",
+    "lint": "npx eslint './src/js/brs/*'",
+    "build": "node esbuild.config.js"
   },
   "repository": {
     "type": "git",
@@ -24,5 +26,11 @@
   "homepage": "https://github.com/deleterium/signum-classic-wallet#readme",
   "dependencies": {
     "light-server": "^2.9.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.15.12",
+    "eslint": "^8.26.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-standard": "^1.0.2"
   }
 }
