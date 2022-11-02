@@ -12,7 +12,9 @@ module.exports = {
     },
     rules: {
         indent: ['error', 4],
-        camelcase: 'warn',
+        camelcase: 'off',
+        eqeqeq: 'warn',
+        'handle-callback-err': 'warn',
         'no-unused-vars': 'warn',
         'brace-style': ['warn', '1tbs', { allowSingleLine: false }]
     }
