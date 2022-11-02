@@ -2,18 +2,6 @@
  * @depends {brs.js}
  */
 var BRS = (function (BRS, $, undefined) {
-    BRS.loadContacts = function () {
-        BRS.contacts = {}
-
-        BRS.database.select('contacts', null, function (error, contacts) {
-	    if (contacts && contacts.length) {
-                $.each(contacts, function (index, contact) {
-		    BRS.contacts[contact.accountRS] = contact
-                })
-	    }
-        })
-    }
-
     BRS.getContactByName = function (nameToFind) {
         for (const accountId in BRS.contacts) {
             if (BRS.contacts[accountId].name === nameToFind) {

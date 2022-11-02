@@ -25,8 +25,18 @@ import {
     showFeeSuggestions
 } from './brs'
 
-import { addEvents } from './brs.addevents'
-import { pagesAliases } from './brs.aliases'
+import {
+    pagesSettings,
+    getSettings,
+    updateSettings
+} from './brs.settings'
+
+import { theme } from './brs.theme'
+
+import { addEventListeners } from './brs.eventlisteners'
+
+// import { addEvents } from './brs.addevents'
+// import { pagesAliases } from './brs.aliases'
 
 export const BRS = {
     server: '',
@@ -65,8 +75,11 @@ export const BRS = {
     currentSubPage: '',
     pageNumber: 1,
     pageSize: 25,
+    showPageNumbers: false,
 
-    pages: {},
+    pages: {
+        pagesSettings
+    },
     incoming: {},
 
     hasLocalStorage: true,
@@ -100,6 +113,23 @@ export const BRS = {
         { address: 'http://localhost:6876', testnet: true }
     ],
 
+    // from brs.settings
+    defaultSettings: {
+        submit_on_enter: 0,
+        news: -1,
+        console_log: 0,
+        fee_warning: '100000000000',
+        amount_warning: '10000000000000',
+        asset_transfer_warning: '10000',
+        '24_hour_format': 1,
+        remember_passphrase: 0,
+        remember_account: 0,
+        automatic_node_selection: 1,
+        page_size: 25,
+        prefered_node: '',
+        language: 'en'
+    },
+
     // from brs.aliases
     alias_page_elements: 500,
     is_loading_aliases: false,
@@ -125,8 +155,15 @@ export const BRS = {
     checkMinimumFee,
     showFeeSuggestions,
 
+    // From settings
+    getSettings,
+    updateSettings,
+
+    // From theme
+    theme
+
     // From brs.addevents.js
-    addEvents
+    // addEvents
 }
 
 window.BRS = BRS
@@ -180,7 +217,7 @@ $(document).ready(function () {
         })
     }
     function loadingDone () {
-        BRS.addEventListeners()
+        addEventListeners()
         $('#loading_bar').val(100)
         BRS.init()
     }

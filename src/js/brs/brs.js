@@ -89,9 +89,10 @@ export function init () {
 
     BRS.setStateInterval(30)
 
-    BRS.allowLoginViaEnter()
-
-    BRS.automaticallyCheckRecipient()
+    // on brs.login
+    // BRS.allowLoginViaEnter()
+    // on brs.recipients
+    // BRS.automaticallyCheckRecipient()
 
     $('.show_popover').popover({
         trigger: 'hover'
@@ -116,7 +117,8 @@ export function init () {
 
     $("[data-toggle='tooltip']").tooltip()
 
-    $('.sidebar .treeview').tree()
+    // TODO use BRS.FnTree from brs.utils
+    // $('.sidebar .treeview').tree()
 
     setInterval(setHeaderClock, 1000)
 
@@ -238,7 +240,7 @@ function setHeaderClock () {
 }
 
 export function getState (callback) {
-    BRS.checkSelectedNode()
+    checkSelectedNode()
 
     BRS.sendRequest('getBlockchainStatus', function (response) {
         if (response.errorCode) {
@@ -360,7 +362,6 @@ export function logoSidebarClick (e, data) {
         $('#inline_message_password').val('')
     }
 
-    // BRS.previousPage = BRS.currentPage;
     BRS.currentPage = page
     BRS.currentSubPage = ''
     BRS.pageNumber = 1
@@ -523,7 +524,13 @@ export function createDatabase (callback) {
             if (!error) {
                 BRS.databaseSupport = true
 
-                BRS.loadContacts()
+                // loadContacts
+                BRS.database.select('contacts', null, function (error, contacts) {
+                    if (error) return
+                    for (const contact of contacts) {
+                        BRS.contacts[contact.accountRS] = contact
+                    }
+                })
 
                 BRS.database.select('data', [{
                     id: 'asset_exchange_version'
