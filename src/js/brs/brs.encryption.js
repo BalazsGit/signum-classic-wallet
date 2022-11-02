@@ -1,845 +1,810 @@
 /**
  * @depends {brs.js}
  */
-var BRS = (function(BRS, $, undefined) {
-    var _password;
-    var _decryptionPassword;
-    var _decryptedTransactions = {};
-    var _encryptedNote = null;
-    var _sharedKeys = {};
+var BRS = (function (BRS, $, undefined) {
+    let _password
+    let _decryptionPassword
+    const _decryptedTransactions = {}
+    let _encryptedNote = null
+    const _sharedKeys = {}
 
-    var _hash = {
-	init: SHA256_init,
-	update: SHA256_write,
-	getBytes: SHA256_finalize
-    };
+    const _hash = {
+        init: SHA256_init,
+        update: SHA256_write,
+        getBytes: SHA256_finalize
+    }
 
-    BRS.generatePublicKey = function(secretPhrase) {
-	if (!secretPhrase) {
+    BRS.generatePublicKey = function (secretPhrase) {
+        if (!secretPhrase) {
 	    if (BRS.rememberPassword) {
-		secretPhrase = _password;
+                secretPhrase = _password
+	    } else {
+		    throw $.t('error_generate_public_key_no_password')
 	    }
-        else {
-		    throw $.t("error_generate_public_key_no_password");
-	    }
-	}
+        }
 
-	return BRS.getPublicKey(converters.stringToHexString(secretPhrase));
-    };
+        return BRS.getPublicKey(converters.stringToHexString(secretPhrase))
+    }
 
-    BRS.getPublicKey = function(secretPhrase, isAccountNumber) {
-	if (isAccountNumber) {
-	    var accountNumber = secretPhrase;
-	    var publicKey = "";
+    BRS.getPublicKey = function (secretPhrase, isAccountNumber) {
+        if (isAccountNumber) {
+	    const accountNumber = secretPhrase
+	    let publicKey = ''
 
-	    //synchronous!
-	    BRS.sendRequest("getAccountPublicKey", {
-		"account": accountNumber
-	    }, function(response) {
-		if (!response.publicKey) {
-		    throw $.t("error_no_public_key");
-		}
-                else {
-		    publicKey = response.publicKey;
-		}
-	    }, false);
+	    // synchronous!
+	    BRS.sendRequest('getAccountPublicKey', {
+                account: accountNumber
+	    }, function (response) {
+                if (!response.publicKey) {
+		    throw $.t('error_no_public_key')
+                } else {
+		    publicKey = response.publicKey
+                }
+	    }, false)
 
-	    return publicKey;
-	}
-        else {
-	    var secretPhraseBytes = converters.hexStringToByteArray(secretPhrase);
-	    var digest = simpleHash(secretPhraseBytes);
-	    return converters.byteArrayToHexString(curve25519.keygen(digest).p);
-	}
-    };
+	    return publicKey
+        } else {
+	    const secretPhraseBytes = converters.hexStringToByteArray(secretPhrase)
+	    const digest = simpleHash(secretPhraseBytes)
+	    return converters.byteArrayToHexString(curve25519.keygen(digest).p)
+        }
+    }
 
-    BRS.getPrivateKey = function(secretPhrase) {
-	SHA256_init();
-	SHA256_write(converters.stringToByteArray(secretPhrase));
-	return converters.shortArrayToHexString(curve25519_clamp(converters.byteArrayToShortArray(SHA256_finalize())));
-    };
+    BRS.getPrivateKey = function (secretPhrase) {
+        SHA256_init()
+        SHA256_write(converters.stringToByteArray(secretPhrase))
+        return converters.shortArrayToHexString(curve25519_clamp(converters.byteArrayToShortArray(SHA256_finalize())))
+    }
 
-    BRS.getAccountId = function(secretPhrase) {
-	return BRS.getAccountIdFromPublicKey(BRS.getPublicKey(converters.stringToHexString(secretPhrase)));
-    };
+    BRS.getAccountId = function (secretPhrase) {
+        return BRS.getAccountIdFromPublicKey(BRS.getPublicKey(converters.stringToHexString(secretPhrase)))
+    }
 
-    BRS.getAccountIdFromPublicKey = function(publicKey, RSFormat) {
-	var hex = converters.hexStringToByteArray(publicKey);
+    BRS.getAccountIdFromPublicKey = function (publicKey, RSFormat) {
+        const hex = converters.hexStringToByteArray(publicKey)
 
-	_hash.init();
-	_hash.update(hex);
+        _hash.init()
+        _hash.update(hex)
 
-	var account = _hash.getBytes();
+        let account = _hash.getBytes()
 
-	account = converters.byteArrayToHexString(account);
+        account = converters.byteArrayToHexString(account)
 
-	var slice = (converters.hexStringToByteArray(account)).slice(0, 8);
+        const slice = (converters.hexStringToByteArray(account)).slice(0, 8)
 
-	var accountId = byteArrayToBigInteger(slice).toString();
+        const accountId = byteArrayToBigInteger(slice).toString()
 
-	if (RSFormat) {
-	    var address = new NxtAddress();
+        if (RSFormat) {
+	    const address = new NxtAddress()
 
 	    if (address.set(accountId)) {
-		return address.toString();
+                return address.toString()
+	    } else {
+                return ''
 	    }
-            else {
-		return "";
-	    }
-	}
-        else {
-	    return accountId;
-	}
-    };
+        } else {
+	    return accountId
+        }
+    }
 
-    BRS.encryptNote = function(message, options, secretPhrase) {
-	try {
+    BRS.encryptNote = function (message, options, secretPhrase) {
+        try {
 	    if (!options.sharedKey) {
-		if (!options.privateKey) {
+                if (!options.privateKey) {
 		    if (!secretPhrase) {
-			if (BRS.rememberPassword) {
-			    secretPhrase = _password;
-			}
-                        else {
+                        if (BRS.rememberPassword) {
+			    secretPhrase = _password
+                        } else {
 			    throw {
-				"message": $.t("error_encryption_passphrase_required"),
-				"errorCode": 1
-			    };
-			}
+                                message: $.t('error_encryption_passphrase_required'),
+                                errorCode: 1
+			    }
+                        }
 		    }
 
-		    options.privateKey = converters.hexStringToByteArray(BRS.getPrivateKey(secretPhrase));
-		}
+		    options.privateKey = converters.hexStringToByteArray(BRS.getPrivateKey(secretPhrase))
+                }
 
-		if (!options.publicKey) {
+                if (!options.publicKey) {
 		    if (!options.account) {
-			throw {
-			    "message": $.t("error_account_id_not_specified"),
-			    "errorCode": 2
-			};
+                        throw {
+			    message: $.t('error_account_id_not_specified'),
+			    errorCode: 2
+                        }
 		    }
 
 		    try {
-			options.publicKey = converters.hexStringToByteArray(BRS.getPublicKey(options.account, true));
+                        options.publicKey = converters.hexStringToByteArray(BRS.getPublicKey(options.account, true))
 		    } catch (err) {
-			var nxtAddress = new NxtAddress();
+                        const nxtAddress = new NxtAddress()
 
-			if (!nxtAddress.set(options.account)) {
+                        if (!nxtAddress.set(options.account)) {
 			    throw {
-				"message": $.t("error_invalid_account_id"),
-				"errorCode": 3
-			    };
-			}
-                        else {
+                                message: $.t('error_invalid_account_id'),
+                                errorCode: 3
+			    }
+                        } else {
 			    throw {
-				"message": $.t("error_public_key_not_specified"),
-				"errorCode": 4
-			    };
-			}
+                                message: $.t('error_public_key_not_specified'),
+                                errorCode: 4
+			    }
+                        }
 		    }
-		}
-                else if (typeof options.publicKey == "string") {
-		    options.publicKey = converters.hexStringToByteArray(options.publicKey);
-		}
+                } else if (typeof options.publicKey === 'string') {
+		    options.publicKey = converters.hexStringToByteArray(options.publicKey)
+                }
 	    }
 
-	    var encrypted = encryptData(converters.stringToByteArray(message), options);
+	    const encrypted = encryptData(converters.stringToByteArray(message), options)
 
 	    return {
-		"message": converters.byteArrayToHexString(encrypted.data),
-		"nonce": converters.byteArrayToHexString(encrypted.nonce)
-	    };
-	} catch (err) {
+                message: converters.byteArrayToHexString(encrypted.data),
+                nonce: converters.byteArrayToHexString(encrypted.nonce)
+	    }
+        } catch (err) {
 	    if (err.errorCode && err.errorCode < 5) {
-		throw err;
+                throw err
+	    } else {
+                throw {
+		    message: $.t('error_message_encryption'),
+		    errorCode: 5
+                }
 	    }
-            else {
-		throw {
-		    "message": $.t("error_message_encryption"),
-		    "errorCode": 5
-		};
-	    }
-	}
-    };
+        }
+    }
 
-    BRS.decryptData = function(data, options, secretPhrase) {
-	try {
-	    return BRS.decryptNote(message, options, secretPhrase);
-	} catch (err) {
-	    var mesage = String(err.message ? err.message : err);
+    BRS.decryptData = function (data, options, secretPhrase) {
+        try {
+	    return BRS.decryptNote(message, options, secretPhrase)
+        } catch (err) {
+	    const mesage = String(err.message ? err.message : err)
 
 	    if (err.errorCode && err.errorCode == 1) {
-		return false;
-	    }
-            else {
-		if (options.title) {
-		    var translatedTitle = BRS.getTranslatedFieldName(options.title).toLowerCase();
+                return false
+	    } else {
+                if (options.title) {
+		    let translatedTitle = BRS.getTranslatedFieldName(options.title).toLowerCase()
 		    if (!translatedTitle) {
-			translatedTitle = String(options.title).escapeHTML().toLowerCase();
+                        translatedTitle = String(options.title).escapeHTML().toLowerCase()
 		    }
 
-		    return $.t("error_could_not_decrypt_var", {
-			"var": translatedTitle
-		    }).capitalize();
-		}
-                else {
-		    return $.t("error_could_not_decrypt");
-		}
+		    return $.t('error_could_not_decrypt_var', {
+                        var: translatedTitle
+		    }).capitalize()
+                } else {
+		    return $.t('error_could_not_decrypt')
+                }
 	    }
-	}
-    };
+        }
+    }
 
-    BRS.decryptNote = function(message, options, secretPhrase) {
-	try {
+    BRS.decryptNote = function (message, options, secretPhrase) {
+        try {
 	    if (!options.sharedKey) {
-		if (!options.privateKey) {
+                if (!options.privateKey) {
 		    if (!secretPhrase) {
-			if (BRS.rememberPassword) {
-			    secretPhrase = _password;
-			}
-                        else if (_decryptionPassword) {
-			    secretPhrase = _decryptionPassword;
-			}
-                        else {
+                        if (BRS.rememberPassword) {
+			    secretPhrase = _password
+                        } else if (_decryptionPassword) {
+			    secretPhrase = _decryptionPassword
+                        } else {
 			    throw {
-				"message": $.t("error_decryption_passphrase_required"),
-				"errorCode": 1
-			    };
-			}
+                                message: $.t('error_decryption_passphrase_required'),
+                                errorCode: 1
+			    }
+                        }
 		    }
 
-		    options.privateKey = converters.hexStringToByteArray(BRS.getPrivateKey(secretPhrase));
-		}
+		    options.privateKey = converters.hexStringToByteArray(BRS.getPrivateKey(secretPhrase))
+                }
 
-		if (!options.publicKey) {
+                if (!options.publicKey) {
 		    if (!options.account) {
-			throw {
-			    "message": $.t("error_account_id_not_specified"),
-			    "errorCode": 2
-			};
+                        throw {
+			    message: $.t('error_account_id_not_specified'),
+			    errorCode: 2
+                        }
 		    }
 
-		    options.publicKey = converters.hexStringToByteArray(BRS.getPublicKey(options.account, true));
-		}
+		    options.publicKey = converters.hexStringToByteArray(BRS.getPublicKey(options.account, true))
+                }
 	    }
 
-	    options.nonce = converters.hexStringToByteArray(options.nonce);
+	    options.nonce = converters.hexStringToByteArray(options.nonce)
 
-	    return decryptData(converters.hexStringToByteArray(message), options);
-	} catch (err) {
+	    return decryptData(converters.hexStringToByteArray(message), options)
+        } catch (err) {
 	    if (err.errorCode && err.errorCode < 3) {
-		throw err;
+                throw err
+	    } else {
+                throw {
+		    message: $.t('error_message_decryption'),
+		    errorCode: 3
+                }
 	    }
-            else {
-		throw {
-		    "message": $.t("error_message_decryption"),
-		    "errorCode": 3
-		};
-	    }
-	}
-    };
+        }
+    }
 
-    BRS.getSharedKeyWithAccount = function(account) {
-	try {
+    BRS.getSharedKeyWithAccount = function (account) {
+        try {
 	    if (account in _sharedKeys) {
-		return _sharedKeys[account];
+                return _sharedKeys[account]
 	    }
 
-	    var secretPhrase;
+	    let secretPhrase
 
 	    if (BRS.rememberPassword) {
-		secretPhrase = _password;
-	    }
-            else if (_decryptionPassword) {
-		secretPhrase = _decryptionPassword;
-	    }
-            else {
-		throw {
-		    "message": $.t("error_passphrase_required"),
-		    "errorCode": 3
-		};
+                secretPhrase = _password
+	    } else if (_decryptionPassword) {
+                secretPhrase = _decryptionPassword
+	    } else {
+                throw {
+		    message: $.t('error_passphrase_required'),
+		    errorCode: 3
+                }
 	    }
 
-	    var privateKey = converters.hexStringToByteArray(BRS.getPrivateKey(secretPhrase));
+	    const privateKey = converters.hexStringToByteArray(BRS.getPrivateKey(secretPhrase))
 
-	    var publicKey = converters.hexStringToByteArray(BRS.getPublicKey(account, true));
+	    const publicKey = converters.hexStringToByteArray(BRS.getPublicKey(account, true))
 
-	    var sharedKey = getSharedKey(privateKey, publicKey);
+	    const sharedKey = getSharedKey(privateKey, publicKey)
 
-	    var sharedKeys = Object.keys(_sharedKeys);
+	    const sharedKeys = Object.keys(_sharedKeys)
 
 	    if (sharedKeys.length > 50) {
-		delete _sharedKeys[sharedKeys[0]];
+                delete _sharedKeys[sharedKeys[0]]
 	    }
 
-	    _sharedKeys[account] = sharedKey;
-	} catch (err) {
-	    throw err;
-	}
-    };
+	    _sharedKeys[account] = sharedKey
+        } catch (err) {
+	    throw err
+        }
+    }
 
-    BRS.signBytes = function(message, secretPhrase) {
-	var messageBytes = converters.hexStringToByteArray(message);
-	var secretPhraseBytes = converters.hexStringToByteArray(secretPhrase);
+    BRS.signBytes = function (message, secretPhrase) {
+        const messageBytes = converters.hexStringToByteArray(message)
+        const secretPhraseBytes = converters.hexStringToByteArray(secretPhrase)
 
-	var digest = simpleHash(secretPhraseBytes);
-	var s = curve25519.keygen(digest).s;
+        const digest = simpleHash(secretPhraseBytes)
+        const s = curve25519.keygen(digest).s
 
-	var m = simpleHash(messageBytes);
+        const m = simpleHash(messageBytes)
 
-	_hash.init();
-	_hash.update(m);
-	_hash.update(s);
-	var x = _hash.getBytes();
+        _hash.init()
+        _hash.update(m)
+        _hash.update(s)
+        const x = _hash.getBytes()
 
-	var y = curve25519.keygen(x).p;
+        const y = curve25519.keygen(x).p
 
-	_hash.init();
-	_hash.update(m);
-	_hash.update(y);
-	var h = _hash.getBytes();
+        _hash.init()
+        _hash.update(m)
+        _hash.update(y)
+        const h = _hash.getBytes()
 
-	var v = curve25519.sign(h, x, s);
+        const v = curve25519.sign(h, x, s)
 
-	return converters.byteArrayToHexString(v.concat(h));
-    };
+        return converters.byteArrayToHexString(v.concat(h))
+    }
 
-    BRS.verifyBytes = function(signature, message, publicKey) {
-	var signatureBytes = converters.hexStringToByteArray(signature);
-	var messageBytes = converters.hexStringToByteArray(message);
-	var publicKeyBytes = converters.hexStringToByteArray(publicKey);
-	var v = signatureBytes.slice(0, 32);
-	var h = signatureBytes.slice(32);
-	var y = curve25519.verify(v, h, publicKeyBytes);
+    BRS.verifyBytes = function (signature, message, publicKey) {
+        const signatureBytes = converters.hexStringToByteArray(signature)
+        const messageBytes = converters.hexStringToByteArray(message)
+        const publicKeyBytes = converters.hexStringToByteArray(publicKey)
+        const v = signatureBytes.slice(0, 32)
+        const h = signatureBytes.slice(32)
+        const y = curve25519.verify(v, h, publicKeyBytes)
 
-	var m = simpleHash(messageBytes);
+        const m = simpleHash(messageBytes)
 
-	_hash.init();
-	_hash.update(m);
-	_hash.update(y);
-	var h2 = _hash.getBytes();
+        _hash.init()
+        _hash.update(m)
+        _hash.update(y)
+        const h2 = _hash.getBytes()
 
-	return areByteArraysEqual(h, h2);
-    };
+        return areByteArraysEqual(h, h2)
+    }
 
-    BRS.setEncryptionPassword = function(password) {
-	_password = password;
-    };
+    BRS.setEncryptionPassword = function (password) {
+        _password = password
+    }
 
-    BRS.getEncryptionPassword = function() {
-        return _password;
-    };
+    BRS.getEncryptionPassword = function () {
+        return _password
+    }
 
-    BRS.setDecryptionPassword = function(password) {
-	_decryptionPassword = password;
-    };
+    BRS.setDecryptionPassword = function (password) {
+        _decryptionPassword = password
+    }
 
-    BRS.addDecryptedTransaction = function(identifier, content) {
-	if (!_decryptedTransactions[identifier]) {
-	    _decryptedTransactions[identifier] = content;
-	}
-    };
+    BRS.addDecryptedTransaction = function (identifier, content) {
+        if (!_decryptedTransactions[identifier]) {
+	    _decryptedTransactions[identifier] = content
+        }
+    }
 
-    BRS.tryToDecryptMessage = function(message) {
-	if (_decryptedTransactions && _decryptedTransactions[message.transaction]) {
-	    return _decryptedTransactions[message.transaction].encryptedMessage;
-	}
+    BRS.tryToDecryptMessage = function (message) {
+        if (_decryptedTransactions && _decryptedTransactions[message.transaction]) {
+	    return _decryptedTransactions[message.transaction].encryptedMessage
+        }
 
-	try {
+        try {
 	    if (!message.attachment.encryptedMessage.data) {
-		return $.t("message_empty");
+                return $.t('message_empty')
+	    } else {
+                var decoded = BRS.decryptNote(message.attachment.encryptedMessage.data, {
+		    nonce: message.attachment.encryptedMessage.nonce,
+		    account: (message.recipient == BRS.account ? message.sender : message.recipient)
+                })
 	    }
-            else {
-		var decoded = BRS.decryptNote(message.attachment.encryptedMessage.data, {
-		    "nonce": message.attachment.encryptedMessage.nonce,
-		    "account": (message.recipient == BRS.account ? message.sender : message.recipient)
-		});
-	    }
 
-	    return decoded;
-	} catch (err) {
-	    throw err;
-	}
-    };
+	    return decoded
+        } catch (err) {
+	    throw err
+        }
+    }
 
-    BRS.tryToDecrypt = function(transaction, fields, account, options) {
-	var showDecryptionForm = false;
+    BRS.tryToDecrypt = function (transaction, fields, account, options) {
+        let showDecryptionForm = false
 
-	if (!options) {
-	    options = {};
-	}
+        if (!options) {
+	    options = {}
+        }
 
-	var nrFields = Object.keys(fields).length;
+        const nrFields = Object.keys(fields).length
 
-	var formEl = (options.formEl ? String(options.formEl).escapeHTML() : "#transaction_info_output_bottom");
-	var outputEl = (options.outputEl ? String(options.outputEl).escapeHTML() : "#transaction_info_output_bottom");
+        const formEl = (options.formEl ? String(options.formEl).escapeHTML() : '#transaction_info_output_bottom')
+        const outputEl = (options.outputEl ? String(options.outputEl).escapeHTML() : '#transaction_info_output_bottom')
 
-	var output = "";
+        let output = ''
 
-	var identifier = (options.identifier ? transaction[options.identifier] : transaction.transaction);
+        const identifier = (options.identifier ? transaction[options.identifier] : transaction.transaction)
 
-	//check in cache first..
-	if (_decryptedTransactions && _decryptedTransactions[identifier]) {
-	    var decryptedTransaction = _decryptedTransactions[identifier];
+        // check in cache first..
+        if (_decryptedTransactions && _decryptedTransactions[identifier]) {
+	    const decryptedTransaction = _decryptedTransactions[identifier]
 
-	    $.each(fields, function(key, title) {
-		if (typeof title != "string") {
-		    title = title.title;
-		}
+	    $.each(fields, function (key, title) {
+                if (typeof title !== 'string') {
+		    title = title.title
+                }
 
-		if (key in decryptedTransaction) {
-		    output += "<div style='" + (!options.noPadding && title ? "padding-left:5px;" : "") + "'>" + (title ? "<label" + (nrFields > 1 ? " style='margin-top:5px'" : "") + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + "</label>" : "") + "<div class='modal-text-box'>" + String(decryptedTransaction[key]).escapeHTML().nl2br() + "</div></div>";
-		}
-                else {
-		    //if a specific key was not found, the cache is outdated..
-		    output = "";
-		    delete _decryptedTransactions[identifier];
-		    return false;
-		}
-	    });
-	}
+                if (key in decryptedTransaction) {
+		    output += "<div style='" + (!options.noPadding && title ? 'padding-left:5px;' : '') + "'>" + (title ? '<label' + (nrFields > 1 ? " style='margin-top:5px'" : '') + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + '</label>' : '') + "<div class='modal-text-box'>" + String(decryptedTransaction[key]).escapeHTML().nl2br() + '</div></div>'
+                } else {
+		    // if a specific key was not found, the cache is outdated..
+		    output = ''
+		    delete _decryptedTransactions[identifier]
+		    return false
+                }
+	    })
+        }
 
-	if (!output) {
-	    $.each(fields, function(key, title) {
-		var data = "";
+        if (!output) {
+	    $.each(fields, function (key, title) {
+                let data = ''
 
-		var encrypted = "";
-		var nonce = "";
-		var nonceField = (typeof title != "string" ? title.nonce : key + "Nonce");
+                let encrypted = ''
+                let nonce = ''
+                const nonceField = (typeof title !== 'string' ? title.nonce : key + 'Nonce')
 
-		if (key == "encryptedMessage" || key == "encryptToSelfMessage") {
-		    encrypted = transaction.attachment[key].data;
-		    nonce = transaction.attachment[key].nonce;
-		}
-                else if (transaction.attachment && transaction.attachment[key]) {
-		    encrypted = transaction.attachment[key];
-		    nonce = transaction.attachment[nonceField];
-		}
-                else if (transaction[key] && typeof transaction[key] == "object") {
-		    encrypted = transaction[key].data;
-		    nonce = transaction[key].nonce;
-		}
-                else if (transaction[key]) {
-		    encrypted = transaction[key];
-		    nonce = transaction[nonceField];
-		}
-                else {
-		    encrypted = "";
-		}
+                if (key == 'encryptedMessage' || key == 'encryptToSelfMessage') {
+		    encrypted = transaction.attachment[key].data
+		    nonce = transaction.attachment[key].nonce
+                } else if (transaction.attachment && transaction.attachment[key]) {
+		    encrypted = transaction.attachment[key]
+		    nonce = transaction.attachment[nonceField]
+                } else if (transaction[key] && typeof transaction[key] === 'object') {
+		    encrypted = transaction[key].data
+		    nonce = transaction[key].nonce
+                } else if (transaction[key]) {
+		    encrypted = transaction[key]
+		    nonce = transaction[nonceField]
+                } else {
+		    encrypted = ''
+                }
 
-		if (encrypted) {
-		    if (typeof title != "string") {
-			title = title.title;
+                if (encrypted) {
+		    if (typeof title !== 'string') {
+                        title = title.title
 		    }
 
 		    try {
-                let destinationAccount = account
-                if (key === "encryptToSelfMessage") {
-                    destinationAccount = BRS.account
-                }
-			data = BRS.decryptNote(encrypted, {
-			    "nonce": nonce,
-			    "account": destinationAccount
-			});
+                        let destinationAccount = account
+                        if (key === 'encryptToSelfMessage') {
+                            destinationAccount = BRS.account
+                        }
+                        data = BRS.decryptNote(encrypted, {
+			    nonce,
+			    account: destinationAccount
+                        })
 		    } catch (err) {
-			var mesage = String(err.message ? err.message : err);
-			if (err.errorCode && err.errorCode == 1) {
-			    showDecryptionForm = true;
-			    return false;
-			}
-                        else {
+                        const mesage = String(err.message ? err.message : err)
+                        if (err.errorCode && err.errorCode == 1) {
+			    showDecryptionForm = true
+			    return false
+                        } else {
 			    if (title) {
-				var translatedTitle = BRS.getTranslatedFieldName(title).toLowerCase();
-				if (!translatedTitle) {
-				    translatedTitle = String(title).escapeHTML().toLowerCase();
-				}
+                                let translatedTitle = BRS.getTranslatedFieldName(title).toLowerCase()
+                                if (!translatedTitle) {
+				    translatedTitle = String(title).escapeHTML().toLowerCase()
+                                }
 
-				data = $.t("error_could_not_decrypt_var", {
-				    "var": translatedTitle
-				}).capitalize();
+                                data = $.t('error_could_not_decrypt_var', {
+				    var: translatedTitle
+                                }).capitalize()
+			    } else {
+                                data = $.t('error_could_not_decrypt')
 			    }
-                            else {
-				data = $.t("error_could_not_decrypt");
-			    }
-			}
+                        }
 		    }
 
-		    output += "<div style='" + (!options.noPadding && title ? "padding-left:5px;" : "") + "'>" + (title ? "<label" + (nrFields > 1 ? " style='margin-top:5px'" : "") + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + "</label>" : "") + "<div class='modal-text-box'>" + String(data).escapeHTML().nl2br() + "</div></div>";
-		}
-	    });
-	}
+		    output += "<div style='" + (!options.noPadding && title ? 'padding-left:5px;' : '') + "'>" + (title ? '<label' + (nrFields > 1 ? " style='margin-top:5px'" : '') + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + '</label>' : '') + "<div class='modal-text-box'>" + String(data).escapeHTML().nl2br() + '</div></div>'
+                }
+	    })
+        }
 
-	if (showDecryptionForm) {
+        if (showDecryptionForm) {
 	    _encryptedNote = {
-		"transaction": transaction,
-		"fields": fields,
-		"account": account,
-		"options": options,
-		"identifier": identifier
-	    };
+                transaction,
+                fields,
+                account,
+                options,
+                identifier
+	    }
 
-	    $("#decrypt_note_form_container").detach().appendTo(formEl);
+	    $('#decrypt_note_form_container').detach().appendTo(formEl)
 
-	    $("#decrypt_note_form_container, " + formEl).show();
-	}
-        else {
-	    BRS.removeDecryptionForm();
-	    $(outputEl).append(output).show();
-	}
-    };
+	    $('#decrypt_note_form_container, ' + formEl).show()
+        } else {
+	    BRS.removeDecryptionForm()
+	    $(outputEl).append(output).show()
+        }
+    }
 
-    BRS.removeDecryptionForm = function($modal) {
-	if (($modal && $modal.find("#decrypt_note_form_container").length) || (!$modal && $("#decrypt_note_form_container").length)) {
-	    $("#decrypt_note_form_container input").val("");
-	    $("#decrypt_note_form_container").find(".callout").html($.t("passphrase_required_to_decrypt_data"));
-	    $("#decrypt_note_form_container").hide().detach().appendTo("body");
-	}
-    };
+    BRS.removeDecryptionForm = function ($modal) {
+        if (($modal && $modal.find('#decrypt_note_form_container').length) || (!$modal && $('#decrypt_note_form_container').length)) {
+	    $('#decrypt_note_form_container input').val('')
+	    $('#decrypt_note_form_container').find('.callout').html($.t('passphrase_required_to_decrypt_data'))
+	    $('#decrypt_note_form_container').hide().detach().appendTo('body')
+        }
+    }
 
-    BRS.decryptNoteFormSubmit = function() {
-	var $form = $("#decrypt_note_form_container");
+    BRS.decryptNoteFormSubmit = function () {
+        const $form = $('#decrypt_note_form_container')
 
-	if (!_encryptedNote) {
-	    $form.find(".callout").html($.t("error_encrypted_note_not_found")).show();
-	    return;
-	}
+        if (!_encryptedNote) {
+	    $form.find('.callout').html($.t('error_encrypted_note_not_found')).show()
+	    return
+        }
 
-	var password = $form.find("input[name=secretPhrase]").val();
+        let password = $form.find('input[name=secretPhrase]').val()
 
-	if (!password) {
+        if (!password) {
 	    if (BRS.rememberPassword) {
-		password = _password;
+                password = _password
+	    } else if (_decryptionPassword) {
+                password = _decryptionPassword
+	    } else {
+                $form.find('.callout').html($.t('error_passphrase_required')).show()
+                return
 	    }
-            else if (_decryptionPassword) {
-		password = _decryptionPassword;
-	    }
-            else {
-		$form.find(".callout").html($.t("error_passphrase_required")).show();
-		return;
-	    }
-	}
+        }
 
-	var accountId = BRS.getAccountId(password);
-	if (accountId != BRS.account) {
-	    $form.find(".callout").html($.t("error_incorrect_passphrase")).show();
-	    return;
-	}
+        const accountId = BRS.getAccountId(password)
+        if (accountId != BRS.account) {
+	    $form.find('.callout').html($.t('error_incorrect_passphrase')).show()
+	    return
+        }
 
-	var rememberPassword = $form.find("input[name=rememberPassword]").is(":checked");
+        const rememberPassword = $form.find('input[name=rememberPassword]').is(':checked')
 
-	var otherAccount = _encryptedNote.account;
+        const otherAccount = _encryptedNote.account
 
-	var output = "";
-	var decryptionError = false;
-	var decryptedFields = {};
+        let output = ''
+        let decryptionError = false
+        const decryptedFields = {}
 
-	var inAttachment = ("attachment" in _encryptedNote.transaction);
+        const inAttachment = ('attachment' in _encryptedNote.transaction)
 
-	var nrFields = Object.keys(_encryptedNote.fields).length;
+        const nrFields = Object.keys(_encryptedNote.fields).length
 
-	$.each(_encryptedNote.fields, function(key, title) {
-	    var data = "";
+        $.each(_encryptedNote.fields, function (key, title) {
+	    let data = ''
 
-	    var encrypted = "";
-	    var nonce = "";
-	    var nonceField = (typeof title != "string" ? title.nonce : key + "Nonce");
+	    let encrypted = ''
+	    let nonce = ''
+	    const nonceField = (typeof title !== 'string' ? title.nonce : key + 'Nonce')
 
-	    if (key == "encryptedMessage" || key == "encryptToSelfMessage") {
-		encrypted = _encryptedNote.transaction.attachment[key].data;
-		nonce = _encryptedNote.transaction.attachment[key].nonce;
-	    }
-            else if (_encryptedNote.transaction.attachment && _encryptedNote.transaction.attachment[key]) {
-		encrypted = _encryptedNote.transaction.attachment[key];
-		nonce = _encryptedNote.transaction.attachment[nonceField];
-	    }
-            else if (_encryptedNote.transaction[key] && typeof _encryptedNote.transaction[key] == "object") {
-		encrypted = _encryptedNote.transaction[key].data;
-		nonce = _encryptedNote.transaction[key].nonce;
-	    }
-            else if (_encryptedNote.transaction[key]) {
-		encrypted = _encryptedNote.transaction[key];
-		nonce = _encryptedNote.transaction[nonceField];
-	    }
-            else {
-		encrypted = "";
+	    if (key == 'encryptedMessage' || key == 'encryptToSelfMessage') {
+                encrypted = _encryptedNote.transaction.attachment[key].data
+                nonce = _encryptedNote.transaction.attachment[key].nonce
+	    } else if (_encryptedNote.transaction.attachment && _encryptedNote.transaction.attachment[key]) {
+                encrypted = _encryptedNote.transaction.attachment[key]
+                nonce = _encryptedNote.transaction.attachment[nonceField]
+	    } else if (_encryptedNote.transaction[key] && typeof _encryptedNote.transaction[key] === 'object') {
+                encrypted = _encryptedNote.transaction[key].data
+                nonce = _encryptedNote.transaction[key].nonce
+	    } else if (_encryptedNote.transaction[key]) {
+                encrypted = _encryptedNote.transaction[key]
+                nonce = _encryptedNote.transaction[nonceField]
+	    } else {
+                encrypted = ''
 	    }
 
 	    if (encrypted) {
-		if (typeof title != "string") {
-		    title = title.title;
-		}
+                if (typeof title !== 'string') {
+		    title = title.title
+                }
 
-		try {
-            let destinationAccount = otherAccount
-            if (key === "encryptToSelfMessage") {
-                destinationAccount = BRS.account
-            }
+                try {
+                    let destinationAccount = otherAccount
+                    if (key === 'encryptToSelfMessage') {
+                        destinationAccount = BRS.account
+                    }
 		    data = BRS.decryptNote(encrypted, {
-			"nonce": nonce,
-			"account": destinationAccount
-		    }, password);
+                        nonce,
+                        account: destinationAccount
+		    }, password)
 
-		    decryptedFields[key] = data;
-		} catch (err) {
-		    decryptionError = true;
-		    var message = String(err.message ? err.message : err);
+		    decryptedFields[key] = data
+                } catch (err) {
+		    decryptionError = true
+		    const message = String(err.message ? err.message : err)
 
-		    $form.find(".callout").html(message.escapeHTML());
-		    return false;
-		}
+		    $form.find('.callout').html(message.escapeHTML())
+		    return false
+                }
 
-		output += "<div style='" + (!_encryptedNote.options.noPadding && title ? "padding-left:5px;" : "") + "'>" + (title ? "<label" + (nrFields > 1 ? " style='margin-top:5px'" : "") + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + "</label>" : "") + "<div class='modal-text-box'>" + String(data).escapeHTML().nl2br() + "</div></div>";
+                output += "<div style='" + (!_encryptedNote.options.noPadding && title ? 'padding-left:5px;' : '') + "'>" + (title ? '<label' + (nrFields > 1 ? " style='margin-top:5px'" : '') + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + '</label>' : '') + "<div class='modal-text-box'>" + String(data).escapeHTML().nl2br() + '</div></div>'
 	    }
-	});
+        })
 
-	if (decryptionError) {
-	    return;
-	}
+        if (decryptionError) {
+	    return
+        }
 
-	_decryptedTransactions[_encryptedNote.identifier] = decryptedFields;
+        _decryptedTransactions[_encryptedNote.identifier] = decryptedFields
 
-	//only save 150 decryptions maximum in cache...
-	var decryptionKeys = Object.keys(_decryptedTransactions);
+        // only save 150 decryptions maximum in cache...
+        const decryptionKeys = Object.keys(_decryptedTransactions)
 
-	if (decryptionKeys.length > 150) {
-	    delete _decryptedTransactions[decryptionKeys[0]];
-	}
+        if (decryptionKeys.length > 150) {
+	    delete _decryptedTransactions[decryptionKeys[0]]
+        }
 
-	BRS.removeDecryptionForm();
+        BRS.removeDecryptionForm()
 
-	var outputEl = (_encryptedNote.options.outputEl ? String(_encryptedNote.options.outputEl).escapeHTML() : "#transaction_info_output_bottom");
+        const outputEl = (_encryptedNote.options.outputEl ? String(_encryptedNote.options.outputEl).escapeHTML() : '#transaction_info_output_bottom')
 
-	$(outputEl).append(output).show();
+        $(outputEl).append(output).show()
 
-	_encryptedNote = null;
+        _encryptedNote = null
 
-	if (rememberPassword) {
-	    _decryptionPassword = password;
-	}
-    };
+        if (rememberPassword) {
+	    _decryptionPassword = password
+        }
+    }
 
-    BRS.decryptAllMessages = function(messages, password) {
-	if (!password) {
+    BRS.decryptAllMessages = function (messages, password) {
+        if (!password) {
 	    throw {
-		"message": $.t("error_passphrase_required"),
-		"errorCode": 1
-	    };
-	}
-        else {
-	    var accountId = BRS.getAccountId(password);
-	    if (accountId != BRS.account) {
-		throw {
-		    "message": $.t("error_incorrect_passphrase"),
-		    "errorCode": 2
-		};
+                message: $.t('error_passphrase_required'),
+                errorCode: 1
 	    }
-	}
+        } else {
+	    const accountId = BRS.getAccountId(password)
+	    if (accountId != BRS.account) {
+                throw {
+		    message: $.t('error_incorrect_passphrase'),
+		    errorCode: 2
+                }
+	    }
+        }
 
-	var success = 0;
-	var error = 0;
+        let success = 0
+        let error = 0
 
-	for (var i = 0; i < messages.length; i++) {
-	    var message = messages[i];
+        for (let i = 0; i < messages.length; i++) {
+	    const message = messages[i]
 
 	    if (message.attachment.encryptedMessage && !_decryptedTransactions[message.transaction]) {
-		try {
-		    var otherUser = (message.sender == BRS.account ? message.recipient : message.sender);
+                try {
+		    const otherUser = (message.sender == BRS.account ? message.recipient : message.sender)
 
-		    var decoded = BRS.decryptNote(message.attachment.encryptedMessage.data, {
-			"nonce": message.attachment.encryptedMessage.nonce,
-			"account": otherUser
-		    }, password);
+		    const decoded = BRS.decryptNote(message.attachment.encryptedMessage.data, {
+                        nonce: message.attachment.encryptedMessage.nonce,
+                        account: otherUser
+		    }, password)
 
 		    _decryptedTransactions[message.transaction] = {
-			"encryptedMessage": decoded
-		    };
+                        encryptedMessage: decoded
+		    }
 
-		    success++;
-		} catch (err) {
+		    success++
+                } catch (err) {
 		    _decryptedTransactions[message.transaction] = {
-			"encryptedMessage": $.t("error_decryption_unknown")
-		    };
-		    error++;
-		}
+                        encryptedMessage: $.t('error_decryption_unknown')
+		    }
+		    error++
+                }
 	    }
-	}
+        }
 
-	if (success || !error) {
-	    return true;
-	}
-        else {
-	    return false;
-	}
-    };
-
-    function simpleHash(message) {
-	_hash.init();
-	_hash.update(message);
-	return _hash.getBytes();
+        if (success || !error) {
+	    return true
+        } else {
+	    return false
+        }
     }
 
-    function areByteArraysEqual(bytes1, bytes2) {
-	if (bytes1.length !== bytes2.length)
-	    return false;
-
-	for (var i = 0; i < bytes1.length; ++i) {
-	    if (bytes1[i] !== bytes2[i])
-		return false;
-	}
-
-	return true;
+    function simpleHash (message) {
+        _hash.init()
+        _hash.update(message)
+        return _hash.getBytes()
     }
 
-    function curve25519_clamp(curve) {
-	curve[0] &= 0xFFF8;
-	curve[15] &= 0x7FFF;
-	curve[15] |= 0x4000;
-	return curve;
+    function areByteArraysEqual (bytes1, bytes2) {
+        if (bytes1.length !== bytes2.length) {
+            return false
+        }
+
+        for (let i = 0; i < bytes1.length; ++i) {
+	    if (bytes1[i] !== bytes2[i]) {
+                return false
+            }
+        }
+
+        return true
     }
 
-    function byteArrayToBigInteger(byteArray, startIndex) {
-	var value = new BigInteger("0", 10);
-	var temp1, temp2;
-	for (var i = byteArray.length - 1; i >= 0; i--) {
-	    temp1 = value.multiply(new BigInteger("256", 10));
-	    temp2 = temp1.add(new BigInteger(byteArray[i].toString(10), 10));
-	    value = temp2;
-	}
-
-	return value;
+    function curve25519_clamp (curve) {
+        curve[0] &= 0xFFF8
+        curve[15] &= 0x7FFF
+        curve[15] |= 0x4000
+        return curve
     }
 
-    function aesEncrypt(plaintext, options) {
-	if (!window.crypto && !window.msCrypto) {
+    function byteArrayToBigInteger (byteArray, startIndex) {
+        let value = new BigInteger('0', 10)
+        let temp1, temp2
+        for (let i = byteArray.length - 1; i >= 0; i--) {
+	    temp1 = value.multiply(new BigInteger('256', 10))
+	    temp2 = temp1.add(new BigInteger(byteArray[i].toString(10), 10))
+	    value = temp2
+        }
+
+        return value
+    }
+
+    function aesEncrypt (plaintext, options) {
+        if (!window.crypto && !window.msCrypto) {
 	    throw {
-		"errorCode": -1,
-		"message": $.t("error_encryption_browser_support")
-	    };
-	}
+                errorCode: -1,
+                message: $.t('error_encryption_browser_support')
+	    }
+        }
 
-	// CryptoJS likes WordArray parameters
-	var text = converters.byteArrayToWordArray(plaintext);
+        // CryptoJS likes WordArray parameters
+        const text = converters.byteArrayToWordArray(plaintext)
 
-	if (!options.sharedKey) {
-	    var sharedKey = getSharedKey(options.privateKey, options.publicKey);
-	}
-        else {
-	    var sharedKey = options.sharedKey.slice(0); //clone
-	}
+        if (!options.sharedKey) {
+	    var sharedKey = getSharedKey(options.privateKey, options.publicKey)
+        } else {
+	    var sharedKey = options.sharedKey.slice(0) // clone
+        }
 
-	for (var i = 0; i < 32; i++) {
-	    sharedKey[i] ^= options.nonce[i];
-	}
+        for (let i = 0; i < 32; i++) {
+	    sharedKey[i] ^= options.nonce[i]
+        }
 
-	var key = CryptoJS.SHA256(converters.byteArrayToWordArray(sharedKey));
+        const key = CryptoJS.SHA256(converters.byteArrayToWordArray(sharedKey))
 
-	var tmp = new Uint8Array(16);
+        const tmp = new Uint8Array(16)
 
-	if (window.crypto) {
-	    window.crypto.getRandomValues(tmp);
-	}
-        else {
-	    window.msCrypto.getRandomValues(tmp);
-	}
+        if (window.crypto) {
+	    window.crypto.getRandomValues(tmp)
+        } else {
+	    window.msCrypto.getRandomValues(tmp)
+        }
 
-	var iv = converters.byteArrayToWordArray(tmp);
-	var encrypted = CryptoJS.AES.encrypt(text, key, {
-	    iv: iv
-	});
+        const iv = converters.byteArrayToWordArray(tmp)
+        const encrypted = CryptoJS.AES.encrypt(text, key, {
+	    iv
+        })
 
-	var ivOut = converters.wordArrayToByteArray(encrypted.iv);
+        const ivOut = converters.wordArrayToByteArray(encrypted.iv)
 
-	var ciphertextOut = converters.wordArrayToByteArray(encrypted.ciphertext);
+        const ciphertextOut = converters.wordArrayToByteArray(encrypted.ciphertext)
 
-	return ivOut.concat(ciphertextOut);
+        return ivOut.concat(ciphertextOut)
     }
 
-    function aesDecrypt(ivCiphertext, options) {
-	if (ivCiphertext.length < 16 || ivCiphertext.length % 16 != 0) {
+    function aesDecrypt (ivCiphertext, options) {
+        if (ivCiphertext.length < 16 || ivCiphertext.length % 16 != 0) {
 	    throw {
-		name: "invalid ciphertext"
-	    };
-	}
+                name: 'invalid ciphertext'
+	    }
+        }
 
-	var iv = converters.byteArrayToWordArray(ivCiphertext.slice(0, 16));
-	var ciphertext = converters.byteArrayToWordArray(ivCiphertext.slice(16));
+        const iv = converters.byteArrayToWordArray(ivCiphertext.slice(0, 16))
+        const ciphertext = converters.byteArrayToWordArray(ivCiphertext.slice(16))
 
-	if (!options.sharedKey) {
-	    var sharedKey = getSharedKey(options.privateKey, options.publicKey);
-	}
-        else {
-	    var sharedKey = options.sharedKey.slice(0); //clone
-	}
+        if (!options.sharedKey) {
+	    var sharedKey = getSharedKey(options.privateKey, options.publicKey)
+        } else {
+	    var sharedKey = options.sharedKey.slice(0) // clone
+        }
 
-	for (var i = 0; i < 32; i++) {
-	    sharedKey[i] ^= options.nonce[i];
-	}
+        for (let i = 0; i < 32; i++) {
+	    sharedKey[i] ^= options.nonce[i]
+        }
 
-	var key = CryptoJS.SHA256(converters.byteArrayToWordArray(sharedKey));
+        const key = CryptoJS.SHA256(converters.byteArrayToWordArray(sharedKey))
 
-	var encrypted = CryptoJS.lib.CipherParams.create({
-	    ciphertext: ciphertext,
-	    iv: iv,
-	    key: key
-	});
+        const encrypted = CryptoJS.lib.CipherParams.create({
+	    ciphertext,
+	    iv,
+	    key
+        })
 
-	var decrypted = CryptoJS.AES.decrypt(encrypted, key, {
-	    iv: iv
-	});
+        const decrypted = CryptoJS.AES.decrypt(encrypted, key, {
+	    iv
+        })
 
-	var plaintext = converters.wordArrayToByteArray(decrypted);
+        const plaintext = converters.wordArrayToByteArray(decrypted)
 
-	return plaintext;
+        return plaintext
     }
 
-    function encryptData(plaintext, options) {
-	if (!window.crypto && !window.msCrypto) {
+    function encryptData (plaintext, options) {
+        if (!window.crypto && !window.msCrypto) {
 	    throw {
-		"errorCode": -1,
-		"message": $.t("error_encryption_browser_support")
-	    };
-	}
+                errorCode: -1,
+                message: $.t('error_encryption_browser_support')
+	    }
+        }
 
-	if (!options.sharedKey) {
-	    options.sharedKey = getSharedKey(options.privateKey, options.publicKey);
-	}
+        if (!options.sharedKey) {
+	    options.sharedKey = getSharedKey(options.privateKey, options.publicKey)
+        }
 
-	var compressedPlaintext = pako.gzip(new Uint8Array(plaintext));
+        const compressedPlaintext = pako.gzip(new Uint8Array(plaintext))
 
-	options.nonce = new Uint8Array(32);
+        options.nonce = new Uint8Array(32)
 
-	if (window.crypto) {
-	    window.crypto.getRandomValues(options.nonce);
-	}
-        else {
-	    window.msCrypto.getRandomValues(options.nonce);
-	}
+        if (window.crypto) {
+	    window.crypto.getRandomValues(options.nonce)
+        } else {
+	    window.msCrypto.getRandomValues(options.nonce)
+        }
 
-	var data = aesEncrypt(compressedPlaintext, options);
+        const data = aesEncrypt(compressedPlaintext, options)
 
-	return {
-	    "nonce": options.nonce,
-	    "data": data
-	};
+        return {
+	    nonce: options.nonce,
+	    data
+        }
     }
 
-    function decryptData(data, options) {
-	if (!options.sharedKey) {
-	    options.sharedKey = getSharedKey(options.privateKey, options.publicKey);
-	}
+    function decryptData (data, options) {
+        if (!options.sharedKey) {
+	    options.sharedKey = getSharedKey(options.privateKey, options.publicKey)
+        }
 
-	var compressedPlaintext = aesDecrypt(data, options);
+        const compressedPlaintext = aesDecrypt(data, options)
 
-	var binData = new Uint8Array(compressedPlaintext);
+        const binData = new Uint8Array(compressedPlaintext)
 
-	var data = pako.inflate(binData);
+        var data = pako.inflate(binData)
 
-	return converters.byteArrayToString(data);
+        return converters.byteArrayToString(data)
     }
 
-    function getSharedKey(key1, key2) {
-	return converters.shortArrayToByteArray(curve25519_(converters.byteArrayToShortArray(key1), converters.byteArrayToShortArray(key2), null));
+    function getSharedKey (key1, key2) {
+        return converters.shortArrayToByteArray(curve25519_(converters.byteArrayToShortArray(key1), converters.byteArrayToShortArray(key2), null))
     }
 
-    return BRS;
-}(BRS || {}, jQuery));
+    return BRS
+}(BRS || {}, jQuery))

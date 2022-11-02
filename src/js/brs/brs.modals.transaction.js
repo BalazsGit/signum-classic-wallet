@@ -2,40 +2,39 @@
  * @depends {brs.js}
  * @depends {brs.modals.js}
  */
-var message = "";
-var BRS = (function(BRS, $, undefined) {
-
-    BRS.showTransactionModal = function(transaction) {
+let message = ''
+var BRS = (function (BRS, $, undefined) {
+    BRS.showTransactionModal = function (transaction) {
         if (BRS.fetchingModalData) {
-            return;
+            return
         }
 
-        BRS.fetchingModalData = true;
+        BRS.fetchingModalData = true
 
-        $("#transaction_info_output_top, #transaction_info_output_bottom, #transaction_info_bottom").html("").hide();
-        $("#transaction_info_callout").hide();
-        $("#transaction_info_table").hide();
-        $("#transaction_info_table tbody").empty();
+        $('#transaction_info_output_top, #transaction_info_output_bottom, #transaction_info_bottom').html('').hide()
+        $('#transaction_info_callout').hide()
+        $('#transaction_info_table').hide()
+        $('#transaction_info_table tbody').empty()
 
-        if (typeof transaction != "object") {
-            BRS.sendRequest("getTransaction", {
-                    "transaction": transaction
-            }, function(response, input) {
-                    response.transaction = input.transaction;
-                    BRS.processTransactionModalData(response);
-            });
+        if (typeof transaction !== 'object') {
+            BRS.sendRequest('getTransaction', {
+                transaction
+            }, function (response, input) {
+                response.transaction = input.transaction
+                BRS.processTransactionModalData(response)
+            })
         } else {
-            BRS.processTransactionModalData(transaction);
+            BRS.processTransactionModalData(transaction)
         }
-    };
+    }
 
-    BRS.processTransactionModalData = function(transaction) {
+    BRS.processTransactionModalData = function (transaction) {
         let data
         let async = false
         let assetDetails, helperStr
         let details
 
-        function processTransactionModalDataMain() {
+        function processTransactionModalDataMain () {
             processInfoDetails()
             processButtons()
             processDefaultProperties()
@@ -53,14 +52,14 @@ var BRS = (function(BRS, $, undefined) {
                 delete transactionDetails.referencedTransaction
             }
             delete transactionDetails.transaction
-        
+
             $('#transaction_info_modal_transaction').html(String(transaction.transaction).escapeHTML())
             $('#transaction_info_tab_link').tab('show')
             $('#transaction_info_details_table tbody').empty().append(BRS.createInfoTable(transactionDetails, true))
             $('#transaction_info_table tbody').empty()
         }
-    
-        function processButtons() {
+
+        function processButtons () {
             let accountButton
             if (transaction.senderRS == BRS.accountRS) {
                 $('#transaction_info_actions').hide()
@@ -72,14 +71,14 @@ var BRS = (function(BRS, $, undefined) {
                     accountButton = transaction.senderRS
                     $('#transaction_info_modal_add_as_contact').show()
                 }
-                    $('#transaction_info_actions').show()
+                $('#transaction_info_actions').show()
                 $('#transaction_info_actions_tab button').data('account', accountButton)
             }
         }
-    
+
         function processDefaultProperties () {
             details = BRS.getTransactionDetails(transaction)
-            const amount_formatted = BRS.formatAmount(new BigInteger(String(transaction.amountNQT))) + " " + BRS.valueSuffix;
+            const amount_formatted = BRS.formatAmount(new BigInteger(String(transaction.amountNQT))) + ' ' + BRS.valueSuffix
             data = {
                 type: details.nameOfTransaction,
                 timestamp: BRS.formatTimestamp(transaction.timestamp),
@@ -96,7 +95,7 @@ var BRS = (function(BRS, $, undefined) {
             }
         }
 
-        function transactionEndLoad() {
+        function transactionEndLoad () {
             $('#transaction_info_table tbody').append(BRS.createInfoTable(data))
             $('#transaction_info_modal').modal('show')
             $('#transaction_info_table').show()
@@ -106,29 +105,29 @@ var BRS = (function(BRS, $, undefined) {
         function processExceptionProperties () {
             switch (transaction.type) {
             case 0:
-                pePayment();
+                pePayment()
                 return
             case 1:
-                peMessaging();
+                peMessaging()
                 return
             case 2:
-                peColoredCoins();
-                return;
+                peColoredCoins()
+                return
             case 3:
-                peDigitalGoods();
-                return;
+                peDigitalGoods()
+                return
             case 4:
                 if (transaction.subtype === 0) {
                     // balance leasing
-                    data['period'] = transaction.attachment.period
+                    data.period = transaction.attachment.period
                 }
                 return
             case 20:
-                peMining();
-                return;
+                peMining()
+                return
             case 21:
                 peAdvancedPayment()
-                break;
+                break
             case 22:
                 peAutomatedTransactions()
             }
@@ -144,61 +143,60 @@ var BRS = (function(BRS, $, undefined) {
                 recipientHTML = ''
                 for (let i = 0; i < transaction.attachment.recipients.length; i++) {
                     const rsAddress = BRS.convertNumericToRSAccountFormat(transaction.attachment.recipients[i][0])
-                    const amount = BRS.formatAmount(transaction.attachment.recipients[i][1]) + " " + BRS.valueSuffix;
+                    const amount = BRS.formatAmount(transaction.attachment.recipients[i][1]) + ' ' + BRS.valueSuffix
                     if (i !== 0) {
-                        recipientHTML += "<br />";
+                        recipientHTML += '<br />'
                     }
                     if (rsAddress === BRS.accountRS) {
-                        recipientHTML += `<strong class="mono-font">${rsAddress}</strong>: ${amount}`;
+                        recipientHTML += `<strong class="mono-font">${rsAddress}</strong>: ${amount}`
                         youReceived = true
                         amountToYou = amount
                     } else {
-                        recipientHTML += `<span class="mono-font">${rsAddress}</span>: ${amount}`;
+                        recipientHTML += `<span class="mono-font">${rsAddress}</span>: ${amount}`
                     }
                 }
                 delete data.recipient_formatted_html
-                data["you_received"] = youReceived ? $.t('yes') : $.t('no')
-                if (youReceived)  data['amount_to_you'] = amountToYou
-                data['recipient_formatted_html'] = recipientHTML
+                data.you_received = youReceived ? $.t('yes') : $.t('no')
+                if (youReceived) data.amount_to_you = amountToYou
+                data.recipient_formatted_html = recipientHTML
                 return
             case 2:
                 // Multi-out same
-                const amountEach = parseInt(transaction.amountNQT) / transaction.attachment.recipients.length;
-                recipientHTML = '';
+                const amountEach = parseInt(transaction.amountNQT) / transaction.attachment.recipients.length
+                recipientHTML = ''
                 for (let i = 0; i < transaction.attachment.recipients.length; i++) {
                     const rsAddress = BRS.convertNumericToRSAccountFormat(transaction.attachment.recipients[i])
                     if (i !== 0) {
-                        recipientHTML += "<br />";
+                        recipientHTML += '<br />'
                     }
                     if (rsAddress === BRS.accountRS) {
-                        recipientHTML += `<strong class="mono-font">${rsAddress}</strong>`;
+                        recipientHTML += `<strong class="mono-font">${rsAddress}</strong>`
                         youReceived = true
                     } else {
-                        recipientHTML += `<span class="mono-font">${rsAddress}</span>`;
+                        recipientHTML += `<span class="mono-font">${rsAddress}</span>`
                     }
                 }
                 delete data.recipient_formatted_html
-                data["you_received"] = youReceived ? $.t('yes') : $.t('no')
-                data["amount_each_formatted_html"] = BRS.formatAmount(amountEach.toString()) + " " + BRS.valueSuffix,
-                data['recipient_formatted_html'] = recipientHTML
-                return
+                data.you_received = youReceived ? $.t('yes') : $.t('no')
+                data.amount_each_formatted_html = BRS.formatAmount(amountEach.toString()) + ' ' + BRS.valueSuffix,
+                data.recipient_formatted_html = recipientHTML
             }
         }
 
-        function peMessaging() {
+        function peMessaging () {
             switch (transaction.subtype) {
             case 1:
                 // alias assignment
-                data.alias = transaction.attachment.alias;
+                data.alias = transaction.attachment.alias
                 data.data_formatted_html = transaction.attachment.uri.autoLink()
                 return
             case 6:
                 // alias sale/transfer/sale cancelation
                 data.alias_name = transaction.attachment.alias
                 if (details.nameOfTransaction === $.t('alias_sale')) {
-                    peMessagingAliasSale();
+                    peMessagingAliasSale()
                 }
-                return;
+                return
             case 7:
                 // alias buy
                 data.alias_name = transaction.attachment.alias
@@ -249,47 +247,47 @@ var BRS = (function(BRS, $, undefined) {
             case 0:
                 // asset issuance
                 assetDetails = BRS.getAssetDetails(BRS.fullHashToId(transaction.fullHash))
-                data['name_formatted_html'] = BRS.getAssetLink(assetDetails)
-                data['description'] = transaction.attachment.description.escapeHTML()
-                data['quantity'] = [transaction.attachment.quantityQNT, transaction.attachment.decimals]
-                data['decimals'] = transaction.attachment.decimals
+                data.name_formatted_html = BRS.getAssetLink(assetDetails)
+                data.description = transaction.attachment.description.escapeHTML()
+                data.quantity = [transaction.attachment.quantityQNT, transaction.attachment.decimals]
+                data.decimals = transaction.attachment.decimals
                 if (transaction.attachment.mintable === true) {
-                    data.mintable = $.t("yes")
+                    data.mintable = $.t('yes')
                 } else {
-                    data.mintable = $.t("no")
+                    data.mintable = $.t('no')
                 }
-                break;
+                break
             case 1:
                 // asset transfer
                 assetDetails = BRS.getAssetDetails(transaction.attachment.asset)
                 if (!assetDetails) {
-                    break;
+                    break
                 }
-                data['asset_name_formatted_html'] = BRS.getAssetLink(assetDetails)
-                data['quantity'] = [transaction.attachment.quantityQNT, assetDetails.decimals]
-                break;
+                data.asset_name_formatted_html = BRS.getAssetLink(assetDetails)
+                data.quantity = [transaction.attachment.quantityQNT, assetDetails.decimals]
+                break
             case 2:
                 // ask order placement
                 assetDetails = BRS.getAssetDetails(transaction.attachment.asset)
                 if (!assetDetails) {
-                    break;
+                    break
                 }
-                data['asset_name_formatted_html'] = BRS.getAssetLink(assetDetails)
-                data['quantity'] = [transaction.attachment.quantityQNT, assetDetails.decimals]
-                data['price_formatted_html'] = BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, assetDetails.decimals) + ' ' + BRS.valueSuffix
-                data['total_formatted_html'] = BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + ' ' + BRS.valueSuffix
-                break;
+                data.asset_name_formatted_html = BRS.getAssetLink(assetDetails)
+                data.quantity = [transaction.attachment.quantityQNT, assetDetails.decimals]
+                data.price_formatted_html = BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, assetDetails.decimals) + ' ' + BRS.valueSuffix
+                data.total_formatted_html = BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + ' ' + BRS.valueSuffix
+                break
             case 3:
                 // bid order placement
                 assetDetails = BRS.getAssetDetails(transaction.attachment.asset)
                 if (!assetDetails) {
-                    break;
+                    break
                 }
-                data['asset_name_formatted_html'] = BRS.getAssetLink(assetDetails)
-                data['quantity'] = [transaction.attachment.quantityQNT, assetDetails.decimals]
-                data['price_formatted_html'] = BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, assetDetails.decimals) + ' ' + BRS.valueSuffix
-                data['total_formatted_html'] = BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + ' ' + BRS.valueSuffix
-                break;
+                data.asset_name_formatted_html = BRS.getAssetLink(assetDetails)
+                data.quantity = [transaction.attachment.quantityQNT, assetDetails.decimals]
+                data.price_formatted_html = BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, assetDetails.decimals) + ' ' + BRS.valueSuffix
+                data.total_formatted_html = BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + ' ' + BRS.valueSuffix
+                break
             case 4:
             case 5:
                 // ask order cancellation
@@ -300,61 +298,61 @@ var BRS = (function(BRS, $, undefined) {
                     transaction: transaction.attachment.order
                 }, function (transactionII) {
                     if (transactionII.errorCode) {
-                        return;
+                        return
                     }
                     const asset = BRS.getAssetDetails(transactionII.attachment.asset)
                     if (!asset) {
-                        return;
+                        return
                     }
-                    data['asset_name_formatted_html'] = BRS.getAssetLink(assetDetails)
-                    data['quantity'] = [transactionII.attachment.quantityQNT, asset.decimals]
-                    data['price_formatted_html'] = BRS.formatOrderPricePerWholeQNT(transactionII.attachment.priceNQT, asset.decimals) + ' ' + BRS.valueSuffix
-                    data['total_formatted_html'] = BRS.formatAmount(BRS.calculateOrderTotalNQT(transactionII.attachment.quantityQNT, transactionII.attachment.priceNQT)) + ' ' + BRS.valueSuffix
+                    data.asset_name_formatted_html = BRS.getAssetLink(assetDetails)
+                    data.quantity = [transactionII.attachment.quantityQNT, asset.decimals]
+                    data.price_formatted_html = BRS.formatOrderPricePerWholeQNT(transactionII.attachment.priceNQT, asset.decimals) + ' ' + BRS.valueSuffix
+                    data.total_formatted_html = BRS.formatAmount(BRS.calculateOrderTotalNQT(transactionII.attachment.quantityQNT, transactionII.attachment.priceNQT)) + ' ' + BRS.valueSuffix
                     transactionEndLoad()
                 })
-                break;
+                break
             case 6:
                 assetDetails = BRS.getAssetDetails(transaction.attachment.asset)
                 if (!assetDetails) {
-                    break;
+                    break
                 }
-                data['asset_name_formatted_html'] = BRS.getAssetLink(assetDetails)
-                data['quantity'] = [transaction.attachment.quantityQNT, assetDetails.decimals]
+                data.asset_name_formatted_html = BRS.getAssetLink(assetDetails)
+                data.quantity = [transaction.attachment.quantityQNT, assetDetails.decimals]
                 break
             case 7:
                 assetDetails = BRS.getAssetDetails(BRS.fullHashToId(transaction.referencedTransactionFullHash))
                 if (!assetDetails) {
-                    break;
+                    break
                 }
-                data['asset_name_formatted_html'] = BRS.getAssetLink(assetDetails)
-                break;
+                data.asset_name_formatted_html = BRS.getAssetLink(assetDetails)
+                break
             case 8:
                 peColoredCoinsDistributeToHolders()
-                break;
+                break
             case 9:
                 helperStr = ''
-                for (let i=0; i< transaction.attachment.assetIds.length; i++) {
+                for (let i = 0; i < transaction.attachment.assetIds.length; i++) {
                     if (i !== 0) {
                         helperStr += '<br>'
                     }
                     foundAsset = BRS.getAssetDetails(transaction.attachment.assetIds[i])
                     if (foundAsset) {
-                        helperStr += `${BRS.formatQuantity(transaction.attachment.quantitiesQNT[i], foundAsset.decimals)} ${BRS.getAssetLink(foundAsset)}`;
+                        helperStr += `${BRS.formatQuantity(transaction.attachment.quantitiesQNT[i], foundAsset.decimals)} ${BRS.getAssetLink(foundAsset)}`
                     } else {
-                        helperStr += `${transaction.attachment.quantityQNT} [QNT]`;
+                        helperStr += `${transaction.attachment.quantityQNT} [QNT]`
                     }
                 }
-                data['assets_transferred_formatted_html'] = helperStr
-                break;
+                data.assets_transferred_formatted_html = helperStr
+                break
             }
         }
 
-        function peColoredCoinsDistributeToHolders() {
+        function peColoredCoinsDistributeToHolders () {
             async = true
-            data['toHoldersOf_formatted_html'] = transaction.attachment.asset
-            data['distributingAsset_formatted_html'] = transaction.attachment.assetToDistribute
-            data['distributingQuantity'] = transaction.attachment.quantityQNT
-            data['youReceived'] = $.t('no')
+            data.toHoldersOf_formatted_html = transaction.attachment.asset
+            data.distributingAsset_formatted_html = transaction.attachment.assetToDistribute
+            data.distributingQuantity = transaction.attachment.quantityQNT
+            data.youReceived = $.t('no')
             BRS.sendRequest('getIndirectIncoming', {
                 transaction: transaction.transaction,
                 account: BRS.account
@@ -377,12 +375,12 @@ var BRS = (function(BRS, $, undefined) {
                     data.distributingAsset_formatted_html = $.t('no')
                     delete data.distributingQuantity
                 } else {
-                    const foundAsset2 =  BRS.getAssetDetails(transaction.attachment.assetToDistribute)
+                    const foundAsset2 = BRS.getAssetDetails(transaction.attachment.assetToDistribute)
                     if (foundAsset2) {
                         data.distributingAsset_formatted_html = BRS.getAssetLink(foundAsset2)
-                        data.distributingQuantity = BRS.convertToQNTf(data.distributingQuantity, foundAsset2.decimals) + " " + foundAsset2.name
+                        data.distributingQuantity = BRS.convertToQNTf(data.distributingQuantity, foundAsset2.decimals) + ' ' + foundAsset2.name
                         if (userQuantity != 0) {
-                            data.quantityToYou = BRS.convertToQNTf(userQuantity, foundAsset2.decimals) + " " + foundAsset2.name
+                            data.quantityToYou = BRS.convertToQNTf(userQuantity, foundAsset2.decimals) + ' ' + foundAsset2.name
                         }
                     } else {
                         if (userQuantity != 0) {
@@ -399,12 +397,12 @@ var BRS = (function(BRS, $, undefined) {
             case 0:
                 // marketplace listing
                 delete data.sender_formatted_html
-                data['seller'] = BRS.getAccountFormatted(transaction, 'sender')
-                data['name'] = transaction.attachment.name
-                data['description'] = transaction.attachment.description
-                data['price'] = transaction.attachment.priceNQT
-                data['quantity_formatted_html'] = BRS.format(transaction.attachment.quantity)
-                break;
+                data.seller = BRS.getAccountFormatted(transaction, 'sender')
+                data.name = transaction.attachment.name
+                data.description = transaction.attachment.description
+                data.price = transaction.attachment.priceNQT
+                data.quantity_formatted_html = BRS.format(transaction.attachment.quantity)
+                break
             case 1:
                 // marketplace removal
                 delete data.sender_formatted_html
@@ -412,11 +410,11 @@ var BRS = (function(BRS, $, undefined) {
                 BRS.sendRequest('getDGSGood', {
                     goods: transaction.attachment.goods
                 }, function (goods) {
-                    data['seller'] = BRS.getAccountFormatted(goods, 'seller')
-                    data['item_name'] = goods.name
+                    data.seller = BRS.getAccountFormatted(goods, 'seller')
+                    data.item_name = goods.name
                     transactionEndLoad()
                 })
-                break;
+                break
             case 2:
                 // marketplace item price change
                 delete data.sender_formatted_html
@@ -424,12 +422,12 @@ var BRS = (function(BRS, $, undefined) {
                 BRS.sendRequest('getDGSGood', {
                     goods: transaction.attachment.goods
                 }, function (goods) {
-                    data['seller'] = BRS.getAccountFormatted(goods, 'seller')
-                    data['item_name'] = goods.name
-                    data['new_price_formatted_html'] = BRS.formatAmount(transaction.attachment.priceNQT) + ' ' + BRS.valueSuffix
+                    data.seller = BRS.getAccountFormatted(goods, 'seller')
+                    data.item_name = goods.name
+                    data.new_price_formatted_html = BRS.formatAmount(transaction.attachment.priceNQT) + ' ' + BRS.valueSuffix
                     transactionEndLoad()
                 })
-                break;
+                break
             case 3:
                 // marketplace item quantity change
                 delete data.sender_formatted_html
@@ -437,21 +435,21 @@ var BRS = (function(BRS, $, undefined) {
                 BRS.sendRequest('getDGSGood', {
                     goods: transaction.attachment.goods
                 }, function (goods) {
-                    data['seller'] = BRS.getAccountFormatted(goods, 'seller')
-                    data['item_name'] = goods.name
-                    data['delta_quantity'] = transaction.attachment.deltaQuantity,
+                    data.seller = BRS.getAccountFormatted(goods, 'seller')
+                    data.item_name = goods.name
+                    data.delta_quantity = transaction.attachment.deltaQuantity,
                     transactionEndLoad()
                 })
-                break;
+                break
             case 4:
                 peDigitalGoodsPurchase()
-                break;
+                break
             case 5:
                 peDigitalGoodsDelivery()
                 break
             case 6:
                 peDigitalGoodsFeedback()
-                break;
+                break
             case 7:
                 delete data.sender_formatted_html
                 delete data.recipient_formatted_html
@@ -459,19 +457,19 @@ var BRS = (function(BRS, $, undefined) {
                 BRS.sendRequest('getDGSPurchase', {
                     purchase: transaction.attachment.purchase
                 }, function (purchase) {
-                    data['seller'] = BRS.getAccountFormatted(purchase, 'seller')
-                    data['buyer'] = BRS.getAccountFormatted(purchase, 'buyer')
+                    data.seller = BRS.getAccountFormatted(purchase, 'seller')
+                    data.buyer = BRS.getAccountFormatted(purchase, 'buyer')
                     BRS.sendRequest('getDGSGood', {
                         goods: purchase.goods
                     }, function (goods) {
-                        data['item_name'] = goods.name
+                        data.item_name = goods.name
                         const orderTotal = new BigInteger(String(purchase.quantity)).multiply(new BigInteger(String(purchase.priceNQT)))
-                        data['order_total_formatted_html'] = BRS.formatAmount(orderTotal) + ' ' + BRS.valueSuffix
-                        data['refund'] = transaction.attachment.refundNQT
+                        data.order_total_formatted_html = BRS.formatAmount(orderTotal) + ' ' + BRS.valueSuffix
+                        data.refund = transaction.attachment.refundNQT
                         transactionEndLoad()
                     })
                 })
-                break;
+                break
             }
         }
 
@@ -483,11 +481,11 @@ var BRS = (function(BRS, $, undefined) {
             BRS.sendRequest('getDGSGood', {
                 goods: transaction.attachment.goods
             }, function (goods) {
-                data['buyer'] = BRS.getAccountFormatted(transaction, 'sender'),
-                data['seller'] = BRS.getAccountFormatted(goods, 'seller')
-                data['item_name'] = goods.name
-                data['price'] = transaction.attachment.priceNQT,
-                data['quantity_formatted_html'] = BRS.format(transaction.attachment.quantity),
+                data.buyer = BRS.getAccountFormatted(transaction, 'sender'),
+                data.seller = BRS.getAccountFormatted(goods, 'seller')
+                data.item_name = goods.name
+                data.price = transaction.attachment.priceNQT,
+                data.quantity_formatted_html = BRS.format(transaction.attachment.quantity),
                 BRS.sendRequest('getDGSPurchase', {
                     purchase: transaction.transaction
                 }, function (purchase) {
@@ -523,7 +521,7 @@ var BRS = (function(BRS, $, undefined) {
             })
         }
 
-        function peDigitalGoodsFeedback() {
+        function peDigitalGoodsFeedback () {
             // marketplace feedback
             delete data.sender_formatted_html
             delete data.recipient_formatted_html
@@ -531,12 +529,12 @@ var BRS = (function(BRS, $, undefined) {
             BRS.sendRequest('getDGSPurchase', {
                 purchase: transaction.attachment.purchase
             }, function (purchase) {
-                data['seller'] = BRS.getAccountFormatted(purchase, 'seller')
-                data['buyer'] = BRS.getAccountFormatted(purchase, 'buyer')
+                data.seller = BRS.getAccountFormatted(purchase, 'seller')
+                data.buyer = BRS.getAccountFormatted(purchase, 'buyer')
                 BRS.sendRequest('getDGSGood', {
                     goods: purchase.goods
                 }, function (goods) {
-                    data['item_name'] = goods.name
+                    data.item_name = goods.name
                     if (purchase.seller != BRS.account && purchase.buyer != BRS.account) {
                         transactionEndLoad()
                         return
@@ -565,7 +563,7 @@ var BRS = (function(BRS, $, undefined) {
             })
         }
 
-        function peDigitalGoodsDelivery() {
+        function peDigitalGoodsDelivery () {
             // marketplace delivery
             delete data.sender_formatted_html
             delete data.recipient_formatted_html
@@ -573,20 +571,20 @@ var BRS = (function(BRS, $, undefined) {
             BRS.sendRequest('getDGSPurchase', {
                 purchase: transaction.attachment.purchase
             }, function (purchase) {
-                data['seller'] = BRS.getAccountFormatted(purchase, 'seller')
-                data['buyer'] = BRS.getAccountFormatted(purchase, 'buyer')
+                data.seller = BRS.getAccountFormatted(purchase, 'seller')
+                data.buyer = BRS.getAccountFormatted(purchase, 'buyer')
                 BRS.sendRequest('getDGSGood', {
                     goods: purchase.goods
                 }, function (goods) {
-                    data['item_name'] = goods.name
-                    data['price'] = purchase.priceNQT
-                    data['quantity_formatted_html'] = BRS.format(purchase.quantity)
+                    data.item_name = goods.name
+                    data.price = purchase.priceNQT
+                    data.quantity_formatted_html = BRS.format(purchase.quantity)
                     if (purchase.quantity != '1') {
                         const orderTotal = BRS.formatAmount(new BigInteger(String(purchase.quantity)).multiply(new BigInteger(String(purchase.priceNQT))))
-                        data['total_formatted_html'] = orderTotal + ' ' + BRS.valueSuffix
+                        data.total_formatted_html = orderTotal + ' ' + BRS.valueSuffix
                     }
                     if (transaction.attachment.discountNQT) {
-                        data['discount'] = transaction.attachment.discountNQT
+                        data.discount = transaction.attachment.discountNQT
                     }
                     if (transaction.attachment.goodsData) {
                         if (BRS.account == purchase.seller || BRS.account == purchase.buyer) {
@@ -597,7 +595,7 @@ var BRS = (function(BRS, $, undefined) {
                                 }
                             }, (purchase.buyer == BRS.account ? purchase.seller : purchase.buyer))
                         } else {
-                            data['data'] = $.t('encrypted_goods_data_no_permission')
+                            data.data = $.t('encrypted_goods_data_no_permission')
                         }
                     }
                     let callout
@@ -618,60 +616,57 @@ var BRS = (function(BRS, $, undefined) {
             })
         }
 
-        function peMining() {
+        function peMining () {
             switch (transaction.subtype) {
             case 1:
             case 2:
                 // add / remove commitment
-                data.amount_formatted = BRS.formatAmount(new BigInteger(String(transaction.attachment.amountNQT))) + " " + BRS.valueSuffix;
-                return;
+                data.amount_formatted = BRS.formatAmount(new BigInteger(String(transaction.attachment.amountNQT))) + ' ' + BRS.valueSuffix
             }
         }
 
-        function peAdvancedPayment() {
+        function peAdvancedPayment () {
             let signers = ''
             switch (transaction.subtype) {
             case 0:
                 // TODO add languages / human readable format
-                data["amount_formatted"] = BRS.formatAmount(new BigInteger(String(transaction.attachment.amountNQT))) + " " + BRS.valueSuffix;
-                data["deadline"] = transaction.attachment.deadline + " seconds"
-                data["deadlineAction"] = $.t(transaction.attachment.deadlineAction)
-                data["requiredSigners"] = transaction.attachment.requiredSigners
-                for (let i=0; i < transaction.attachment.signers.length; i++) {
-                    if (i!==0) {
-                        signers+="<br />"
+                data.amount_formatted = BRS.formatAmount(new BigInteger(String(transaction.attachment.amountNQT))) + ' ' + BRS.valueSuffix
+                data.deadline = transaction.attachment.deadline + ' seconds'
+                data.deadlineAction = $.t(transaction.attachment.deadlineAction)
+                data.requiredSigners = transaction.attachment.requiredSigners
+                for (let i = 0; i < transaction.attachment.signers.length; i++) {
+                    if (i !== 0) {
+                        signers += '<br />'
                     }
                     signers += BRS.convertNumericToRSAccountFormat(transaction.attachment.signers[i])
                 }
-                data["signers_formatted_html"] = signers
-                return;
+                data.signers_formatted_html = signers
+                return
             case 1:
             case 2:
                 // TODO get details from escrow creation
-                data["decision"] = $.t(transaction.attachment.decision)
-                data["escrowId"] = transaction.attachment.escrowId
-                return;
+                data.decision = $.t(transaction.attachment.decision)
+                data.escrowId = transaction.attachment.escrowId
+                return
             case 3:
                 // TODO add languages / human readable format
-                data['frequency'] = transaction.attachment.frequency + " seconds"
+                data.frequency = transaction.attachment.frequency + ' seconds'
                 return
             case 4:
             case 5:
                 // TODO get details from subscription
-                data['subscriptionId'] = transaction.attachment.subscriptionId
-                return;
+                data.subscriptionId = transaction.attachment.subscriptionId
             }
         }
 
-        function peAutomatedTransactions() {
+        function peAutomatedTransactions () {
             let contractAddress
             switch (transaction.subtype) {
             case 0:
                 contractAddress = BRS.convertNumericToRSAccountFormat(transaction.transaction)
-                data["at_created_formatted_html"] = `<a href='#' data-user='${contractAddress}"' class='user-info'>${BRS.getAccountTitle(contractAddress)}</a>`
-                data["name"] =  transaction.attachment.name
-                data["description_formatted_html"] = transaction.attachment.description.escapeHTML()
-                return
+                data.at_created_formatted_html = `<a href='#' data-user='${contractAddress}"' class='user-info'>${BRS.getAccountTitle(contractAddress)}</a>`
+                data.name = transaction.attachment.name
+                data.description_formatted_html = transaction.attachment.description.escapeHTML()
             }
         }
 
@@ -681,8 +676,8 @@ var BRS = (function(BRS, $, undefined) {
                 return
             }
             const $output = $('#transaction_info_output_bottom')
-            $output.html('');
-            let showMessage = false;
+            $output.html('')
+            let showMessage = false
             if (transaction.attachment.message) {
                 if (!transaction.attachment['version.Message']) {
                     try {
@@ -709,7 +704,7 @@ var BRS = (function(BRS, $, undefined) {
                     outHTML += `<label>${$.t('text')}:</label>`
                     outHTML += `<div class='modal-text-box'>${String(converters.hexStringToString(message)).escapeHTML().nl2br()}</div>`
                 }
-                $output.append(outHTML);
+                $output.append(outHTML)
                 showMessage = true
             }
             if (transaction.attachment.encryptedMessage || (transaction.attachment.encryptToSelfMessage && BRS.account == transaction.sender)) {
@@ -729,16 +724,16 @@ var BRS = (function(BRS, $, undefined) {
                         outputEl: '#transaction_info_decryption_output'
                     })
                 } else {
-                    $output.append("<div>" + $.t('encrypted_message_no_permission') + '</div>')
+                    $output.append('<div>' + $.t('encrypted_message_no_permission') + '</div>')
                 }
             }
             if (showMessage) {
-                $output.show();
+                $output.show()
             }
         }
 
         processTransactionModalDataMain()
     }
 
-    return BRS;
-}(BRS || {}, jQuery));
+    return BRS
+}(BRS || {}, jQuery))
