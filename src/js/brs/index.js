@@ -57,6 +57,47 @@ import {
     logout
 } from './brs.login'
 
+import {
+    getBlock,
+    handleInitialBlocks,
+    handleNewBlocks,
+    checkBlockHeight,
+    incomingUpdateDashboardBlocks,
+    pagesBlocksForged,
+    pagesBlockInfo,
+    blocksInfoLoad,
+    pagesBlocks,
+    incomingBlocks,
+    finish100Blocks,
+    blocksPageLoaded
+} from './brs.blocks'
+
+import {
+    pagesAliases,
+    evAliasModalOnShowBsModal,
+    formsSellAlias,
+    formsSellAliasComplete,
+    evSellAliasClick,
+    evBuyAliasModalOnShowBsModal,
+    formsBuyAliasError,
+    formsBuyAliasComplete,
+    evRegisterAliasModalOnShowBsModal,
+    incomingAliases,
+    formsSetAlias,
+    setAliasType,
+    formsSetAliasError,
+    formsSetAliasComplete,
+    evAliasSearchSubmit,
+    evAliasShowSearchResult
+} from './brs.aliases'
+
+import { pagesAt } from './brs.at'
+
+import {
+    showConsole,
+    addToConsole
+} from './brs.console'
+
 import { addEventListeners } from './brs.eventlisteners'
 
 // import { addEvents } from './brs.addevents'
@@ -102,9 +143,27 @@ export const BRS = {
     showPageNumbers: false,
 
     pages: {
-        pagesSettings
+        settings: pagesSettings,
+        blocks_forged: pagesBlocksForged,
+        block_info: pagesBlockInfo,
+        blocks: pagesBlocks,
+        aliases: pagesAliases,
+        at: pagesAt
     },
-    incoming: {},
+    incoming: {
+        updateDashboardBlocks: incomingUpdateDashboardBlocks,
+        blocks: incomingBlocks,
+        aliases: incomingAliases
+    },
+    forms: {
+        sellAlias: formsSellAlias,
+        sellAliasComplete: formsSellAliasComplete,
+        buyAliasError: formsBuyAliasError,
+        buyAliasComplete: formsBuyAliasComplete,
+        setAlias: formsSetAlias,
+        setAliasError: formsSetAliasError,
+        setAliasComplete: formsSetAliasComplete
+    },
 
     hasLocalStorage: true,
     inApp: false,
@@ -161,10 +220,13 @@ export const BRS = {
     // from login
     newlyCreatedAccount: false,
 
+    // from blocks
+    tempBlocks: [],
+    trackBlockchain: false,
+
     // from brs.aliases
     alias_page_elements: 500,
     is_loading_aliases: false,
-    prev_search_length: 0,
 
     // From brs.js
     init,
@@ -213,7 +275,29 @@ export const BRS = {
     loginCommon,
     evLoginButtonClick,
     showLockscreen,
-    logout
+    logout,
+
+    // From blocks
+    getBlock,
+    handleInitialBlocks,
+    handleNewBlocks,
+    checkBlockHeight,
+    blocksInfoLoad,
+    finish100Blocks,
+    blocksPageLoaded,
+
+    // From aliases
+    evAliasModalOnShowBsModal,
+    evSellAliasClick,
+    evBuyAliasModalOnShowBsModal,
+    evRegisterAliasModalOnShowBsModal,
+    setAliasType,
+    evAliasSearchSubmit,
+    evAliasShowSearchResult,
+
+    // From console
+    showConsole,
+    addToConsole
 
     // From brs.addevents.js
     // addEvents
