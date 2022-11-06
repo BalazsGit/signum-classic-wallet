@@ -2,7 +2,7 @@
  * @module BRS
 */
 
-/* global $ */
+/* global $ SHA256_init SHA256_write SHA256_finalize */
 
 import {
     init,
@@ -98,6 +98,45 @@ import {
     addToConsole
 } from './brs.console'
 
+import {
+    getContactByName,
+    pagesContacts,
+    formsAddContact,
+    evUpdateContactModalOnShowBsModal,
+    formsUpdateContact,
+    formsDeleteContact,
+    exportContacts,
+    importContacts
+} from './brs.contacts'
+
+import {
+    generatePublicKey,
+    getPublicKey,
+    getAccountId,
+    getAccountIdFromPublicKey,
+    encryptNote,
+    signBytes,
+    verifyBytes,
+    setEncryptionPassword,
+    getEncryptionPassword,
+    setDecryptionPassword,
+    addDecryptedTransaction,
+    tryToDecryptMessage,
+    tryToDecrypt,
+    removeDecryptionForm,
+    decryptNoteFormSubmit,
+    decryptAllMessages
+} from './brs.encryption'
+
+import { pagesEscrow } from './brs.escrow'
+
+import {
+    addMessageData,
+    submitForm,
+    formsAddCommitment,
+    unlockForm
+} from './brs.forms'
+
 import { addEventListeners } from './brs.eventlisteners'
 
 // import { addEvents } from './brs.addevents'
@@ -148,7 +187,9 @@ export const BRS = {
         block_info: pagesBlockInfo,
         blocks: pagesBlocks,
         aliases: pagesAliases,
-        at: pagesAt
+        at: pagesAt,
+        contacts: pagesContacts,
+        escrow: pagesEscrow
     },
     incoming: {
         updateDashboardBlocks: incomingUpdateDashboardBlocks,
@@ -162,7 +203,11 @@ export const BRS = {
         buyAliasComplete: formsBuyAliasComplete,
         setAlias: formsSetAlias,
         setAliasError: formsSetAliasError,
-        setAliasComplete: formsSetAliasComplete
+        setAliasComplete: formsSetAliasComplete,
+        addContact: formsAddContact,
+        updateContact: formsUpdateContact,
+        deleteContact: formsDeleteContact,
+        addCommitment: formsAddCommitment
     },
 
     hasLocalStorage: true,
@@ -214,7 +259,6 @@ export const BRS = {
     },
 
     // from brs.server
-    _password: '',
     multiQueue: null,
 
     // from login
@@ -227,6 +271,18 @@ export const BRS = {
     // from brs.aliases
     alias_page_elements: 500,
     is_loading_aliases: false,
+
+    // from encryption
+    _password: '',
+    _decryptionPassword: '',
+    _decryptedTransactions: {},
+    _encryptedNote: null,
+    _sharedKeys: {},
+    _hash: {
+        init: SHA256_init,
+        update: SHA256_write,
+        getBytes: SHA256_finalize
+    },
 
     // From brs.js
     init,
@@ -297,7 +353,36 @@ export const BRS = {
 
     // From console
     showConsole,
-    addToConsole
+    addToConsole,
+
+    // From contacts
+    getContactByName,
+    evUpdateContactModalOnShowBsModal,
+    exportContacts,
+    importContacts,
+
+    // From encryption
+    generatePublicKey,
+    getPublicKey,
+    getAccountId,
+    getAccountIdFromPublicKey,
+    encryptNote,
+    signBytes,
+    verifyBytes,
+    setEncryptionPassword,
+    getEncryptionPassword,
+    setDecryptionPassword,
+    addDecryptedTransaction,
+    tryToDecryptMessage,
+    tryToDecrypt,
+    removeDecryptionForm,
+    decryptNoteFormSubmit,
+    decryptAllMessages,
+
+    // From forms
+    addMessageData,
+    submitForm,
+    unlockForm
 
     // From brs.addevents.js
     // addEvents

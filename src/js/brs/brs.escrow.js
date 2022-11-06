@@ -1,24 +1,24 @@
 /**
  * @depends {brs.js}
  */
-var BRS = (function (BRS, $, undefined) {
-    BRS.escrowPageType = null
 
-    BRS.pages.escrow = function () {
-        BRS.sendRequest('getAccountEscrowTransactions', {
-            account: BRS.account
-        }, function (response) {
-            let rows = ''
-            if (response.escrows && response.escrows.length) {
-                const escrows = {}
+import { BRS } from '.'
 
-                for (let i = 0; i < response.escrows.length; i++) {
-                    rows += "<tr><td><a href='#' data-escrow='" + String(response.escrows[i].id).escapeHTML() + "'>" + String(response.escrows[i].id).escapeHTML() + '</a></td><td>' + String(response.escrows[i].senderRS).escapeHTML() + '</td><td>' + String(response.escrows[i].recipientRS).escapeHTML() + '</td><td>' + BRS.formatAmount(response.escrows[i].amountNQT) + '</td</tr>'
-                }
+export function pagesEscrow () {
+    BRS.sendRequest('getAccountEscrowTransactions', {
+        account: BRS.account
+    }, function (response) {
+        let rows = ''
+        if (response.escrows && response.escrows.length) {
+            for (const escrow of response.escrows) {
+                rows += '<tr>'
+                rows += `<td><a href='#' data-escrow='${escrow.id}'>${escrow.id}</a></td>`
+                rows += `<td>${escrow.senderRS}</td>`
+                rows += `<td>${escrow.recipientRS}</td>`
+                rows += `<td>${BRS.formatAmount(escrow.amountNQT)}</td>`
+                rows += '</tr>'
             }
-            BRS.dataLoaded(rows)
-        })
-    }
-
-    return BRS
-}(BRS || {}, jQuery))
+        }
+        BRS.dataLoaded(rows)
+    })
+}
