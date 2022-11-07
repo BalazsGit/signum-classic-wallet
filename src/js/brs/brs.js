@@ -116,8 +116,7 @@ export function init () {
 
     $("[data-toggle='tooltip']").tooltip()
 
-    // TODO use BRS.FnTree from brs.utils
-    // $('.sidebar .treeview').tree()
+    $('.sidebar .treeview').tree()
 
     setInterval(setHeaderClock, 1000)
 

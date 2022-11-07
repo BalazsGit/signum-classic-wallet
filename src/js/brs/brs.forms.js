@@ -303,7 +303,7 @@ export function submitForm ($btn) {
         return
     }
 
-    data = BRS.getFormData($form)
+    data = getFormData($form)
 
     if (typeof formFunction === 'function') {
         const output = formFunction(data)
@@ -507,6 +507,21 @@ function lockForm ($modal, $btn) {
     $modal.modal('lock')
     $modal.find('button').prop('disabled', true)
     $btn.button('loading')
+}
+
+function getFormData ($form) {
+    const serialized = $form.serializeArray()
+    const data = {}
+    for (const s in serialized) {
+        if (data[serialized[s].name] === undefined) {
+            data[serialized[s].name] = serialized[s].value
+        } else if (typeof data[serialized[s].name] !== 'object') {
+            data[serialized[s].name] = [data[serialized[s].name], serialized[s].value]
+        } else {
+            data[serialized[s].name].push(serialized[s].value)
+        }
+    }
+    return data
 }
 
 export function unlockForm ($modal, $btn, hide) {

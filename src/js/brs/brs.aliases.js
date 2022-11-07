@@ -65,9 +65,9 @@ $(window).scroll(function () {
                         for (const alias of aliases) {
                             alias.status = '/'
 
-                            const unconfirmedTransaction = BRS.getUnconfirmedTransactionFromCache(1, 6, {
+                            const unconfirmedTransaction = BRS.getUnconfirmedTransactionsFromCache(1, 6, {
                                 alias: alias.aliasName
-                            })
+                            }, true)
 
                             if (unconfirmedTransaction) {
                                 alias.tentative = true
@@ -261,9 +261,9 @@ export function pagesAliases () {
             for (const alias of aliases) {
                 alias.status = '/'
 
-                const unconfirmedTransaction = BRS.getUnconfirmedTransactionFromCache(1, 6, {
+                const unconfirmedTransaction = BRS.getUnconfirmedTransactionsFromCache(1, 6, {
                     alias: alias.aliasName
-                })
+                }, true)
 
                 if (unconfirmedTransaction) {
                     alias.tentative = true

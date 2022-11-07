@@ -137,6 +137,45 @@ import {
     unlockForm
 } from './brs.forms'
 
+import {
+    formatVolume,
+    formatOrderPricePerWholeQNT,
+    calculateOrderPricePerWholeQNT,
+    calculatePricePerWholeQNT,
+    calculateOrderTotalNQT,
+    calculateOrderTotal,
+    calculatePercentage,
+    convertToNXT,
+    amountToPrecision,
+    convertToNQT,
+    convertToQNTf,
+    convertToQNT,
+    format,
+    formatQuantity,
+    formatAmount,
+    formatTimestamp,
+    convertFromHex16,
+    convertFromHex8,
+    convertNumericToRSAccountFormat,
+    convertRSAccountToNumeric,
+    getAccountLink,
+    getAssetLink,
+    fullHashToId,
+    getAccountTitle,
+    getAccountFormatted,
+    setupClipboardFunctionality,
+    dataLoaded,
+    dataLoadFinished,
+    createInfoTable,
+    getSelectedText,
+    formatStyledAmount,
+    getUnconfirmedTransactionsFromCache,
+    hasTransactionUpdates,
+    FnTree,
+    translateServerError,
+    getTranslatedFieldName
+} from './brs.util'
+
 import { addEventListeners } from './brs.eventlisteners'
 
 // import { addEvents } from './brs.addevents'
@@ -382,7 +421,45 @@ export const BRS = {
     // From forms
     addMessageData,
     submitForm,
-    unlockForm
+    unlockForm,
+
+    // From util
+    formatVolume,
+    formatOrderPricePerWholeQNT,
+    calculateOrderPricePerWholeQNT,
+    calculatePricePerWholeQNT,
+    calculateOrderTotalNQT,
+    calculateOrderTotal,
+    calculatePercentage,
+    convertToNXT,
+    amountToPrecision,
+    convertToNQT,
+    convertToQNTf,
+    convertToQNT,
+    format,
+    formatQuantity,
+    formatAmount,
+    formatTimestamp,
+    convertFromHex16,
+    convertFromHex8,
+    convertNumericToRSAccountFormat,
+    convertRSAccountToNumeric,
+    getAccountLink,
+    getAssetLink,
+    fullHashToId,
+    getAccountTitle,
+    getAccountFormatted,
+    setupClipboardFunctionality,
+    dataLoaded,
+    dataLoadFinished,
+    createInfoTable,
+    getSelectedText,
+    formatStyledAmount,
+    getUnconfirmedTransactionsFromCache,
+    hasTransactionUpdates,
+    FnTree,
+    translateServerError,
+    getTranslatedFieldName
 
     // From brs.addevents.js
     // addEvents
