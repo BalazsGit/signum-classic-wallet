@@ -219,6 +219,24 @@ import {
     formsCancelOrderComplete
 } from './brs.assetexchange'
 
+import {
+    getInitialTransactions,
+    getNewTransactions,
+    getUnconfirmedTransactions,
+    handleIncomingTransactions,
+    incomingUpdateDashboardTransactions,
+    addUnconfirmedTransaction,
+    pagesTransactions,
+    incomingTransactions,
+    getTransactionDetails,
+    evTransactionsPageTypeClick
+} from './brs.transactions'
+
+import {
+    evSidebarContextOnContextmenu,
+    closeContextMenu
+} from './brs.sidebar'
+
 export const BRS = {
     server: '',
     state: {},
@@ -270,7 +288,8 @@ export const BRS = {
         asset_exchange: pagesAssetExchange,
         transfer_history: pagesTransferHistory,
         my_assets: pagesMyAssets,
-        open_orders: pagesOpenOrders
+        open_orders: pagesOpenOrders,
+        transactions: pagesTransactions
     },
     incoming: {
         updateDashboardBlocks: incomingUpdateDashboardBlocks,
@@ -278,7 +297,10 @@ export const BRS = {
         aliases: incomingAliases,
         asset_exchange: incomingAssetExchange,
         my_assets: incomingMyAssets,
-        open_orders: incomingOpenOrders
+        open_orders: incomingOpenOrders,
+        updateDashboardTransactions: incomingUpdateDashboardTransactions,
+        transactions: incomingTransactions
+
     },
     forms: {
         sellAlias: formsSellAlias,
@@ -386,6 +408,13 @@ export const BRS = {
     assetSearch: false,
     currentAsset: {},
     currentAssetID: 'undefined',
+
+    // from transactions
+    lastTransactions: '',
+    unconfirmedTransactions: [],
+    unconfirmedTransactionIds: '',
+    unconfirmedTransactionsChange: true,
+    transactionsPageType: null,
 
     // From brs.js
     init,
@@ -545,7 +574,20 @@ export const BRS = {
     evAssetOrderModalOnShowBsModal,
     evAssetExchangeSidebarContextClick,
     evTransferAssetModalOnShowBsModal,
-    goToAsset
+    goToAsset,
+
+    // From transactions
+    getInitialTransactions,
+    getNewTransactions,
+    getUnconfirmedTransactions,
+    handleIncomingTransactions,
+    addUnconfirmedTransaction,
+    getTransactionDetails,
+    evTransactionsPageTypeClick,
+
+    // From sidebar
+    evSidebarContextOnContextmenu,
+    closeContextMenu
 
     // From brs.addevents.js
     // addEvents
