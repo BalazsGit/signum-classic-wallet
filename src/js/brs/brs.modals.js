@@ -35,36 +35,6 @@ var BRS = (function (BRS, $, undefined) {
         }
     })
 
-    BRS.evSpanRecipientSelectorClickButton = function (e) {
-        if (!Object.keys(BRS.contacts).length) {
-            e.preventDefault()
-            e.stopPropagation()
-            return
-        }
-        const $list = $(this).parent().find('ul')
-        $list.empty()
-        const names = []
-        for (const accountId in BRS.contacts) {
-            names.push(BRS.contacts[accountId].name)
-        }
-        names.sort((a, b) => {
-            const nameA = a.toUpperCase()
-            const nameB = b.toUpperCase()
-            if (nameA < nameB) return -1
-            if (nameA > nameB) return 1
-            return 0
-        })
-        for (const name of names) {
-            $list.append("<li><a href='#' data-contact='" + name.escapeHTML() + "'>" + name.escapeHTML() + '</a></li>')
-        }
-    }
-
-    BRS.evSpanRecipientSelectorClickUlLiA = function (e) {
-        e.preventDefault()
-        $(this).closest('form').find('input[name=converted_account_id]').val('')
-        $(this).closest('.input-group').find('input').not('[type=hidden]').val($(this).data('contact')).trigger('blur')
-    }
-
     BRS.evAddRecipientsClick = function (e) {
         e.preventDefault()
         if ($('#send_money_same_out_checkbox').is(':checked')) {

@@ -90,8 +90,7 @@ export function init () {
     BRS.setStateInterval(30)
 
     BRS.allowLoginViaEnter()
-    // on brs.recipients
-    // BRS.automaticallyCheckRecipient()
+    BRS.automaticallyCheckRecipient()
 
     $('.show_popover').popover({
         trigger: 'hover'

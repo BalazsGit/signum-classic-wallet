@@ -240,6 +240,36 @@ import {
     closeContextMenu
 } from './brs.sidebar'
 
+import {
+    pagesMessages,
+    incomingMessages,
+    evMessagesSidebarClick,
+    evMessagesSidebarContextClick,
+    evInlineMessageFormSubmit,
+    formsSendMessageComplete,
+    formsDecryptMessages
+} from './brs.messages'
+
+import {
+    pagesPeers,
+    incomingPeers
+} from './brs.peers'
+
+import {
+    automaticallyCheckRecipient,
+    sendMoneyCalculateTotal,
+    commitmentCalculateTotal,
+    formsSendMoneyComplete,
+    formsSendMoneyMulti,
+    correctAddressMistake,
+    evSpanRecipientSelectorClickButton,
+    evSpanRecipientSelectorClickUlLiA
+} from './brs.recipient'
+
+import {
+    pagesSubscription
+} from './brs.subscription'
+
 export const BRS = {
     server: '',
     state: {},
@@ -292,7 +322,10 @@ export const BRS = {
         transfer_history: pagesTransferHistory,
         my_assets: pagesMyAssets,
         open_orders: pagesOpenOrders,
-        transactions: pagesTransactions
+        transactions: pagesTransactions,
+        peers: pagesPeers,
+        subscription: pagesSubscription,
+        messages: pagesMessages
     },
     incoming: {
         updateDashboardBlocks: incomingUpdateDashboardBlocks,
@@ -302,8 +335,9 @@ export const BRS = {
         my_assets: incomingMyAssets,
         open_orders: incomingOpenOrders,
         updateDashboardTransactions: incomingUpdateDashboardTransactions,
-        transactions: incomingTransactions
-
+        transactions: incomingTransactions,
+        peers: incomingPeers,
+        messages: incomingMessages
     },
     forms: {
         sellAlias: formsSellAlias,
@@ -328,7 +362,11 @@ export const BRS = {
         transferAsset: formsTransferAsset,
         transferAssetComplete: formsTransferAssetComplete,
         cancelOrder: formsCancelOrder,
-        cancelOrderComplete: formsCancelOrderComplete
+        cancelOrderComplete: formsCancelOrderComplete,
+        sendMoneyComplete: formsSendMoneyComplete,
+        sendMoneyMulti: formsSendMoneyMulti,
+        sendMessageComplete: formsSendMessageComplete,
+        decryptMessages: formsDecryptMessages
     },
 
     hasLocalStorage: true,
@@ -417,6 +455,10 @@ export const BRS = {
     unconfirmedTransactionIds: '',
     unconfirmedTransactionsChange: true,
     transactionsPageType: null,
+
+    // from messages
+    _messages: {},
+    _latestMessages: {},
 
     // From brs.js
     init,
@@ -589,6 +631,19 @@ export const BRS = {
     addUnconfirmedTransaction,
     getTransactionDetails,
     evTransactionsPageTypeClick,
+
+    // From recipient
+    automaticallyCheckRecipient,
+    sendMoneyCalculateTotal,
+    commitmentCalculateTotal,
+    correctAddressMistake,
+    evSpanRecipientSelectorClickButton,
+    evSpanRecipientSelectorClickUlLiA,
+
+    // From messages
+    evMessagesSidebarClick,
+    evMessagesSidebarContextClick,
+    evInlineMessageFormSubmit,
 
     // From sidebar
     evSidebarContextOnContextmenu,

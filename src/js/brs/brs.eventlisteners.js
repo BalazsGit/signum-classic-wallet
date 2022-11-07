@@ -77,7 +77,6 @@ export function addEventListeners () {
     // from brs.login.js
     $('#account_phrase_custom_panel form').submit(BRS.evAccountPhraseCustomPanelSubmit)
 
-    /*
     // from brs.recipient.js
     $('#send_message_modal, #send_money_modal, #add_contact_modal').on('show.bs.modal', function (e) {
         const $invoker = $(e.relatedTarget)
@@ -127,7 +126,6 @@ export function addEventListeners () {
     $('span.asset_selector').on('click', 'ul li a', BRS.evTransferAssetModalOnShowBsModal)
     $('span.recipient_selector').on('click', 'button', BRS.evSpanRecipientSelectorClickButton)
     $('span.recipient_selector').on('click', 'ul li a', BRS.evSpanRecipientSelectorClickUlLiA)
-    */
 
     // from brs.transactions.js
     $('input[type=radio][name=transactions_from_account]').on('click', function () {
@@ -223,7 +221,6 @@ export function addEventListeners () {
         $('#cancel_order_order').val(orderId)
     })
 
-    /*
     // from brs.messages.js
     $('#send_message_modal').on('show.bs.modal', function (e) {
         BRS.showFeeSuggestions('#send_message_fee', '#suggested_fee_response_send_message')
@@ -261,7 +258,6 @@ export function addEventListeners () {
     $('#message_details').on('click', 'dd.to_decrypt', function (e) {
         $('#messages_decrypt_modal').modal('show')
     })
-    */
 
     // from brs.aliases.js
     $('#transfer_alias_modal').on('show.bs.modal', function (e) {
