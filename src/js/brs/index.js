@@ -178,8 +178,46 @@ import {
 
 import { addEventListeners } from './brs.eventlisteners'
 
-// import { addEvents } from './brs.addevents'
-// import { pagesAliases } from './brs.aliases'
+import {
+    pagesAssetExchange,
+    loadCachedAssets,
+    saveCachedAssets,
+    getAssetDetails,
+    cacheUserAssets,
+    sortCachedAssets,
+    bookmarkAllUserAssets,
+    formsAddAssetBookmark,
+    formsAddAssetBookmarkComplete,
+    saveAssetBookmarks,
+    positionAssetSidebar,
+    incomingAssetExchange,
+    evAssetExchangeSidebarClick,
+    updateMiniTradeHistory,
+    evAssetExchangeSearchInput,
+    evAssetExchangeOrdersTableClick,
+    evSellBuyAutomaticPriceClick,
+    evAssetExchangeQuantityPriceKeydown,
+    evCalculatePricePreviewKeyup,
+    evAssetOrderModalOnShowBsModal,
+    formsOrderAsset,
+    formsOrderAssetComplete,
+    formsIssueAsset,
+    formsAssetExchangeChangeGroupName,
+    evAssetExchangeSidebarContextClick,
+    formsAssetExchangeGroup,
+    pagesTransferHistory,
+    pagesMyAssets,
+    incomingMyAssets,
+    evTransferAssetModalOnShowBsModal,
+    formsTransferAssetMulti,
+    formsTransferAsset,
+    formsTransferAssetComplete,
+    goToAsset,
+    pagesOpenOrders,
+    incomingOpenOrders,
+    formsCancelOrder,
+    formsCancelOrderComplete
+} from './brs.assetexchange'
 
 export const BRS = {
     server: '',
@@ -228,12 +266,19 @@ export const BRS = {
         aliases: pagesAliases,
         at: pagesAt,
         contacts: pagesContacts,
-        escrow: pagesEscrow
+        escrow: pagesEscrow,
+        asset_exchange: pagesAssetExchange,
+        transfer_history: pagesTransferHistory,
+        my_assets: pagesMyAssets,
+        open_orders: pagesOpenOrders
     },
     incoming: {
         updateDashboardBlocks: incomingUpdateDashboardBlocks,
         blocks: incomingBlocks,
-        aliases: incomingAliases
+        aliases: incomingAliases,
+        asset_exchange: incomingAssetExchange,
+        my_assets: incomingMyAssets,
+        open_orders: incomingOpenOrders
     },
     forms: {
         sellAlias: formsSellAlias,
@@ -246,7 +291,19 @@ export const BRS = {
         addContact: formsAddContact,
         updateContact: formsUpdateContact,
         deleteContact: formsDeleteContact,
-        addCommitment: formsAddCommitment
+        addCommitment: formsAddCommitment,
+        addAssetBookmark: formsAddAssetBookmark,
+        addAssetBookmarkComplete: formsAddAssetBookmarkComplete,
+        orderAsset: formsOrderAsset,
+        orderAssetComplete: formsOrderAssetComplete,
+        issueAsset: formsIssueAsset,
+        assetExchangeChangeGroupName: formsAssetExchangeChangeGroupName,
+        assetExchangeGroup: formsAssetExchangeGroup,
+        transferAssetMulti: formsTransferAssetMulti,
+        transferAsset: formsTransferAsset,
+        transferAssetComplete: formsTransferAssetComplete,
+        cancelOrder: formsCancelOrder,
+        cancelOrderComplete: formsCancelOrderComplete
     },
 
     hasLocalStorage: true,
@@ -322,6 +379,13 @@ export const BRS = {
         update: SHA256_write,
         getBytes: SHA256_finalize
     },
+
+    // from assetexchange
+    assets: [],
+    closedGroups: [],
+    assetSearch: false,
+    currentAsset: {},
+    currentAssetID: 'undefined',
 
     // From brs.js
     init,
@@ -459,7 +523,29 @@ export const BRS = {
     hasTransactionUpdates,
     FnTree,
     translateServerError,
-    getTranslatedFieldName
+    getTranslatedFieldName,
+
+    // From assetexchange
+    loadCachedAssets,
+    saveCachedAssets,
+    getAssetDetails,
+    cacheUserAssets,
+    sortCachedAssets,
+    bookmarkAllUserAssets,
+    saveAssetBookmarks,
+    positionAssetSidebar,
+    incomingAssetExchange,
+    evAssetExchangeSidebarClick,
+    updateMiniTradeHistory,
+    evAssetExchangeSearchInput,
+    evAssetExchangeOrdersTableClick,
+    evSellBuyAutomaticPriceClick,
+    evAssetExchangeQuantityPriceKeydown,
+    evCalculatePricePreviewKeyup,
+    evAssetOrderModalOnShowBsModal,
+    evAssetExchangeSidebarContextClick,
+    evTransferAssetModalOnShowBsModal,
+    goToAsset
 
     // From brs.addevents.js
     // addEvents

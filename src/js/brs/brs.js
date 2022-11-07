@@ -308,8 +308,7 @@ export function getState (callback) {
         }
     })
 
-    // TODO on assetexchange
-    // BRS.saveCachedAssets()
+    BRS.saveCachedAssets()
 }
 
 export function logoSidebarClick (e, data) {
