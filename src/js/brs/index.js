@@ -365,7 +365,6 @@ export const BRS = {
     // from brs.settings
     defaultSettings: {
         submit_on_enter: 0,
-        news: -1,
         console_log: 0,
         fee_warning: '100000000000',
         amount_warning: '10000000000000',

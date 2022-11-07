@@ -317,12 +317,6 @@ export function addEventListeners () {
         $('#import_contacts_button_field').click()
     })
 
-    // from brs.news.js
-    $('#rss_news_enable').on('click', function () {
-        BRS.updateSettings('news', 1)
-        BRS.loadPage('news')
-    })
-
     // from brs.settings.js
     $('#settings_box select').on('change', function (e) {
         e.preventDefault()

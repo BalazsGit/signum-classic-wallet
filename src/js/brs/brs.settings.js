@@ -19,10 +19,6 @@ export function pagesSettings () {
         }
     }
 
-    if (BRS.settings.news != -1) {
-        $('#settings_news_initial').remove()
-    }
-
     if (BRS.inApp) {
         $('#settings_console_log_div').hide()
     }
@@ -75,14 +71,6 @@ function applySettings (key) {
             })
         } else {
             $('.modal form').off('submit.onEnter')
-        }
-    }
-
-    if (!key || key == 'news') {
-        if (BRS.settings.news === 0) {
-            $('#news_link').hide()
-        } else if (BRS.settings.news == 1) {
-            $('#news_link').show()
         }
     }
 
