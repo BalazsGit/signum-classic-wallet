@@ -59,7 +59,6 @@ export function addEventListeners () {
     $('#id_search').on('submit', BRS.evIdSearchSubmit)
     $('#login_button').on('click', BRS.evLoginButtonClick)
 
-    /*
     // from brs.forms.js
     $('.modal form input').keydown(function (e) {
         if (e.which === '13') {
@@ -78,6 +77,7 @@ export function addEventListeners () {
     // from brs.login.js
     $('#account_phrase_custom_panel form').submit(BRS.evAccountPhraseCustomPanelSubmit)
 
+    /*
     // from brs.recipient.js
     $('#send_message_modal, #send_money_modal, #add_contact_modal').on('show.bs.modal', function (e) {
         const $invoker = $(e.relatedTarget)
@@ -127,6 +127,7 @@ export function addEventListeners () {
     $('span.asset_selector').on('click', 'ul li a', BRS.evTransferAssetModalOnShowBsModal)
     $('span.recipient_selector').on('click', 'button', BRS.evSpanRecipientSelectorClickButton)
     $('span.recipient_selector').on('click', 'ul li a', BRS.evSpanRecipientSelectorClickUlLiA)
+    */
 
     // from brs.transactions.js
     $('input[type=radio][name=transactions_from_account]').on('click', function () {
@@ -134,6 +135,7 @@ export function addEventListeners () {
         BRS.hasMorePages = false
         BRS.loadPage('transactions')
     })
+    $('#transactions_page_type li a').click(BRS.evTransactionsPageTypeClick)
 
     // from brs.assetexchange.js
     $('#asset_exchange_bookmark_this_asset').on('click', function () {
@@ -221,6 +223,7 @@ export function addEventListeners () {
         $('#cancel_order_order').val(orderId)
     })
 
+    /*
     // from brs.messages.js
     $('#send_message_modal').on('show.bs.modal', function (e) {
         BRS.showFeeSuggestions('#send_message_fee', '#suggested_fee_response_send_message')
@@ -258,6 +261,7 @@ export function addEventListeners () {
     $('#message_details').on('click', 'dd.to_decrypt', function (e) {
         $('#messages_decrypt_modal').modal('show')
     })
+    */
 
     // from brs.aliases.js
     $('#transfer_alias_modal').on('show.bs.modal', function (e) {
@@ -291,9 +295,6 @@ export function addEventListeners () {
     })
     $('#alias_search').on('submit', BRS.evAliasSearchSubmit)
 
-    // from brs.messages.js
-    $('#transactions_page_type li a').click(BRS.evTransactionsPageTypeClick)
-
     // from brs.contacts.js
     $('#update_contact_modal').on('show.bs.modal', BRS.evUpdateContactModalOnShowBsModal)
     $('#delete_contact_modal').on('show.bs.modal', BRS.evDeleteContactModalOnShowBsModal)
@@ -321,7 +322,6 @@ export function addEventListeners () {
         BRS.updateSettings('news', 1)
         BRS.loadPage('news')
     })
-    */
 
     // from brs.settings.js
     $('#settings_box select').on('change', function (e) {
@@ -339,7 +339,6 @@ export function addEventListeners () {
         BRS.updateSettings(key, value)
     })
 
-    /*
     // from brs.sidebar.js
     $('.sidebar_context').on('contextmenu', 'a', BRS.evSidebarContextOnContextmenu)
 
@@ -352,6 +351,7 @@ export function addEventListeners () {
         BRS.decryptNoteFormSubmit()
     })
 
+    /*
     // from brs.modals.js
     // Reset scroll position of tab when shown.
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -693,6 +693,7 @@ export function addEventListeners () {
         BRS.removeDecryptionForm($(this))
         $('#transaction_info_output_bottom, #transaction_info_output_top, #transaction_info_bottom').html('').hide()
     })
+    */
 
     // from brs.utils.js
     $.fn.tree = BRS.FnTree
@@ -726,5 +727,4 @@ export function addEventListeners () {
         }
         BRS.blocksInfoLoad(currentBlock + 1)
     })
-    */
 }

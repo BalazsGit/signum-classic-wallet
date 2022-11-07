@@ -21,7 +21,7 @@ export function loadCachedAssets () {
     BRS.database.select('assets', null, function (error, assets) {
         // select already bookmarked assets
         if (error === null) {
-            assets.forEach(asset => BRS.cacheAsset(asset))
+            assets.forEach(asset => cacheAsset(asset))
         }
     })
 }

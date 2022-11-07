@@ -8,7 +8,9 @@ import {
     init,
     setStateInterval,
     checkSelectedNode,
+    autoSelectServer,
     getState,
+    logoSidebarClick,
     loadPage,
     goToPage,
     pageLoading,
@@ -16,13 +18,14 @@ import {
     addPagination,
     goToPageNumber,
     createDatabase,
+    clearData,
     getAccountInfo,
-    checkAssetDifferences,
     checkLocationHash,
     updateBlockchainDownloadProgress,
     checkIfOnAFork,
     checkMinimumFee,
-    showFeeSuggestions
+    showFeeSuggestions,
+    evIdSearchSubmit
 } from './brs'
 
 import {
@@ -420,7 +423,9 @@ export const BRS = {
     init,
     setStateInterval,
     checkSelectedNode,
+    autoSelectServer,
     getState,
+    logoSidebarClick,
     loadPage,
     goToPage,
     pageLoading,
@@ -428,13 +433,14 @@ export const BRS = {
     addPagination,
     goToPageNumber,
     createDatabase,
+    clearData,
     getAccountInfo,
-    checkAssetDifferences,
     checkLocationHash,
     updateBlockchainDownloadProgress,
     checkIfOnAFork,
     checkMinimumFee,
     showFeeSuggestions,
+    evIdSearchSubmit,
 
     // From settings
     getSettings,

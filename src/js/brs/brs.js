@@ -679,7 +679,7 @@ export function getAccountInfo (firstRun, callback) {
                                 id: 'asset_balances_' + BRS.account
                             }])
                             if (showAssetDifference) {
-                                BRS.checkAssetDifferences(BRS.accountInfo.assetBalances, previous_balances)
+                                checkAssetDifferences(BRS.accountInfo.assetBalances, previous_balances)
                             }
                         }
                     } else {
@@ -694,7 +694,7 @@ export function getAccountInfo (firstRun, callback) {
                 const currentBalances = JSON.stringify(BRS.accountInfo.assetBalances)
 
                 if (previousBalances !== currentBalances) {
-                    BRS.checkAssetDifferences(BRS.accountInfo.assetBalances, previousAccountInfo.assetBalances)
+                    checkAssetDifferences(BRS.accountInfo.assetBalances, previousAccountInfo.assetBalances)
                 }
             }
 
@@ -730,7 +730,7 @@ export function getAccountInfo (firstRun, callback) {
     })
 }
 
-export function checkAssetDifferences (current_balances, previous_balances) {
+function checkAssetDifferences (current_balances, previous_balances) {
     const current_balances_ = {}
     const previous_balances_ = {}
 
