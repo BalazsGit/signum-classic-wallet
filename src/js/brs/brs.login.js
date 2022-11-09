@@ -281,7 +281,7 @@ function loginWithPassphrase (passphrase) {
                 if ($('#remember_password').is(':checked')) {
                     BRS.rememberPassword = true
                     $('#remember_password').prop('checked', false)
-                    BRS.setPassword(passphrase)
+                    BRS.setServerPassword(passphrase)
                     $('.secret_phrase, .show_secret_phrase').hide()
                     $('.hide_secret_phrase').show()
                 }

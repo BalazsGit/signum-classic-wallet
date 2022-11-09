@@ -262,6 +262,7 @@ import {
     formsSendMoneyComplete,
     formsSendMoneyMulti,
     correctAddressMistake,
+    checkRecipient,
     evSpanRecipientSelectorClickButton,
     evSpanRecipientSelectorClickUlLiA
 } from './brs.recipient'
@@ -726,6 +727,7 @@ export const BRS = {
     sendMoneyCalculateTotal,
     commitmentCalculateTotal,
     correctAddressMistake,
+    checkRecipient,
     evSpanRecipientSelectorClickButton,
     evSpanRecipientSelectorClickUlLiA,
 

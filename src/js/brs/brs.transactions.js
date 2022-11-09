@@ -110,15 +110,6 @@ export function getUnconfirmedTransactions (callback) {
 
             for (let i = 0; i < response.unconfirmedTransactions.length; i++) {
                 const unconfirmedTransaction = response.unconfirmedTransactions[i]
-
-                if (unconfirmedTransaction.attachment) {
-                    for (const key in unconfirmedTransaction.attachment) {
-                        if (!unconfirmedTransaction.hasOwn(key)) {
-                            unconfirmedTransaction[key] = unconfirmedTransaction.attachment[key]
-                        }
-                    }
-                }
-
                 unconfirmedTransactions.push(unconfirmedTransaction)
                 unconfirmedTransactionIds.push(unconfirmedTransaction.transaction)
             }
@@ -127,7 +118,7 @@ export function getUnconfirmedTransactions (callback) {
 
             const unconfirmedTransactionIdString = unconfirmedTransactionIds.toString()
 
-            if (unconfirmedTransactionIdString != BRS.unconfirmedTransactionIds) {
+            if (unconfirmedTransactionIdString !== BRS.unconfirmedTransactionIds) {
                 BRS.unconfirmedTransactionsChange = true
                 BRS.unconfirmedTransactionIds = unconfirmedTransactionIdString
             } else {
@@ -236,14 +227,6 @@ export function addUnconfirmedTransaction (transactionId, callback) {
     }, function (response) {
         if (!response.errorCode) {
             response.transaction = transactionId
-
-            if (response.attachment) {
-                for (const key in response.attachment) {
-                    if (!response.hasOwn(key)) {
-                        response[key] = response.attachment[key]
-                    }
-                }
-            }
 
             let alreadyProcessed = false
 
