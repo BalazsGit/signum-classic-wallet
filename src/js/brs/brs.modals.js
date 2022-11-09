@@ -1,9 +1,11 @@
 /**
  * @depends {brs.js}
  */
-var BRS = (function (BRS, $, undefined) {
-    BRS.fetchingModalData = false
+/* global $ */
 
+import { BRS } from '.'
+
+export function setupLockableModal () {
     // save the original function object
     const _superModal = $.fn.modal
 
@@ -34,279 +36,277 @@ var BRS = (function (BRS, $, undefined) {
             _hide.apply(this, arguments)
         }
     })
+}
 
-    BRS.evAddRecipientsClick = function (e) {
-        e.preventDefault()
-        if ($('#send_money_same_out_checkbox').is(':checked')) {
-            $('#multi_out_same_recipients').append($('#additional_multi_out_same_recipient').html()) // add input box
-        } else {
-            $('#multi_out_recipients').append($('#additional_multi_out_recipient').html()) // add input box
-        }
-        $('input[name=recipient_multi_out_same]').off('blur').on('blur', BRS.evMultiOutSameAmountChange)
-        $('input[name=recipient_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
-        $('input[name=amount_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
-        $('.remove_recipient .remove_recipient_button').off('click').on('click', BRS.evDocumentOnClickRemoveRecipient)
-
-        $('span.recipient_selector').on('click', 'button', BRS.evSpanRecipientSelectorClickButton)
-        $('span.recipient_selector').on('click', 'ul li a', BRS.evSpanRecipientSelectorClickUlLiA)
+export function evAddRecipientsClick (e) {
+    e.preventDefault()
+    if ($('#send_money_same_out_checkbox').is(':checked')) {
+        $('#multi_out_same_recipients').append($('#additional_multi_out_same_recipient').html()) // add input box
+    } else {
+        $('#multi_out_recipients').append($('#additional_multi_out_recipient').html()) // add input box
     }
+    $('input[name=recipient_multi_out_same]').off('blur').on('blur', BRS.evMultiOutSameAmountChange)
+    $('input[name=recipient_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
+    $('input[name=amount_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
+    $('.remove_recipient .remove_recipient_button').off('click').on('click', BRS.evDocumentOnClickRemoveRecipient)
 
-    BRS.evDocumentOnClickRemoveRecipient = function (e) {
-        e.preventDefault()
-        $(this).parent().parent('div').remove()
+    $('span.recipient_selector').on('click', 'button', BRS.evSpanRecipientSelectorClickButton)
+    $('span.recipient_selector').on('click', 'ul li a', BRS.evSpanRecipientSelectorClickUlLiA)
+}
 
-        if ($('#send_money_same_out_checkbox').is(':checked')) {
-            BRS.evMultiOutSameAmountChange()
-        } else {
-            BRS.evMultiOutAmountChange()
-        }
+export function evDocumentOnClickRemoveRecipient (e) {
+    e.preventDefault()
+    $(this).parent().parent('div').remove()
+
+    if ($('#send_money_same_out_checkbox').is(':checked')) {
+        BRS.evMultiOutSameAmountChange()
+    } else {
+        BRS.evMultiOutAmountChange()
     }
+}
 
-    BRS.evMultiOutAmountChange = function (e) {
-        // get amount for each recipient
-        let amount_total = 0
-        $('#multi_out_recipients .row').each(function (index, row) {
-            const recipient = $(row).find('input[name=recipient_multi_out]').val()
-            const value = $(row).find('input[name=amount_multi_out]').val()
-            const current_amount = parseFloat(value, 10)
-            const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount)
-            if (recipient !== '') {
-                amount_total += amount
-            }
-        })
-        const current_fee = parseFloat($('#multi_out_fee').val(), 10)
-        const fee = BRS.checkMinimumFee(current_fee)
-        // $("#multi_out_fee").val(fee.toFixed(8));
-        amount_total += fee
-
-        $('#total_amount_multi_out').html(BRS.formatAmount(BRS.convertToNQT(amount_total)) + ' ' + BRS.valueSuffix)
-    }
-
-    BRS.evMultiOutSameAmountChange = function () {
-        let amount_total = 0
-        const current_amount = parseFloat($('#multi_out_same_amount').val(), 10)
-        const current_fee = parseFloat($('#multi_out_fee').val(), 10)
+export function evMultiOutAmountChange (e) {
+    // get amount for each recipient
+    let amount_total = 0
+    $('#multi_out_recipients .row').each(function (index, row) {
+        const recipient = $(row).find('input[name=recipient_multi_out]').val()
+        const value = $(row).find('input[name=amount_multi_out]').val()
+        const current_amount = parseFloat(value, 10)
         const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount)
-        const fee = BRS.checkMinimumFee(current_fee)
-
-        $('#multi_out_same_recipients input[name=recipient_multi_out_same]').each(function () {
-            if ($(this).val() !== '') {
-                amount_total += amount
-            }
-        })
-        amount_total += fee
-
-        $('#total_amount_multi_out').html(BRS.formatAmount(BRS.convertToNQT(amount_total)) + ' ' + BRS.valueSuffix)
-    }
-
-    BRS.evSameOutCheckboxChange = function (e) {
-        $('#total_amount_multi_out').html('?')
-        if ($(this).is(':checked')) {
-            $('#multi_out_same_recipients').fadeIn()
-            $('#row_multi_out_same_amount').fadeIn()
-            $('#multi_out_recipients').hide()
-            BRS.evMultiOutSameAmountChange()
-        } else {
-            $('#multi_out_same_recipients').hide()
-            $('#row_multi_out_same_amount').hide()
-            $('#multi_out_recipients').fadeIn()
-            BRS.evMultiOutAmountChange()
+        if (recipient !== '') {
+            amount_total += amount
         }
-    }
+    })
+    const current_fee = parseFloat($('#multi_out_fee').val(), 10)
+    const fee = BRS.checkMinimumFee(current_fee)
+    // $("#multi_out_fee").val(fee.toFixed(8));
+    amount_total += fee
 
-    BRS.evMultiOutFeeChange = function (e) {
-        if ($('#send_money_same_out_checkbox').is(':checked')) {
-            BRS.evMultiOutSameAmountChange()
-        } else {
-            BRS.evMultiOutAmountChange()
+    $('#total_amount_multi_out').html(BRS.formatAmount(BRS.convertToNQT(amount_total)) + ' ' + BRS.valueSuffix)
+}
+
+export function evMultiOutSameAmountChange () {
+    let amount_total = 0
+    const current_amount = parseFloat($('#multi_out_same_amount').val(), 10)
+    const current_fee = parseFloat($('#multi_out_fee').val(), 10)
+    const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount)
+    const fee = BRS.checkMinimumFee(current_fee)
+
+    $('#multi_out_same_recipients input[name=recipient_multi_out_same]').each(function () {
+        if ($(this).val() !== '') {
+            amount_total += amount
         }
-    }
+    })
+    amount_total += fee
 
-    // hide modal when another one is activated.
-    BRS.evModalOnShowBsModal = function (e) {
-        const $visible_modal = $('.modal.in')
-        if ($visible_modal.length) {
-            if ($visible_modal.hasClass('locked')) {
-                const $btn = $visible_modal.find('button.btn-primary:not([data-dismiss=modal])')
-                BRS.unlockForm($visible_modal, $btn, true)
-            } else {
-                $visible_modal.modal('hide')
-            }
-        }
-        $(this).find('.form-group').css('margin-bottom', '')
-    }
+    $('#total_amount_multi_out').html(BRS.formatAmount(BRS.convertToNQT(amount_total)) + ' ' + BRS.valueSuffix)
+}
 
-    BRS.resetModalMultiOut = function () {
-        $('#multi_out_recipients').empty()
-        $('#multi_out_same_recipients').empty()
+export function evSameOutCheckboxChange (e) {
+    $('#total_amount_multi_out').html('?')
+    if ($(this).is(':checked')) {
+        $('#multi_out_same_recipients').fadeIn()
+        $('#row_multi_out_same_amount').fadeIn()
+        $('#multi_out_recipients').hide()
+        BRS.evMultiOutSameAmountChange()
+    } else {
         $('#multi_out_same_recipients').hide()
         $('#row_multi_out_same_amount').hide()
         $('#multi_out_recipients').fadeIn()
-        $('#multi_out_recipients').append($('#additional_multi_out_recipient').html())
-        $('#multi_out_recipients').append($('#additional_multi_out_recipient').html())
-        $('#multi_out_same_recipients').append($('#additional_multi_out_same_recipient').html())
-        $('#multi_out_same_recipients').append($('#additional_multi_out_same_recipient').html())
-        $('#multi_out_same_recipients input[name=recipient_multi_out_same]').off('blur').on('blur', BRS.evMultiOutSameAmountChange)
-        $('#multi_out_recipients input[name=recipient_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
-        $('#multi_out_recipients input[name=amount_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
-        $('span.recipient_selector').on('click', 'button', BRS.evSpanRecipientSelectorClickButton)
-        $('span.recipient_selector').on('click', 'ul li a', BRS.evSpanRecipientSelectorClickUlLiA)
-        $('#send_multi_out .remove_recipient').each(function () {
-            $(this).remove()
-        })
-        $('#send_money_same_out_checkbox').prop('checked', false)
-        $('#multi_out_fee').val(0.02)
-        $('#multi_out_same_amount').val('')
-        $('#send_ordinary').fadeIn()
-        $('#send_multi_out').hide()
-        if (!$('.ordinary-nav').hasClass('active')) {
-            $('.ordinary-nav').addClass('active')
-        }
-        if ($('.multi-out-nav').toggleClass('active')) {
-            $('.multi-out-nav').removeClass('active')
+        BRS.evMultiOutAmountChange()
+    }
+}
+
+export function evMultiOutFeeChange (e) {
+    if ($('#send_money_same_out_checkbox').is(':checked')) {
+        BRS.evMultiOutSameAmountChange()
+    } else {
+        BRS.evMultiOutAmountChange()
+    }
+}
+
+// hide modal when another one is activated.
+export function evModalOnShowBsModal (e) {
+    const $visible_modal = $('.modal.in')
+    if ($visible_modal.length) {
+        if ($visible_modal.hasClass('locked')) {
+            const $btn = $visible_modal.find('button.btn-primary:not([data-dismiss=modal])')
+            BRS.unlockForm($visible_modal, $btn, true)
+        } else {
+            $visible_modal.modal('hide')
         }
     }
+    $(this).find('.form-group').css('margin-bottom', '')
+}
 
-    // Reset form to initial state when modal is closed
-    BRS.evModalOnHiddenBsModal = function (e) {
-        BRS.resetModalMultiOut()
+export function resetModalMultiOut () {
+    $('#multi_out_recipients').empty()
+    $('#multi_out_same_recipients').empty()
+    $('#multi_out_same_recipients').hide()
+    $('#row_multi_out_same_amount').hide()
+    $('#multi_out_recipients').fadeIn()
+    $('#multi_out_recipients').append($('#additional_multi_out_recipient').html())
+    $('#multi_out_recipients').append($('#additional_multi_out_recipient').html())
+    $('#multi_out_same_recipients').append($('#additional_multi_out_same_recipient').html())
+    $('#multi_out_same_recipients').append($('#additional_multi_out_same_recipient').html())
+    $('#multi_out_same_recipients input[name=recipient_multi_out_same]').off('blur').on('blur', BRS.evMultiOutSameAmountChange)
+    $('#multi_out_recipients input[name=recipient_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
+    $('#multi_out_recipients input[name=amount_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
+    $('span.recipient_selector').on('click', 'button', BRS.evSpanRecipientSelectorClickButton)
+    $('span.recipient_selector').on('click', 'ul li a', BRS.evSpanRecipientSelectorClickUlLiA)
+    $('#send_multi_out .remove_recipient').each(function () {
+        $(this).remove()
+    })
+    $('#send_money_same_out_checkbox').prop('checked', false)
+    $('#multi_out_fee').val(0.02)
+    $('#multi_out_same_amount').val('')
+    $('#send_ordinary').fadeIn()
+    $('#send_multi_out').hide()
+    if (!$('.ordinary-nav').hasClass('active')) {
+        $('.ordinary-nav').addClass('active')
+    }
+    if ($('.multi-out-nav').toggleClass('active')) {
+        $('.multi-out-nav').removeClass('active')
+    }
+}
 
-        // Multi-transfers
-        $('.multi-transfer').hide()
-        $('.transfer-asset').fadeIn()
-        if (!$('.transfer-asset-nav').hasClass('active')) {
-            $('.transfer-asset-nav').addClass('active')
-        }
-        if ($('.multi-transfer-nav').toggleClass('active')) {
-            $('.multi-transfer-nav').removeClass('active')
-        }
-        $(this).find('span[name=transfer_asset_available]').each(function () {
-            $(this).html('')
-        })
-        $(this).find('span[name=asset-name]').each(function () {
-            $(this).html('?')
-        })
-        // End multi-transfers
+// Reset form to initial state when modal is closed
+export function evModalOnHiddenBsModal (e) {
+    BRS.resetModalMultiOut()
 
-        $(this).find(':input:not(button)').each(function (index) {
-            const defaultValue = $(this).data('default')
-            const type = $(this).attr('type')
-            const tag = $(this).prop('tagName').toLowerCase()
+    // Multi-transfers
+    $('.multi-transfer').hide()
+    $('.transfer-asset').fadeIn()
+    if (!$('.transfer-asset-nav').hasClass('active')) {
+        $('.transfer-asset-nav').addClass('active')
+    }
+    if ($('.multi-transfer-nav').toggleClass('active')) {
+        $('.multi-transfer-nav').removeClass('active')
+    }
+    $(this).find('span[name=transfer_asset_available]').each(function () {
+        $(this).html('')
+    })
+    $(this).find('span[name=asset-name]').each(function () {
+        $(this).html('?')
+    })
+    // End multi-transfers
 
-            if (type == 'checkbox') {
-                if (defaultValue == 'checked') {
-                    $(this).prop('checked', true)
-                } else {
-                    $(this).prop('checked', false)
-                }
-            } else if (type == 'hidden') {
-                if (defaultValue !== undefined) {
-                    $(this).val(defaultValue)
-                }
-            } else if (tag == 'select') {
-                if (defaultValue !== undefined) {
-                    $(this).val(defaultValue)
-                } else {
-                    $(this).find('option:selected').prop('selected', false)
-                    $(this).find('option:first').prop('selected', 'selected')
-                }
+    $(this).find(':input:not(button)').each(function (index) {
+        const defaultValue = $(this).data('default')
+        const type = $(this).attr('type')
+        const tag = $(this).prop('tagName').toLowerCase()
+
+        if (type === 'checkbox') {
+            if (defaultValue === 'checked') {
+                $(this).prop('checked', true)
             } else {
-                if (defaultValue !== undefined) {
-                    $(this).val(defaultValue)
-                } else {
-                    $(this).val('')
-                }
+                $(this).prop('checked', false)
             }
-        })
+        } else if (type === 'hidden') {
+            if (defaultValue !== undefined) {
+                $(this).val(defaultValue)
+            }
+        } else if (tag === 'select') {
+            if (defaultValue !== undefined) {
+                $(this).val(defaultValue)
+            } else {
+                $(this).find('option:selected').prop('selected', false)
+                $(this).find('option:first').prop('selected', 'selected')
+            }
+        } else {
+            if (defaultValue !== undefined) {
+                $(this).val(defaultValue)
+            } else {
+                $(this).val('')
+            }
+        }
+    })
 
-        // Hidden form field
-        $(this).find('input[name=converted_account_id]').val('')
+    // Hidden form field
+    $(this).find('input[name=converted_account_id]').val('')
 
-        // Hide/Reset any possible error messages
-        $(this).find('.callout-danger:not(.never_hide), .error_message, .account_info').html('').hide()
+    // Hide/Reset any possible error messages
+    $(this).find('.callout-danger:not(.never_hide), .error_message, .account_info').html('').hide()
 
-        $(this).find('.advanced').hide()
+    $(this).find('.advanced').hide()
 
-        $(this).find('.recipient_public_key').hide()
+    $(this).find('.recipient_public_key').hide()
 
-        $(this).find('.optional_message, .optional_note').hide()
+    $(this).find('.optional_message, .optional_note').hide()
 
-        $(this).find('.advanced_info a').text($.t('advanced'))
+    $(this).find('.advanced_info a').text($.t('advanced'))
 
-        $(this).find('.advanced_extend').each(function (index, obj) {
-            const normalSize = $(obj).data('normal')
-            const advancedSize = $(obj).data('advanced')
+    $(this).find('.advanced_extend').each(function (index, obj) {
+        const normalSize = $(obj).data('normal')
+        const advancedSize = $(obj).data('advanced')
+        $(obj).removeClass('col-xs-' + advancedSize + ' col-sm-' + advancedSize + ' col-md-' + advancedSize).addClass('col-xs-' + normalSize + ' col-sm-' + normalSize + ' col-md-' + normalSize)
+    })
+
+    const $feeInput = $(this).find('input[name=feeNXT]')
+
+    if ($feeInput.length) {
+        let defaultFee = $feeInput.data('default')
+        if (!defaultFee) {
+            defaultFee = 1
+        }
+
+        $(this).find('.advanced_fee').html(BRS.formatAmount(BRS.convertToNQT(defaultFee)) + ' ' + BRS.valueSuffix)
+    }
+
+    BRS.showedFormWarning = false
+}
+
+export function showModalError (errorMessage, $modal) {
+    const $btn = $modal.find('button.btn-primary:not([data-dismiss=modal], .ignore)')
+
+    $modal.find('button').prop('disabled', false)
+
+    $modal.find('.error_message').html(String(errorMessage).escapeHTML()).show()
+    $btn.button('reset')
+    $modal.modal('unlock')
+}
+
+// export function closeModal($modal) {
+//     if (!$modal) {
+//         $modal = $('div.modal.in:first')
+//     }
+
+//     $modal.find('button').prop('disabled', false)
+
+//     const $btn = $modal.find('button.btn-primary:not([data-dismiss=modal], .ignore)')
+
+//     $btn.button('reset')
+//     $modal.modal('unlock')
+//     $modal.modal('hide')
+// }
+
+export function evAdvancedInfoClick (e) {
+    e.preventDefault()
+
+    const $modal = $(this).closest('.modal')
+
+    const text = $(this).text()
+
+    if (text === $.t('advanced')) {
+        $modal.find('.advanced').not('.optional_note').fadeIn()
+    } else {
+        $modal.find('.advanced').hide()
+    }
+
+    $modal.find('.advanced_extend').each(function (index, obj) {
+        const normalSize = $(obj).data('normal')
+        const advancedSize = $(obj).data('advanced')
+
+        if (text === 'advanced') {
+            $(obj).addClass('col-xs-' + advancedSize + ' col-sm-' + advancedSize + ' col-md-' + advancedSize).removeClass('col-xs-' + normalSize + ' col-sm-' + normalSize + ' col-md-' + normalSize)
+        } else {
             $(obj).removeClass('col-xs-' + advancedSize + ' col-sm-' + advancedSize + ' col-md-' + advancedSize).addClass('col-xs-' + normalSize + ' col-sm-' + normalSize + ' col-md-' + normalSize)
-        })
-
-        const $feeInput = $(this).find('input[name=feeNXT]')
-
-        if ($feeInput.length) {
-            let defaultFee = $feeInput.data('default')
-            if (!defaultFee) {
-                defaultFee = 1
-            }
-
-            $(this).find('.advanced_fee').html(BRS.formatAmount(BRS.convertToNQT(defaultFee)) + ' ' + BRS.valueSuffix)
         }
+    })
 
-        BRS.showedFormWarning = false
+    if (text === $.t('advanced')) {
+        $(this).text($.t('basic'))
+    } else {
+        $(this).text($.t('advanced'))
     }
-
-    BRS.showModalError = function (errorMessage, $modal) {
-        const $btn = $modal.find('button.btn-primary:not([data-dismiss=modal], .ignore)')
-
-        $modal.find('button').prop('disabled', false)
-
-        $modal.find('.error_message').html(String(errorMessage).escapeHTML()).show()
-        $btn.button('reset')
-        $modal.modal('unlock')
-    }
-
-    BRS.closeModal = function ($modal) {
-        if (!$modal) {
-            $modal = $('div.modal.in:first')
-        }
-
-        $modal.find('button').prop('disabled', false)
-
-        const $btn = $modal.find('button.btn-primary:not([data-dismiss=modal], .ignore)')
-
-        $btn.button('reset')
-        $modal.modal('unlock')
-        $modal.modal('hide')
-    }
-
-    BRS.evAdvancedInfoClick = function (e) {
-        e.preventDefault()
-
-        const $modal = $(this).closest('.modal')
-
-        const text = $(this).text()
-
-        if (text == $.t('advanced')) {
-            $modal.find('.advanced').not('.optional_note').fadeIn()
-        } else {
-            $modal.find('.advanced').hide()
-        }
-
-        $modal.find('.advanced_extend').each(function (index, obj) {
-            const normalSize = $(obj).data('normal')
-            const advancedSize = $(obj).data('advanced')
-
-            if (text == 'advanced') {
-                $(obj).addClass('col-xs-' + advancedSize + ' col-sm-' + advancedSize + ' col-md-' + advancedSize).removeClass('col-xs-' + normalSize + ' col-sm-' + normalSize + ' col-md-' + normalSize)
-            } else {
-                $(obj).removeClass('col-xs-' + advancedSize + ' col-sm-' + advancedSize + ' col-md-' + advancedSize).addClass('col-xs-' + normalSize + ' col-sm-' + normalSize + ' col-md-' + normalSize)
-            }
-        })
-
-        if (text == $.t('advanced')) {
-            $(this).text($.t('basic'))
-        } else {
-            $(this).text($.t('advanced'))
-        }
-    }
-
-    return BRS
-}(BRS || {}, jQuery))
+}

@@ -2,36 +2,37 @@
  * @depends {brs.js}
  * @depends {brs.modals.js}
  */
-var BRS = (function (BRS, $, undefined) {
-    BRS.showSubscriptionCancelModal = function (subscription) {
-        if (BRS.fetchingModalData) {
-	    return
-        }
 
-        BRS.fetchingModalData = true
+/* global $ */
 
-        if (typeof subscription !== 'object') {
-	    BRS.sendRequest('getSubscription', {
-                subscription
-	    }, function (response, input) {
-                BRS.processSubscriptionCancelModalData(response)
-	    })
-        } else {
-	    BRS.processSubscriptionCancelModalData(subscription)
-        }
+import { BRS } from '.'
+
+export function showSubscriptionCancelModal (subscription) {
+    if (BRS.fetchingModalData) {
+        return
     }
 
-    BRS.processSubscriptionCancelModalData = function (subscription) {
-        $('#subscription_cancel_subscription').val(subscription.id)
-        $('#subscription_cancel_sender').html(subscription.senderRS)
-        $('#subscription_cancel_recipient').html(subscription.recipientRS)
-        $('#subscription_cancel_amount').html(BRS.formatAmount(subscription.amountNQT))
-        $('#subscription_cancel_frequency').html(subscription.frequency)
-        $('#subscription_cancel_time_next').html(BRS.formatTimestamp(subscription.timeNext))
+    BRS.fetchingModalData = true
 
-        $('#subscription_cancel_modal').modal('show')
-        BRS.fetchingModalData = false
+    if (typeof subscription !== 'object') {
+        BRS.sendRequest('getSubscription', {
+            subscription
+        }, function (response, input) {
+            BRS.processSubscriptionCancelModalData(response)
+        })
+    } else {
+        BRS.processSubscriptionCancelModalData(subscription)
     }
+}
 
-    return BRS
-}(BRS || {}, jQuery))
+export function processSubscriptionCancelModalData (subscription) {
+    $('#subscription_cancel_subscription').val(subscription.id)
+    $('#subscription_cancel_sender').html(subscription.senderRS)
+    $('#subscription_cancel_recipient').html(subscription.recipientRS)
+    $('#subscription_cancel_amount').html(BRS.formatAmount(subscription.amountNQT))
+    $('#subscription_cancel_frequency').html(subscription.frequency)
+    $('#subscription_cancel_time_next').html(BRS.formatTimestamp(subscription.timeNext))
+
+    $('#subscription_cancel_modal').modal('show')
+    BRS.fetchingModalData = false
+}

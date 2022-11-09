@@ -341,8 +341,8 @@ export function addEventListeners () {
         BRS.decryptNoteFormSubmit()
     })
 
-    /*
     // from brs.modals.js
+    BRS.setupLockableModal()
     // Reset scroll position of tab when shown.
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         const target = $(e.target).attr('href')
@@ -455,7 +455,7 @@ export function addEventListeners () {
         const content = $('#user_info_modal_' + tab)
         content.show()
         if (content.hasClass('data-loading')) {
-            BRS.userInfoModal[tab]()
+            BRS.loadUserInfoModal(tab)
         }
     })
 
@@ -683,7 +683,6 @@ export function addEventListeners () {
         BRS.removeDecryptionForm($(this))
         $('#transaction_info_output_bottom, #transaction_info_output_top, #transaction_info_bottom').html('').hide()
     })
-    */
 
     // from brs.utils.js
     $.fn.tree = BRS.FnTree

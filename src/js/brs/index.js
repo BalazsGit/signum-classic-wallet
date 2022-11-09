@@ -270,6 +270,78 @@ import {
     pagesSubscription
 } from './brs.subscription'
 
+import {
+    setupLockableModal,
+    evAddRecipientsClick,
+    evDocumentOnClickRemoveRecipient,
+    evMultiOutAmountChange,
+    evMultiOutSameAmountChange,
+    evSameOutCheckboxChange,
+    evMultiOutFeeChange,
+    evModalOnShowBsModal,
+    resetModalMultiOut,
+    evModalOnHiddenBsModal,
+    showModalError,
+    evAdvancedInfoClick
+} from './brs.modals'
+
+import {
+    evAccountDetailsModalOnShowBsModal
+} from './brs.modals.accountdetails'
+
+import {
+    formsSetAccountInfoComplete
+} from './brs.modals.accountinfo'
+
+import {
+    showAccountModal,
+    loadUserInfoModal
+} from './brs.modals.account'
+
+import {
+    showRawTransactionModal,
+    evTransactionOperationsModalClick,
+    formsBroadcastTransactionComplete,
+    formsParseTransactionComplete,
+    formsParseTransactionError,
+    formsCalculateFullHashComplete,
+    formsCalculateFullHashError
+} from './brs.modals.advanced'
+
+import {
+    evBlocksTableClick,
+    showBlockModal
+} from './brs.modals.block'
+
+import {
+    showEscrowDecisionModal,
+    processEscrowDecisionModalData
+} from './brs.modals.escrow'
+
+import {
+    evBrsModalOnShowBsModal
+} from './brs.modals.info'
+
+import {
+    evRequestBurstQrModalOnShowBsModal,
+    evGenerateQrButtonClick
+} from './brs.modals.request'
+
+import {
+    formsSignModalButtonClicked,
+    formsSignMessage,
+    formsVerifyMessage
+} from './brs.modals.signmessage'
+
+import {
+    showSubscriptionCancelModal,
+    processSubscriptionCancelModalData
+} from './brs.modals.subscription'
+
+import {
+    showTransactionModal
+} from './brs.modals.transaction'
+
 export const BRS = {
     server: '',
     state: {},
@@ -366,7 +438,16 @@ export const BRS = {
         sendMoneyComplete: formsSendMoneyComplete,
         sendMoneyMulti: formsSendMoneyMulti,
         sendMessageComplete: formsSendMessageComplete,
-        decryptMessages: formsDecryptMessages
+        decryptMessages: formsDecryptMessages,
+        setAccountInfoComplete: formsSetAccountInfoComplete,
+        broadcastTransactionComplete: formsBroadcastTransactionComplete,
+        parseTransactionComplete: formsParseTransactionComplete,
+        parseTransactionError: formsParseTransactionError,
+        calculateFullHashComplete: formsCalculateFullHashComplete,
+        calculateFullHashError: formsCalculateFullHashError,
+        signModalButtonClicked: formsSignModalButtonClicked,
+        signMessage: formsSignMessage,
+        verifyMessage: formsVerifyMessage
     },
 
     hasLocalStorage: true,
@@ -459,6 +540,14 @@ export const BRS = {
     // from messages
     _messages: {},
     _latestMessages: {},
+
+    // from modals
+    fetchingModalData: false,
+
+    // from modals.account
+    userInfoModal: {
+        user: 0
+    },
 
     // From brs.js
     init,
@@ -647,10 +736,54 @@ export const BRS = {
 
     // From sidebar
     evSidebarContextOnContextmenu,
-    closeContextMenu
+    closeContextMenu,
 
-    // From brs.addevents.js
-    // addEvents
+    // From modals
+    setupLockableModal,
+    evAddRecipientsClick,
+    evDocumentOnClickRemoveRecipient,
+    evMultiOutAmountChange,
+    evMultiOutSameAmountChange,
+    evSameOutCheckboxChange,
+    evMultiOutFeeChange,
+    evModalOnShowBsModal,
+    resetModalMultiOut,
+    evModalOnHiddenBsModal,
+    showModalError,
+    evAdvancedInfoClick,
+
+    // From modals.accountdetails
+    evAccountDetailsModalOnShowBsModal,
+
+    // From modals.account
+    showAccountModal,
+    loadUserInfoModal,
+
+    // From modals.advanced
+    showRawTransactionModal,
+    evTransactionOperationsModalClick,
+
+    // From modals.block
+    evBlocksTableClick,
+    showBlockModal,
+
+    // From modals.escrow
+    showEscrowDecisionModal,
+    processEscrowDecisionModalData,
+
+    // from modals.info
+    evBrsModalOnShowBsModal,
+
+    // From modals.request
+    evRequestBurstQrModalOnShowBsModal,
+    evGenerateQrButtonClick,
+
+    // From modals.subscription
+    showSubscriptionCancelModal,
+    processSubscriptionCancelModalData,
+
+    // From modals.transaction
+    showTransactionModal
 }
 
 window.BRS = BRS
