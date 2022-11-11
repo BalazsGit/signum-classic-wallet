@@ -652,7 +652,7 @@ function aesEncrypt (plaintext, options) {
         sharedKey[i] ^= options.nonce[i]
     }
 
-    const key = CryptoJS.SHA256(converters.byteArrayToWordArray(sharedKey))
+    const key = converters.byteArrayToWordArray(jssha.SHA256_hash(sharedKey))
 
     const tmp = new Uint8Array(16)
 
@@ -695,7 +695,7 @@ function aesDecrypt (ivCiphertext, options) {
         sharedKey[i] ^= options.nonce[i]
     }
 
-    const key = CryptoJS.SHA256(converters.byteArrayToWordArray(sharedKey))
+    const key = converters.byteArrayToWordArray(jssha.SHA256_hash(sharedKey))
 
     const encrypted = CryptoJS.lib.CipherParams.create({
         ciphertext,
