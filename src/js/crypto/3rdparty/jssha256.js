@@ -94,7 +94,10 @@ function array_to_hex_string(ary) {
   var SHA256_len = 0;
 var SHA256_H = new Array();
 
-function SHA256_init() {	
+/**
+ * Initialize structures for hashing
+ */
+export function SHA256_init() {
   SHA256_H = new Array(0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 
     0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19);
 	
@@ -102,18 +105,12 @@ function SHA256_init() {
   SHA256_len = 0;
 }
 
-/*
-   SHA256_write: add a message fragment to the hash function's internal state. 
-   'msg' may be given as string or as byte array and may have arbitrary length.
-
-*/
-
-function SHA256_write(msg) {	
-  if (typeof(msg) == "string")
-    SHA256_buf = SHA256_buf.concat(string_to_array(msg));
-  else
+/**
+ *  SHA256_write: add a message fragment to the hash function's internal state. 
+ *  @param msg {number[]} byte array and may have arbitrary length.
+ */
+export function SHA256_write(msg) {
     SHA256_buf = SHA256_buf.concat(msg);
-                    
   for(var i = 0; i + 64 <= SHA256_buf.length; i += 64)
     SHA256_Hash_Byte_Block(SHA256_H, SHA256_buf.slice(i, i + 64));
         
@@ -122,12 +119,12 @@ function SHA256_write(msg) {
   SHA256_len += msg.length;
 }
 
-/*
-   SHA256_finalize: finalize the hash value calculation. Call this function
-   after the last call to SHA256_write. An array of 32 bytes (= 256 bits) 
-   is returned.
+/**
+ * SHA256_finalize: finalize the hash value calculation. Call this function
+ * after the last call to SHA256_write.
+ * @returns {number[]} byte array of 32 bytes (= 256 bits)
 */
-
+export function SHA256_finalize() {
 function SHA256_finalize() {
   SHA256_buf[SHA256_buf.length] = 0x80;
 
@@ -162,82 +159,32 @@ function SHA256_finalize() {
   return res;
 }
 
-/*
-   SHA256_hash: calculate the hash value of the string or byte array 'msg' 
-   and return it as hexadecimal string. This shortcut function may be more 
-   convenient than calling SHA256_init, SHA256_write, SHA256_finalize 
-   and array_to_hex_string explicitly.
-*/
-
-function SHA256_hash(msg, no_hex) {
-  var res;
+/**
+ * SHA256_hash: calculate the hash value of byte array 'msg'. This shortcut
+ * function may be more convenient than calling SHA256_init, SHA256_write,
+ * SHA256_finalize.
+ * @param msg {number[]} byte array to be hashed
+ * @returns {number[]} hash as byte array 
+ */
+export function SHA256_hash(msg) {
   SHA256_init();
-   
   SHA256_write(msg);
-  
-  res = SHA256_finalize();
-    
-  if (no_hex) {
-	  return res;
-  }
-  
-  return array_to_hex_string(res);
-}
-
-/******************************************************************************/
-
-/* The following are the HMAC-SHA256 routines */
-
-/*
-   HMAC_SHA256_init: initialize the MAC's internal state. The MAC key 'key'
-   may be given as string or as byte array and may have arbitrary length.
-*/
-
-function HMAC_SHA256_init(key) {
-  if (typeof(key) == "string")
-    HMAC_SHA256_key = string_to_array(key);
-  else
-    HMAC_SHA256_key = new Array().concat(key);
-
-  if (HMAC_SHA256_key.length > 64) {
-    SHA256_init();
-    SHA256_write(HMAC_SHA256_key);
-    HMAC_SHA256_key = SHA256_finalize();
-  }
-
-  for(var i = HMAC_SHA256_key.length; i < 64; i++)
-    HMAC_SHA256_key[i] = 0;
-  for(var i = 0; i < 64; i++)
-    HMAC_SHA256_key[i] ^=  0x36;
-  SHA256_init();
-  SHA256_write(HMAC_SHA256_key);
-}
-
-/*
-   HMAC_SHA256_write: process a message fragment. 'msg' may be given as 
-   string or as byte array and may have arbitrary length.
-*/
-
-function HMAC_SHA256_write(msg) {
-  SHA256_write(msg);
-}
-
-/*
-   HMAC_SHA256_finalize: finalize the HMAC calculation. An array of 32 bytes
-   (= 256 bits) is returned.
-*/
-
-function HMAC_SHA256_finalize() {
-  var md = SHA256_finalize();
-  for(var i = 0; i < 64; i++)
-    HMAC_SHA256_key[i] ^= 0x36 ^ 0x5c;
-  SHA256_init();
-  SHA256_write(HMAC_SHA256_key);
-  SHA256_write(md);
-  for(var i = 0; i < 64; i++)
-    HMAC_SHA256_key[i] = 0;
-  delete HMAC_SHA256_key;
   return SHA256_finalize();
+}
+
+/**
+ * SHA256_double_hash: calculate the hash value of byte array 'block1' 'block2'
+ * This shortcut function may be more convenient than calling SHA256_init(),
+ * SHA256_write (block1), SHA256_write (block2), SHA256_finalize().
+ * @param block1 {number[]} byte array to be hashed (first pass)
+ * @param block2 {number[]} byte array to be hashed (second pass)
+ * @returns {number[]} hash as byte array 
+ */
+export function SHA256_double_hash(block1, block2) {
+    SHA256_init();
+    SHA256_write(block2);
+    SHA256_write(block2);
+    return SHA256_finalize();
 }
 
 /*

@@ -2,11 +2,12 @@
  * @depends {brs.js}
  */
 
-/* global $ NxtAddress BigInteger converters CryptoJS SHA256_init SHA256_write SHA256_finalize pako */
+/* global $ NxtAddress BigInteger converters CryptoJS pako */
 
 import { BRS } from '.'
 
 import * as curve25519 from '../crypto/curve25519'
+import * as jssha from '../crypto/3rdparty/jssha256'
 
 export function generatePublicKey (secretPhrase) {
     if (!secretPhrase) {
@@ -39,15 +40,14 @@ export function getPublicKey (secretPhrase, isAccountNumber) {
         return publicKey
     } else {
         const secretPhraseBytes = converters.hexStringToByteArray(secretPhrase)
-        const digest = simpleHash(secretPhraseBytes)
+        const digest = jssha.SHA256_hash(secretPhraseBytes)
         return converters.byteArrayToHexString(curve25519.keygen(digest).p)
     }
 }
 
 function getPrivateKey (secretPhrase) {
-    SHA256_init()
-    SHA256_write(converters.stringToByteArray(secretPhrase))
-    return converters.shortArrayToHexString(curve25519_clamp(converters.byteArrayToShortArray(SHA256_finalize())))
+    const pk = jssha.SHA256_hash(converters.stringToByteArray(secretPhrase))
+    return converters.byteArrayToHexString(curve25519.clamp(pk))
 }
 
 export function getAccountId (secretPhrase) {
@@ -55,18 +55,9 @@ export function getAccountId (secretPhrase) {
 }
 
 export function getAccountIdFromPublicKey (publicKey, RSFormat) {
-    const hex = converters.hexStringToByteArray(publicKey)
+    const accountBA = jssha.SHA256_hash(converters.hexStringToByteArray(publicKey))
 
-    BRS._hash.init()
-    BRS._hash.update(hex)
-
-    let account = BRS._hash.getBytes()
-
-    account = converters.byteArrayToHexString(account)
-
-    const slice = (converters.hexStringToByteArray(account)).slice(0, 8)
-
-    const accountId = byteArrayToBigInteger(slice).toString()
+    const accountId = byteArrayToBigInteger(accountBA.slice(0, 8)).toString()
 
     if (RSFormat) {
         const address = new NxtAddress()
@@ -257,29 +248,16 @@ export function signBytes (message, secretPhrase) {
     const messageBytes = converters.hexStringToByteArray(message)
     const secretPhraseBytes = converters.hexStringToByteArray(secretPhrase)
 
-    const digest = simpleHash(secretPhraseBytes)
+    const digest = jssha.SHA256_hash(secretPhraseBytes)
     const s = curve25519.keygen(digest).s
 
-    const secretPhraseBytes1 = ut.hexToBytes(secretPhrase)
-    const digest2 = sh.sha256(secretPhraseBytes1)
-    // digest2[31] &= 0x7F;
-    // digest2[31] |= 0x40;
-    // digest2[ 0] &= 0xF8;
-    const s2 = ed.curve25519.scalarMultBase(digest2)
+    const m = jssha.SHA256_hash(messageBytes)
 
-    const m = simpleHash(messageBytes)
-
-    BRS._hash.init()
-    BRS._hash.update(m)
-    BRS._hash.update(s)
-    const x = BRS._hash.getBytes()
+    const x = jssha.SHA256_double_hash(m, s)
 
     const y = curve25519.keygen(x).p
 
-    BRS._hash.init()
-    BRS._hash.update(m)
-    BRS._hash.update(y)
-    const h = BRS._hash.getBytes()
+    const h = jssha.SHA256_double_hash(m, y)
 
     const v = curve25519.sign(h, x, s)
 
@@ -294,12 +272,9 @@ export function verifyBytes (signature, message, publicKey) {
     const h = signatureBytes.slice(32)
     const y = curve25519.verify(v, h, publicKeyBytes)
 
-    const m = simpleHash(messageBytes)
+    const m = jssha.SHA256_hash(messageBytes)
 
-    BRS._hash.init()
-    BRS._hash.update(m)
-    BRS._hash.update(y)
-    const h2 = BRS._hash.getBytes()
+    const h2 = jssha.SHA256_double_hash(m, y)
 
     return areByteArraysEqual(h, h2)
 }
@@ -630,12 +605,6 @@ export function decryptAllMessages (messages, password) {
     }
 }
 
-function simpleHash (message) {
-    BRS._hash.init()
-    BRS._hash.update(message)
-    return BRS._hash.getBytes()
-}
-
 function areByteArraysEqual (bytes1, bytes2) {
     if (bytes1.length !== bytes2.length) {
         return false
@@ -648,13 +617,6 @@ function areByteArraysEqual (bytes1, bytes2) {
     }
 
     return true
-}
-
-function curve25519_clamp (curve) {
-    curve[0] &= 0xFFF8
-    curve[15] &= 0x7FFF
-    curve[15] |= 0x4000
-    return curve
 }
 
 function byteArrayToBigInteger (byteArray, startIndex) {

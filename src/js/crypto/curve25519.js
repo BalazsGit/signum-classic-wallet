@@ -70,14 +70,15 @@ var P26 = 67108863 /* (1 << 26) - 1 */
 
 // region Key Agreement
 
-/* Private key clamping
- *   k [out] your private key for key agreement
- *   k  [in]  32 random bytes
+/** Clamps private key in place
+ * @param  k {number[]} Private key clamped (in place)
+ * @returns clamped key
  */
-function clamp (k) {
+export function clamp (k) {
     k[31] &= 0x7F
     k[31] |= 0x40
     k[0] &= 0xF8
+    return k
 }
 
 // endregion

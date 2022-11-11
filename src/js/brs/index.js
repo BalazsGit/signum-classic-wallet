@@ -2,7 +2,7 @@
  * @module BRS
 */
 
-/* global $ SHA256_init SHA256_write SHA256_finalize */
+/* global $ */
 
 import {
     init,
@@ -518,11 +518,6 @@ export const BRS = {
     _decryptedTransactions: {},
     _encryptedNote: null,
     _sharedKeys: {},
-    _hash: {
-        init: SHA256_init,
-        update: SHA256_write,
-        getBytes: SHA256_finalize
-    },
 
     // from assetexchange
     assets: [],
