@@ -10,7 +10,7 @@
  * Based on work by Daniel J Bernstein, http://cr.yp.to/ecdh.html
  */
 
-var curve25519 = function () {
+//var curve25519 = function () {
 
     //region Constants
 
@@ -682,7 +682,7 @@ var curve25519 = function () {
      * returns signature value on success, undefined on failure (use different x or h)
      */
 
-    function sign (h, x, s) {
+    export function sign (h, x, s) {
         // v = (x - h) s  mod q
         var w, i;
         var h1 = new Array(32)
@@ -723,7 +723,7 @@ var curve25519 = function () {
      *   P  [in]  public key
      *   Returns signature public key
      */
-    function verify (v, h, P) {
+    export function verify (v, h, P) {
         /* Y = v abs(P) + h G  */
         var d = new Array(32);
         var p = [createUnpackedArray(), createUnpackedArray()];
@@ -841,7 +841,7 @@ var curve25519 = function () {
      * s may be NULL if you don't care
      *
      * WARNING: if s is not NULL, this function has data-dependent timing */
-    function keygen (k) {
+    export function keygen (k) {
         var P = [];
         var s = [];
         k = k || [];
@@ -851,9 +851,11 @@ var curve25519 = function () {
         return { p: P, s: s, k: k };
     }
 
-    return {
-        sign: sign,
-        verify: verify,
-        keygen: keygen
-    };
-}();
+    export function sharedKeyGen(k, oP) {
+        var P = [];
+        k = k || [];
+        clamp(k);
+        core(P, null, k, oP);
+        return P;
+    }
+

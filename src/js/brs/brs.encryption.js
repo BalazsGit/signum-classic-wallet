@@ -2,9 +2,11 @@
  * @depends {brs.js}
  */
 
-/* global $ NxtAddress BigInteger converters CryptoJS SHA256_init SHA256_write SHA256_finalize pako curve25519 curve25519_ */
+/* global $ NxtAddress BigInteger converters CryptoJS SHA256_init SHA256_write SHA256_finalize pako */
 
 import { BRS } from '.'
+
+import * as curve25519 from '../crypto/curve25519'
 
 export function generatePublicKey (secretPhrase) {
     if (!secretPhrase) {
@@ -240,7 +242,7 @@ function decryptNote (message, options, secretPhrase) {
 
 //     const publicKey = converters.hexStringToByteArray(BRS.getPublicKey(account, true))
 
-//     const sharedKey = getSharedKey(privateKey, publicKey)
+//     const sharedKey = curve25519.sharedKeyGen(privateKey, publicKey)
 
 //     const sharedKeys = Object.keys(BRS._sharedKeys)
 
@@ -257,6 +259,13 @@ export function signBytes (message, secretPhrase) {
 
     const digest = simpleHash(secretPhraseBytes)
     const s = curve25519.keygen(digest).s
+
+    const secretPhraseBytes1 = ut.hexToBytes(secretPhrase)
+    const digest2 = sh.sha256(secretPhraseBytes1)
+    // digest2[31] &= 0x7F;
+    // digest2[31] |= 0x40;
+    // digest2[ 0] &= 0xF8;
+    const s2 = ed.curve25519.scalarMultBase(digest2)
 
     const m = simpleHash(messageBytes)
 
@@ -672,7 +681,7 @@ function aesEncrypt (plaintext, options) {
     const text = converters.byteArrayToWordArray(plaintext)
     let sharedKey
     if (!options.sharedKey) {
-        sharedKey = getSharedKey(options.privateKey, options.publicKey)
+        sharedKey = curve25519.sharedKeyGen(options.privateKey, options.publicKey)
     } else {
         sharedKey = options.sharedKey.slice(0) // clone
     }
@@ -715,7 +724,7 @@ function aesDecrypt (ivCiphertext, options) {
 
     let sharedKey
     if (!options.sharedKey) {
-        sharedKey = getSharedKey(options.privateKey, options.publicKey)
+        sharedKey = curve25519.sharedKeyGen(options.privateKey, options.publicKey)
     } else {
         sharedKey = options.sharedKey.slice(0) // clone
     }
@@ -751,7 +760,7 @@ function encryptData (plaintext, options) {
     }
 
     if (!options.sharedKey) {
-        options.sharedKey = getSharedKey(options.privateKey, options.publicKey)
+        options.sharedKey = curve25519.sharedKeyGen(options.privateKey, options.publicKey)
     }
 
     const compressedPlaintext = pako.gzip(new Uint8Array(plaintext))
@@ -774,7 +783,7 @@ function encryptData (plaintext, options) {
 
 function decryptData (data, options) {
     if (!options.sharedKey) {
-        options.sharedKey = getSharedKey(options.privateKey, options.publicKey)
+        options.sharedKey = curve25519.sharedKeyGen(options.privateKey, options.publicKey)
     }
 
     const compressedPlaintext = aesDecrypt(data, options)
@@ -784,8 +793,4 @@ function decryptData (data, options) {
     const data2 = pako.inflate(binData)
 
     return converters.byteArrayToString(data2)
-}
-
-function getSharedKey (key1, key2) {
-    return converters.shortArrayToByteArray(curve25519_(converters.byteArrayToShortArray(key1), converters.byteArrayToShortArray(key2), null))
 }

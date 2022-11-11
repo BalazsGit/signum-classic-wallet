@@ -9,8 +9,6 @@
  * @depends {3rdparty/ajaxmultiqueue.js}
  * @depends {3rdparty/notify.min.js}
  * @depends {3rdparty/clipboard.js}
- * @depends {crypto/curve25519.js}
- * @depends {crypto/curve25519_.js}
  * @depends {crypto/passphrasegenerator.js}
  * @depends {crypto/sha256worker.js}
  * @depends {crypto/3rdparty/aes.js}
