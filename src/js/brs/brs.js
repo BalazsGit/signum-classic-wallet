@@ -10,7 +10,6 @@
  * @depends {3rdparty/notify.min.js}
  * @depends {3rdparty/clipboard.js}
  * @depends {crypto/passphrasegenerator.js}
- * @depends {crypto/sha256worker.js}
  * @depends {crypto/3rdparty/aes.js}
  * @depends {crypto/3rdparty/seedrandom.js}
  * @depends {util/converters.js}
