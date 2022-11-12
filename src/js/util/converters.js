@@ -30,13 +30,8 @@ var converters = function() {
 			return str;
 		},
 		stringToByteArray: function(str) {
-			str = unescape(encodeURIComponent(str)); //temporary
-
-			var bytes = new Array(str.length);
-			for (var i = 0; i < str.length; ++i)
-				bytes[i] = str.charCodeAt(i);
-
-			return bytes;
+            const encoder = new TextEncoder();
+            return Array.from(encoder.encode(str));
 		},
 		hexStringToByteArray: function(str) {
 			var bytes = [];
@@ -171,14 +166,20 @@ var converters = function() {
 			if (length == 0) {
 				return "";
 			}
-
+            let UintBytes
 			if (opt_startIndex && length) {
 				var index = this.checkBytesToIntInput(bytes, parseInt(length, 10), parseInt(opt_startIndex, 10));
 
-				bytes = bytes.slice(opt_startIndex, opt_startIndex + length);
-			}
-
-			return decodeURIComponent(escape(String.fromCharCode.apply(null, bytes)));
+				UintBytes = new Uint8Array(bytes.slice(opt_startIndex, opt_startIndex + length));
+			} else {
+                UintBytes = new Uint8Array(bytes);
+            }
+            const utf8decoder = new TextDecoder("utf-8", { fatal: true });
+            try {
+                return utf8decoder.decode(UintBytes)
+            } catch (_error) {
+                return ""
+            }
 		},
 		byteArrayToShortArray: function(byteArray) {
 			var shortArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
