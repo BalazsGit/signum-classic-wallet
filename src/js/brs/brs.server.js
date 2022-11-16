@@ -1,9 +1,10 @@
 /**
  * @depends {brs.js}
  */
-/* global $ NxtAddress converters */
+/* global $ converters */
 
 import { BRS } from '.'
+import { NxtAddress } from '../util/nxtaddress'
 
 export function setServerPassword (password) {
     BRS._password = password
@@ -150,14 +151,8 @@ export function sendRequest (requestType, data, callback, async) {
     if (requestType === 'getAccountId') {
         const accountId = BRS.getAccountId(data.secretPhrase)
 
-        const nxtAddress = new NxtAddress(BRS.prefix)
-        let accountRS
-
-        if (nxtAddress.set(accountId)) {
-            accountRS = nxtAddress.toString()
-        } else {
-            accountRS = ''
-        }
+        const nxtAddress = new NxtAddress(accountId)
+        const accountRS = nxtAddress.getAccountRS(BRS.prefix)
 
         if (callback) {
             callback({
@@ -453,12 +448,9 @@ export function verifyAndSignTransactionBytes (transactionBytes, signature, requ
         if (BRS.rsRegEx.test(data.recipient)) {
             // wrong data type... Fix
             const parts = BRS.rsRegEx.exec(data.recipient)
-            const address = new NxtAddress(BRS.prefix)
-            if (address.set(parts[1] + parts[2]) === false) {
-                return
-            }
-            data.recipient = address.account_id()
-            data.recipientRS = address.toString()
+            const address = new NxtAddress(parts[1] + parts[2])
+            data.recipient = address.getAccountId()
+            data.recipientRS = address.getAccountRS(BRS.prefix)
         }
     }
 

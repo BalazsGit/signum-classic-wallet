@@ -2,9 +2,10 @@
  * @depends {brs.js}
  */
 
-/* global $ NxtAddress */
+/* global $  */
 
 import { BRS } from '.'
+import { NxtAddress } from '../util/nxtaddress'
 
 export function getInitialTransactions () {
     BRS.sendRequest('getAccountTransactions', {
@@ -387,9 +388,8 @@ export function getTransactionDetails (transaction, viewingAccount) {
             }
             recipientHTML = ''
             for (const recipient of transaction.attachment.recipients) {
-                const nxtAddress = new NxtAddress(BRS.prefix)
-                nxtAddress.set(recipient[0])
-                const RSAddress = nxtAddress.toString()
+                const nxtAddress = new NxtAddress(recipient[0])
+                const RSAddress = nxtAddress.getAccountRS(BRS.prefix)
                 const amountEach = BRS.formatAmount(recipient[1]) + ' ' + BRS.valueSuffix
                 if (recipient[0] === viewingAccount) {
                     recipientHTML += `<strong class="mono-font">${RSAddress}: ${amountEach}</strong>`
@@ -413,9 +413,8 @@ export function getTransactionDetails (transaction, viewingAccount) {
             recipientHTML = ''
 
             for (const recipient of transaction.attachment.recipients) {
-                const nxtAddress = new NxtAddress(BRS.prefix)
-                nxtAddress.set(recipient)
-                const address = nxtAddress.toString()
+                const nxtAddress = new NxtAddress(recipient)
+                const address = nxtAddress.getAccountRS(BRS.prefix)
                 if (recipient === viewingAccount) {
                     recipientHTML += '<strong class="mono-font">' + address + '</strong>'
                     toFromViewer = true

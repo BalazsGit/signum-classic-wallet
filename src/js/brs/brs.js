@@ -14,7 +14,6 @@
  * @depends {crypto/3rdparty/seedrandom.js}
  * @depends {util/converters.js}
  * @depends {util/extensions.js}
- * @depends {util/nxtaddress.js}
  */
 
 /* global $ WebDB BigInteger */

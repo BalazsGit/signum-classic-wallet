@@ -2,9 +2,10 @@
  * @depends {brs.js}
  */
 
-/* global $ NxtAddress */
+/* global $ */
 
 import { BRS } from '.'
+import { NxtAddress } from '../util/nxtaddress'
 
 // TODO delete?
 $(window).scroll(function () {
@@ -598,9 +599,8 @@ export function formsSetAlias (data) {
     if (data.type === 'account') {
         if (!(/acct:(.*)@burst/.test(data.aliasURI)) && !(/nacc:(.*)/.test(data.aliasURI))) {
             if (BRS.rsRegEx.test(data.aliasURI.toUpperCase())) {
-                const address = new NxtAddress(BRS.prefix)
-
-                if (!address.set(data.aliasURI)) {
+                const address = new NxtAddress(data.aliasURI)
+                if (!address.isOk()) {
                     return {
                         error: $.t('error_invalid_account_id')
                     }
@@ -660,13 +660,8 @@ export function setAliasType (type, uri) {
             }
 
             if (/^\d+$/.test(uri)) {
-                const address = new NxtAddress()
-
-                if (address.set(uri)) {
-                    uri = address.toString()
-                } else {
-                    uri = ''
-                }
+                const address = new NxtAddress(uri)
+                uri = address.getAccountRS(BRS.prefix)
             } else if (!BRS.rsRegEx.test(uri.toUpperCase())) {
                 uri = BRS.accountRS
             }

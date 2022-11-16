@@ -2,9 +2,10 @@
  * @depends {brs.js}
  */
 
-/* global $ NxtAddress */
+/* global $ */
 
 import { BRS } from '.'
+import { NxtAddress } from '../util/nxtaddress'
 
 export function getContactByName (nameToFind) {
     for (const accountId in BRS.contacts) {
@@ -104,10 +105,10 @@ export function formsAddContact (data) {
             }
         }
     }
-    const address = new NxtAddress(BRS.prefix)
-    if (address.set(data.account_id)) {
-        data.account = address.account_id()
-        data.account_rs = address.toString()
+    const address = new NxtAddress(data.account_id)
+    if (address.isOk()) {
+        data.account = address.getAccountId()
+        data.account_rs = address.getAccountRS(BRS.prefix)
     } else {
         return {
             error: $.t('error_account_id')
@@ -213,10 +214,10 @@ export function formsUpdateContact (data) {
             error: $.t('error_contact')
         }
     }
-    const address = new NxtAddress(BRS.prefix)
-    if (address.set(data.account_id)) {
-        data.account = address.account_id()
-        data.account_rs = address.toString()
+    const address = new NxtAddress(data.account_id)
+    if (address.isOk()) {
+        data.account = address.getAccountId()
+        data.account_rs = address.getAccountRS(BRS.prefix)
     } else {
         return {
             error: $.t('error_account_id')

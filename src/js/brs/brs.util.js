@@ -2,9 +2,10 @@
  * @depends {brs.js}
  */
 
-/* global $ NxtAddress BigInteger Big Clipboard */
+/* global $ BigInteger Big Clipboard */
 
 import { BRS } from '.'
+import { NxtAddress } from '../util/nxtaddress'
 
 export function formatVolume (volume) {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
@@ -429,30 +430,13 @@ export function convertFromHex8 (hex) {
 }
 
 export function convertNumericToRSAccountFormat (account) {
-    if (BRS.rsRegEx.test(account)) {
-        return String(account).escapeHTML()
-    } else {
-        const address = new NxtAddress()
-
-        if (address.set(account)) {
-            return address.toString().escapeHTML()
-        } else {
-            return ''
-        }
-    }
+    const address = new NxtAddress(account)
+    return address.getAccountRS(BRS.prefix)
 }
 
 export function convertRSAccountToNumeric (account) {
-    if (BRS.idRegEx.test(account)) {
-        return String(account).escapeHTML()
-    } else {
-        const address = new NxtAddress()
-        if (address.set(account)) {
-            return address.account_id().escapeHTML()
-        } else {
-            return ''
-        }
-    }
+    const address = new NxtAddress(account)
+    return address.getAccountId()
 }
 
 export function getAccountLink (object, acc) {

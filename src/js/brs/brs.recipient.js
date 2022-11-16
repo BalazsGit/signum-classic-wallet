@@ -2,9 +2,10 @@
  * @depends {brs.js}
  */
 
-/* global $ NxtAddress BigNumber */
+/* global $ BigNumber */
 
 import { BRS } from '.'
+import { NxtAddress } from '../util/nxtaddress'
 
 export function automaticallyCheckRecipient () {
     const $recipientFields = $('#add_contact_account_id, #update_contact_account_id, #buy_alias_recipient, #escrow_create_recipient, #inline_message_recipient, #reward_recipient, #sell_alias_recipient, #send_message_recipient, #send_money_recipient, #subscription_cancel_recipient, #subscription_create_recipient, #transfer_alias_recipient, #transfer_asset_recipient, #transfer_asset_multi_recipient')
@@ -298,8 +299,8 @@ export function checkRecipient (account, modal) {
     const accountParts = BRS.rsRegEx.exec(account)
     if (accountParts !== null) {
         // Account seems to be RS Address
-        const address = new NxtAddress(BRS.prefix)
-        if (address.set(accountParts[2])) {
+        const address = new NxtAddress(accountParts[2])
+        if (address.isOk()) {
             // Account is RS Address
             if (accountParts[3] !== undefined) {
                 // Account is extended RS Address. Verify the public key
@@ -315,7 +316,7 @@ export function checkRecipient (account, modal) {
                 }
             } else {
                 // Account is RS Address and it isn't extended
-                getAccountTypeAndMessage(address.account_id(), function (response) {
+                getAccountTypeAndMessage(address.getAccountId(), function (response) {
                     modal.find('input[name=recipientPublicKey]').val('')
                     modal.find('.recipient_public_key').hide()
                     if (response.account && response.account.description) {
@@ -326,19 +327,20 @@ export function checkRecipient (account, modal) {
                 })
             }
         } else {
+            const guessedAddresses = address.getGuesses(BRS.prefix)
             // Account seems to be RS Address but there is an error
-            if (address.guess.length === 1) {
+            if (guessedAddresses.length === 1) {
                 // There is only one option of error correction suggestion.
                 callout.removeClass(classes).addClass('callout-danger').html($.t('recipient_malformed_suggestion', {
-                    recipient: "<span class='malformed_address' data-address='" + String(address.guess[0]).escapeHTML() + "' onclick='BRS.correctAddressMistake(this);'>" + address.format_guess(address.guess[0], account) + '</span>'
+                    recipient: "<span class='malformed_address' data-address='" + guessedAddresses[0] + "' onclick='BRS.correctAddressMistake(this);'>" + address.formatGuess(guessedAddresses[0], account) + '</span>'
                 })).show()
-            } else if (address.guess.length > 1) {
+            } else if (guessedAddresses.length > 1) {
                 // There are many options of error correction suggestion.
                 let html = $.t('recipient_malformed_suggestion', {
-                    count: address.guess.length
+                    count: guessedAddresses.length
                 }) + '<ul>'
-                for (let i = 0; i < address.guess.length; i++) {
-                    html += "<li><span clas='malformed_address' data-address='" + String(address.guess[i]).escapeHTML() + "' onclick='BRS.correctAddressMistake(this);'>" + address.format_guess(address.guess[i], account) + '</span></li>'
+                for (let i = 0; i < guessedAddresses.length; i++) {
+                    html += "<li><span clas='malformed_address' data-address='" + guessedAddresses[i] + "' onclick='BRS.correctAddressMistake(this);'>" + address.formatGuess(guessedAddresses[i], account) + '</span></li>'
                 }
                 callout.removeClass(classes).addClass('callout-danger').html(html).show()
             } else {
@@ -413,22 +415,22 @@ function checkRecipientAlias (account, modal) {
                 }
 
                 if (match && match[1]) {
-                    const address = new NxtAddress()
-                    if (!address.set(String(match[1]).toUpperCase())) {
+                    const address = new NxtAddress(String(match[1]).toUpperCase())
+                    if (!address.isOk()) {
                         accountInputField.val('')
                         callout.html('Invalid account alias.')
                     }
 
-                    getAccountTypeAndMessage(address.account_id(), function (response) {
+                    getAccountTypeAndMessage(address.getAccountId(), function (response) {
                         modal.find('input[name=recipientPublicKey]').val('')
                         modal.find('.recipient_public_key').hide()
                         if (response.account && response.account.description) {
                             checkForMerchant(response.account.description, modal)
                         }
 
-                        accountInputField.val(address.toString())
+                        accountInputField.val(address.getAccountRS(BRS.prefix))
                         callout.html($.t('alias_account_link', {
-                            account_id: address.toString()
+                            account_id: address.getAccountRS(BRS.prefix)
                         }) + '.<br>' + $.t('alias_last_adjusted', {
                             timestamp: BRS.formatTimestamp(timestamp)
                         }) + '<br>' + response.message).removeClass(classes).addClass('callout-' + response.type).show()

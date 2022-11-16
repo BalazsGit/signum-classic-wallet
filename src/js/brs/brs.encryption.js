@@ -2,9 +2,10 @@
  * @depends {brs.js}
  */
 
-/* global $ NxtAddress BigInteger converters CryptoJS pako */
+/* global $ BigInteger converters CryptoJS pako */
 
 import { BRS } from '.'
+import { NxtAddress } from '../util/nxtaddress'
 
 import * as curve25519 from '../crypto/curve25519'
 import * as jssha from '../crypto/3rdparty/jssha256'
@@ -60,13 +61,8 @@ export function getAccountIdFromPublicKey (publicKey, RSFormat) {
     const accountId = byteArrayToBigInteger(accountBA.slice(0, 8)).toString()
 
     if (RSFormat) {
-        const address = new NxtAddress()
-
-        if (address.set(accountId)) {
-            return address.toString()
-        } else {
-            return ''
-        }
+        const address = new NxtAddress(accountId)
+        return address.getAccountRS(BRS.prefix)
     } else {
         return accountId
     }
@@ -101,9 +97,9 @@ export function encryptNote (message, options, secretPhrase) {
                 try {
                     options.publicKey = converters.hexStringToByteArray(BRS.getPublicKey(options.account, true))
                 } catch (err) {
-                    const nxtAddress = new NxtAddress()
+                    const nxtAddress = new NxtAddress(options.account)
 
-                    if (!nxtAddress.set(options.account)) {
+                    if (!nxtAddress.isOk()) {
                         throw {
                             message: $.t('error_invalid_account_id'),
                             errorCode: 3
