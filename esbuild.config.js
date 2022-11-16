@@ -9,15 +9,15 @@ const configDev = {
     sourcemap: 'inline',
     target: 'es2020'
 }
-// const configMin = {
-//     entryPoints: ['./src/smartc.js'],
-//     outfile: 'dist/smartc.min.js',
-//     bundle: true,
-//     minify: true,
-//     platform: 'browser',
-//     sourcemap: false,
-//     target: 'es2020'
-// }
+const configMin = {
+    entryPoints: ['src/js/brs/index.js'],
+    outfile: 'src/js/index.min.js',
+    bundle: true,
+    minify: true,
+    platform: 'browser',
+    sourcemap: false,
+    target: 'es2020'
+}
 
 esbuild.build(configDev).catch(() => process.exit(1))
-// esbuild.build(configMin).catch(() => process.exit(1))
+esbuild.build(configMin).catch(() => process.exit(1))
