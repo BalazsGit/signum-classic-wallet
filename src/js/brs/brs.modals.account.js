@@ -274,9 +274,9 @@ function userInfoModalAddIssuedAssets (assets) {
                 }
             })
 
-            BRS.userInfoModalAssetsLoaded(assets)
+            userInfoModalAssetsLoaded(assets)
         } else if (!$.isEmptyObject(assets)) {
-            BRS.userInfoModalAssetsLoaded(assets)
+            userInfoModalAssetsLoaded(assets)
         } else {
             $('#user_info_modal_assets_table tbody').empty()
             BRS.dataLoadFinished($('#user_info_modal_assets_table'))
