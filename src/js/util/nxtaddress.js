@@ -43,6 +43,22 @@ export class NxtAddress {
     }
 
     /** private */
+    calcSyndrome () {
+        const syndrome = [0, 0, 0, 0, 0]
+        for (let i = 1; i < 5; i++) {
+            let t = 0
+            for (let j = 0; j < 31; j++) {
+                if (j > 12 && j < 27) continue
+                let pos = j
+                if (j > 26) pos -= 14
+                t ^= this.gmult(this.codeword[pos], this.gexp[(i * j) % 31])
+            }
+            syndrome[i] = t
+        }
+        return syndrome
+    }
+
+    /** private */
     findErrors (lambda) {
         const errloc = []
         for (let i = 1; i <= 31; i++) {
@@ -69,7 +85,7 @@ export class NxtAddress {
         let deg_lambda = 0
         let lambda = [1, 0, 0, 0, 0] // error+erasure locator poly
         // Berlekamp-Massey algorithm to determine error+erasure locator polynomial
-        const syndrome = this.calculateSyndrome()
+        const syndrome = this.calcSyndrome()
         for (let r = 0; r < 4; r++) {
             const discr = this.calcDiscrepancy(lambda, r + 1, syndrome) // Compute discrepancy at the r-th step in poly-form
             if (discr !== 0) {
@@ -132,10 +148,8 @@ export class NxtAddress {
     /** private */
     calculateParity () {
         const p = [0, 0, 0, 0]
-
         for (let i = 12; i >= 0; i--) {
             const fb = this.codeword[i] ^ p[3]
-
             p[3] = p[2] ^ this.gmult(30, fb)
             p[2] = p[1] ^ this.gmult(6, fb)
             p[1] = p[0] ^ this.gmult(9, fb)
@@ -155,36 +169,6 @@ export class NxtAddress {
         for (let i = 0; i < clean.length; i++) {
             this.codeword[this.cwmap[i]] = clean[i]
         }
-    }
-
-    /** private */
-    calculateSyndrome () {
-        const syndrome = [0, 0, 0, 0, 0]
-        for (let i = 1; i < 5; i++) {
-            let t = 0
-            for (let j = 0; j < 31; j++) {
-                if (j > 12 && j < 27) continue
-
-                let pos = j
-                if (j > 26) pos -= 14
-
-                t ^= this.gmult(this.codeword[pos], this.gexp[(i * j) % 31])
-            }
-            syndrome[i] = t
-        }
-        return syndrome
-    } // __________________________
-
-    /** Returns true if the address is valid
-     * or false if there is an error. Use 'getGuesses' to check if
-     * the mistake was recovered.
-     */
-    isOk () {
-        const parity = this.calculateParity()
-        return this.codeword[13] === parity[0] &&
-            this.codeword[14] === parity[1] &&
-            this.codeword[15] === parity[2] &&
-            this.codeword[16] === parity[3]
     }
 
     /** private */
@@ -226,66 +210,6 @@ export class NxtAddress {
         this.codeword[14] = parity[1]
         this.codeword[15] = parity[2]
         this.codeword[16] = parity[3]
-    }
-
-    /** Returns the account in the Reed-Solomon format.
-     * If prefix is undefined, no prefix is added.
-     */
-    getAccountRS (prefix) {
-        if (!this.isOk()) {
-            return ''
-        }
-        let out = ''
-        if (prefix !== undefined) {
-            out = prefix.replace('-', '') + '-'
-        }
-        for (let i = 0; i < 17; i++) {
-            out += this.alphabet[this.codeword[this.cwmap[i]]]
-            if ((i & 3) === 3 && i < 13) out += '-'
-        }
-        return out
-    } // __________________________
-
-    /** Returns the numeric ID of an account as string. If given account was
-     * invalid, returns empty string */
-    getAccountId () {
-        if (!this.isOk()) {
-            return ''
-        }
-        let out = ''
-        const inp = []
-        let len = 13
-        for (let i = 0; i < 13; i++) {
-            inp[i] = this.codeword[12 - i]
-        }
-        let newlen
-        do {
-            // base 32 to base 10 conversion
-            let divide = 0
-            newlen = 0
-            for (let i = 0; i < len; i++) {
-                divide = divide * 32 + inp[i]
-                if (divide >= 10) {
-                    inp[newlen++] = Math.floor(divide / 10)
-                    divide %= 10
-                } else if (newlen > 0) {
-                    inp[newlen++] = 0
-                }
-            }
-            len = newlen
-            out += String.fromCharCode(divide + '0'.charCodeAt(0))
-        } while (newlen)
-        return out.split('').reverse().join('')
-    }
-
-    /** Get guessed results */
-    getGuesses (prefix) {
-        const resultArray = Array.from(this.guess)
-        if (prefix === undefined) {
-            return resultArray
-        }
-        prefix = prefix.replace('-', '')
-        return resultArray.map(adr => prefix + '-' + adr)
     }
 
     /** private */
@@ -354,6 +278,78 @@ export class NxtAddress {
         default:
             this.setInvalidCodeword()
         }
+    }
+
+    /** Returns true if the address is valid
+     * or false if there is an error. Use 'getGuesses' to check if
+     * the mistake was recovered.
+     */
+    isOk () {
+        const parity = this.calculateParity()
+        return this.codeword[13] === parity[0] &&
+            this.codeword[14] === parity[1] &&
+            this.codeword[15] === parity[2] &&
+            this.codeword[16] === parity[3]
+    }
+
+    /** Returns the account in the Reed-Solomon format.
+     * If prefix is undefined, no prefix is added.
+     */
+    getAccountRS (prefix) {
+        if (!this.isOk()) {
+            return ''
+        }
+        let out = ''
+        if (prefix !== undefined) {
+            out = prefix.replace('-', '') + '-'
+        }
+        for (let i = 0; i < 17; i++) {
+            out += this.alphabet[this.codeword[this.cwmap[i]]]
+            if ((i & 3) === 3 && i < 13) out += '-'
+        }
+        return out
+    } // __________________________
+
+    /** Returns the numeric ID of an account as string. If given account was
+     * invalid, returns empty string */
+    getAccountId () {
+        if (!this.isOk()) {
+            return ''
+        }
+        let out = ''
+        const inp = []
+        let len = 13
+        for (let i = 0; i < 13; i++) {
+            inp[i] = this.codeword[12 - i]
+        }
+        let newlen
+        do {
+            // base 32 to base 10 conversion
+            let divide = 0
+            newlen = 0
+            for (let i = 0; i < len; i++) {
+                divide = divide * 32 + inp[i]
+                if (divide >= 10) {
+                    inp[newlen++] = Math.floor(divide / 10)
+                    divide %= 10
+                } else if (newlen > 0) {
+                    inp[newlen++] = 0
+                }
+            }
+            len = newlen
+            out += String.fromCharCode(divide + '0'.charCodeAt(0))
+        } while (newlen)
+        return out.split('').reverse().join('')
+    }
+
+    /** Get guessed results */
+    getGuesses (prefix) {
+        const resultArray = Array.from(this.guess)
+        if (prefix === undefined) {
+            return resultArray
+        }
+        prefix = prefix.replace('-', '')
+        return resultArray.map(adr => prefix + '-' + adr)
     }
 
     /** Compares two strings and returns the diff formatted in HTML with underscore */
