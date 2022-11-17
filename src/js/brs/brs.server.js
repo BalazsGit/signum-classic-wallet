@@ -148,22 +148,6 @@ export function sendRequest (requestType, data, callback, async) {
         delete data.referencedTransactionFullHash
     }
 
-    // gets account id from passphrase client side, used only for login.
-    if (requestType === 'getAccountId') {
-        const accountId = BRS.getAccountId(data.secretPhrase)
-
-        const nxtAddress = new NxtAddress(accountId)
-        const accountRS = nxtAddress.getAccountRS(BRS.prefix)
-
-        if (callback) {
-            callback({
-                account: accountId,
-                accountRS
-            })
-        }
-        return
-    }
-
     // check to see if secretPhrase supplied matches logged in account, if not - show error.
     if ('secretPhrase' in data) {
         const accountId = BRS.getAccountId(BRS.rememberPassword ? BRS._password : data.secretPhrase)

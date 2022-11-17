@@ -247,52 +247,44 @@ function loginWithPassphrase (passphrase) {
 
         BRS.state = response
 
-        // Standard login logic
-        // this is done locally..  'sendRequest' has special logic to prevent
-        // transmitting the passphrase to the server unncessarily via BRS.getAccountId()
-        BRS.sendRequest('getAccountId', {
-            secretPhrase: passphrase
+        BRS.account = BRS.getAccountId(passphrase)
+        BRS.accountRS = BRS.convertNumericToRSAccountFormat(BRS.account)
+        BRS.publicKey = BRS.getPublicKey(converters.stringToHexString(passphrase))
+        BRS.accountRSExtended = BRS.accountRS + '-' + new BigNumber(BRS.publicKey, 16).toString(36).toUpperCase()
+
+        BRS.sendRequest('getAccountPublicKey', {
+            account: BRS.account
         }, function (response) {
-            // this hardcoded 'getAccountId' never returns errorCode.
-            BRS.account = response.account
-            BRS.accountRS = response.accountRS
-            BRS.publicKey = BRS.getPublicKey(converters.stringToHexString(passphrase))
-            BRS.accountRSExtended = BRS.accountRS + '-' + new BigNumber(BRS.publicKey, 16).toString(36).toUpperCase()
+            if (response && response.publicKey && response.publicKey !== BRS.publicKey) {
+                $.notify($.t('error_account_taken'), { type: 'danger' })
+                return
+            }
 
-            BRS.sendRequest('getAccountPublicKey', {
-                account: BRS.account
-            }, function (response) {
-                if (response && response.publicKey && response.publicKey !== BRS.publicKey) {
-                    $.notify($.t('error_account_taken'), { type: 'danger' })
-                    return
-                }
+            let passwordNotice = ''
+            if (passphrase.length < 35) {
+                passwordNotice = $.t('error_passphrase_length_secure')
+            } else if (passphrase.length < 50 && (!passphrase.match(/[A-Z]/) || !passphrase.match(/[0-9]/))) {
+                passwordNotice = $.t('error_passphrase_strength_secure')
+            }
+            if (passwordNotice) {
+                $.notify('<strong>' + $.t('warning') + '</strong>: ' + passwordNotice, {
+                    type: 'danger'
+                })
+            }
 
-                let passwordNotice = ''
-                if (passphrase.length < 35) {
-                    passwordNotice = $.t('error_passphrase_length_secure')
-                } else if (passphrase.length < 50 && (!passphrase.match(/[A-Z]/) || !passphrase.match(/[0-9]/))) {
-                    passwordNotice = $.t('error_passphrase_strength_secure')
-                }
-                if (passwordNotice) {
-                    $.notify('<strong>' + $.t('warning') + '</strong>: ' + passwordNotice, {
-                        type: 'danger'
-                    })
-                }
+            if ($('#remember_password').is(':checked')) {
+                BRS.rememberPassword = true
+                $('#remember_password').prop('checked', false)
+                BRS.setServerPassword(passphrase)
+                $('.secret_phrase, .show_secret_phrase').hide()
+                $('.hide_secret_phrase').show()
+            }
 
-                if ($('#remember_password').is(':checked')) {
-                    BRS.rememberPassword = true
-                    $('#remember_password').prop('checked', false)
-                    BRS.setServerPassword(passphrase)
-                    $('.secret_phrase, .show_secret_phrase').hide()
-                    $('.hide_secret_phrase').show()
-                }
+            $('#login_password, #login_account, #registration_password, #registration_password_repeat').val('')
+            $('#login_check_password_length').val(1)
+            $('#account_id').html(String(BRS.accountRS).escapeHTML())
 
-                $('#login_password, #login_account, #registration_password, #registration_password_repeat').val('')
-                $('#login_check_password_length').val(1)
-                $('#account_id').html(String(BRS.accountRS).escapeHTML())
-
-                BRS.loginCommon()
-            })
+            BRS.loginCommon()
         })
     })
 }
