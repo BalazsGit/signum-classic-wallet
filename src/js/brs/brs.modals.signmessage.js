@@ -3,8 +3,9 @@
  * @depends {brs.modals.js}
  */
 
-/* global $ converters */
+/* global $ */
 
+import converters from '../util/converters'
 import { BRS } from '.'
 
 export function formsSignModalButtonClicked () {

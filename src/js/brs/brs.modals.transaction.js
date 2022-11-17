@@ -3,8 +3,9 @@
  * @depends {brs.modals.js}
  */
 
-/* global $ converters BigInteger */
+/* global $ BigInteger */
 
+import converters from '../util/converters'
 import { BRS } from '.'
 
 export function showTransactionModal (transaction) {

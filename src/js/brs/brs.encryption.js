@@ -2,13 +2,14 @@
  * @depends {brs.js}
  */
 
-/* global $ BigInteger converters CryptoJS pako */
+/* global $ BigInteger CryptoJS pako */
 
 import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
 
 import * as curve25519 from '../crypto/curve25519'
 import * as jssha from '../crypto/3rdparty/jssha256'
+import converters from '../util/converters'
 
 export function generatePublicKey (secretPhrase) {
     if (!secretPhrase) {

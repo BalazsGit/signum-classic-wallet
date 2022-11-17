@@ -2,9 +2,10 @@
  * @depends {brs.js}
  */
 
-/* global $ converters PassPhraseGenerator BigNumber */
+/* global $ PassPhraseGenerator BigNumber */
 
 import { BRS } from '.'
+import converters from '../util/converters'
 
 export function allowLoginViaEnter () {
     $('#login_password').keypress(function (e) {

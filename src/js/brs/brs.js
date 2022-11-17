@@ -12,7 +12,6 @@
  * @depends {crypto/passphrasegenerator.js}
  * @depends {crypto/3rdparty/aes.js}
  * @depends {crypto/3rdparty/seedrandom.js}
- * @depends {util/converters.js}
  * @depends {util/extensions.js}
  */
 
