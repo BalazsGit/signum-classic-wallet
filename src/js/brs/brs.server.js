@@ -244,6 +244,12 @@ export function processAjaxRequest (requestType, data, callback, async) {
             BRS.accountInfo.publicKey = data.publicKey
         }
     }
+    if (data.secretPhrase) {
+        // Last fence to avoid sending plain text passphrases!!!
+        if (!confirm($.t('confirm_send_passphrase'))) {
+            return
+        }
+    }
 
     $.support.cors = true
 

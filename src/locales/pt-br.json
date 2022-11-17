@@ -1,4 +1,5 @@
 {
+    "confirm_send_passphrase": "Você está prestes a mandar sua frase secreta pela internet. Isso NÃO é recomendado.\n\nVocê ainda deseja enviar sua frase secreta?",
     "filled": "Executada",
     "asset_issuer": "Emissor do ativo",
     "issuer": "Emissor",

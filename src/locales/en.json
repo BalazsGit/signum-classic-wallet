@@ -1,4 +1,5 @@
 {
+    "confirm_send_passphrase": "You are about to send your passphrase over the internet. It is not recommend to proceed.\n\nDo you still want to send your passphrase?",
     "filled": "Filled",
     "asset_issuer": "Asset issuer",
     "issuer": "Issuer",
