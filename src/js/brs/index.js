@@ -114,6 +114,7 @@ import {
 
 import {
     generatePublicKey,
+    getAccountPublicKey,
     getPublicKey,
     getAccountId,
     getAccountIdFromPublicKey,
@@ -627,6 +628,7 @@ export const BRS = {
 
     // From encryption
     generatePublicKey,
+    getAccountPublicKey,
     getPublicKey,
     getAccountId,
     getAccountIdFromPublicKey,

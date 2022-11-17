@@ -23,28 +23,29 @@ export function generatePublicKey (secretPhrase) {
     return BRS.getPublicKey(converters.stringToHexString(secretPhrase))
 }
 
-export function getPublicKey (secretPhrase, isAccountNumber) {
-    if (isAccountNumber) {
-        const accountNumber = secretPhrase
-        let publicKey = ''
+export function getAccountPublicKey (account) {
+    let publicKey = ''
+    // synchronous!
+    BRS.sendRequest('getAccountPublicKey', {
+        account
+    }, function (response) {
+        if (!response.publicKey) {
+            throw $.t('error_no_public_key')
+        } else {
+            publicKey = response.publicKey
+        }
+    }, false)
+    return publicKey
+}
 
-        // synchronous!
-        BRS.sendRequest('getAccountPublicKey', {
-            account: accountNumber
-        }, function (response) {
-            if (!response.publicKey) {
-                throw $.t('error_no_public_key')
-            } else {
-                publicKey = response.publicKey
-            }
-        }, false)
-
-        return publicKey
-    } else {
-        const secretPhraseBytes = converters.hexStringToByteArray(secretPhrase)
-        const digest = jssha.SHA256_hash(secretPhraseBytes)
-        return converters.byteArrayToHexString(curve25519.keygen(digest).p)
-    }
+/**
+ * @param {String} hexSecretPhrase in hexString format
+ * @returns publicKey in hexString format
+ */
+export function getPublicKey (hexSecretPhrase) {
+    const secretPhraseBytes = converters.hexStringToByteArray(hexSecretPhrase)
+    const digest = jssha.SHA256_hash(secretPhraseBytes)
+    return converters.byteArrayToHexString(curve25519.keygen(digest).p)
 }
 
 function getPrivateKey (secretPhrase) {
@@ -96,7 +97,7 @@ export function encryptNote (message, options, secretPhrase) {
                 }
 
                 try {
-                    options.publicKey = converters.hexStringToByteArray(BRS.getPublicKey(options.account, true))
+                    options.publicKey = converters.hexStringToByteArray(getAccountPublicKey(options.account))
                 } catch (err) {
                     const nxtAddress = new NxtAddress(options.account)
 
@@ -189,7 +190,7 @@ function decryptNote (message, options, secretPhrase) {
                     }
                 }
 
-                options.publicKey = converters.hexStringToByteArray(BRS.getPublicKey(options.account, true))
+                options.publicKey = converters.hexStringToByteArray(getAccountPublicKey(options.account))
             }
         }
 
@@ -241,9 +242,9 @@ function decryptNote (message, options, secretPhrase) {
 //     BRS._sharedKeys[account] = sharedKey
 // }
 
-export function signBytes (message, secretPhrase) {
+export function signBytes (message, hexSecretPhrase) {
     const messageBytes = converters.hexStringToByteArray(message)
-    const secretPhraseBytes = converters.hexStringToByteArray(secretPhrase)
+    const secretPhraseBytes = converters.hexStringToByteArray(hexSecretPhrase)
 
     const digest = jssha.SHA256_hash(secretPhraseBytes)
     const s = curve25519.keygen(digest).s
