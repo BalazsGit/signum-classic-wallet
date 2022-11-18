@@ -280,7 +280,7 @@ function getAccountTypeAndMessage (accountId, callback) {
 }
 
 export function correctAddressMistake (el) {
-    $(el).closest('.modal-body').find('input[name=recipient],input[name=account_id]').val($(el).data('address')).trigger('blur')
+    $(el.target).closest('form').find('input[name=recipient],input[name=account_id]').val($(el.target).data('address')).trigger('blur')
 }
 
 export function checkRecipient (account, modal) {
@@ -332,7 +332,7 @@ export function checkRecipient (account, modal) {
             if (guessedAddresses.length === 1) {
                 // There is only one option of error correction suggestion.
                 callout.removeClass(classes).addClass('callout-danger').html($.t('recipient_malformed_suggestion', {
-                    recipient: "<span class='malformed_address' data-address='" + guessedAddresses[0] + "' onclick='BRS.correctAddressMistake(this);'>" + address.formatGuess(guessedAddresses[0], account) + '</span>'
+                    recipient: `<span class='malformed_address' data-address='${guessedAddresses[0]}'>${address.formatGuess(guessedAddresses[0], account)}</span>`
                 })).show()
             } else if (guessedAddresses.length > 1) {
                 // There are many options of error correction suggestion.
@@ -340,13 +340,15 @@ export function checkRecipient (account, modal) {
                     count: guessedAddresses.length
                 }) + '<ul>'
                 for (let i = 0; i < guessedAddresses.length; i++) {
-                    html += "<li><span clas='malformed_address' data-address='" + guessedAddresses[i] + "' onclick='BRS.correctAddressMistake(this);'>" + address.formatGuess(guessedAddresses[i], account) + '</span></li>'
+                    html += `<li><span clas='malformed_address' data-address='${guessedAddresses[i]}'>${address.formatGuess(guessedAddresses[i], account)} </span></li>`
                 }
+                html += '</ul>'
                 callout.removeClass(classes).addClass('callout-danger').html(html).show()
             } else {
                 // There is no error correction suggestion
                 callout.removeClass(classes).addClass('callout-danger').html($.t('recipient_malformed')).show()
             }
+            callout.find('.malformed_address').on('click', BRS.correctAddressMistake)
         }
         return
     }

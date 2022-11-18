@@ -76,6 +76,37 @@ export function addEventListeners () {
 
     // from brs.login.js
     $('#account_phrase_custom_panel form').submit(BRS.evAccountPhraseCustomPanelSubmit)
+    $('#menu_logout').on('click', function (event) {
+        event.preventDefault()
+        BRS.logout()
+    })
+    $('#menu_clear_data').on('click', function (event) {
+        event.preventDefault()
+        BRS.clearData()
+    })
+
+    // from brs.console.js
+    $('#show_console a').on('click', function (event) {
+        event.preventDefault()
+        BRS.showConsole()
+    })
+
+    // found on lockscreen.html
+    $('#lockscreen_register1, #lockscreen_register2').on('click', BRS.registerAccount)
+    $('#lockscreen_registration_cancel').on('click', BRS.showLoginScreen)
+    $('#lockscreen_registration_cancel2, #lockscreen_registration_cancel3, #lockscreen_registration_cancel4, #lockscreen_registration_cancel5').on('click', BRS.showLoginOrWelcomeScreen)
+    $('#lockscreen_next').on('click', function (event) {
+        $('.step_2').hide()
+        $('.step_3').show()
+    })
+    $('#lockscreen_verify_passphrase').on('click', function (event) {
+        event.preventDefault()
+        BRS.verifyGeneratedPassphrase()
+    })
+    $('#lockscreen_user_defined_passphrase').on('click', function (event) {
+        event.preventDefault()
+        BRS.registerUserDefinedAccount()
+    })
 
     // from brs.recipient.js
     $('#send_message_modal, #send_money_modal, #add_contact_modal').on('show.bs.modal', function (e) {
