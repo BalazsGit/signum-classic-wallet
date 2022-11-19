@@ -5,6 +5,7 @@
 /* global $ */
 
 import { BRS } from '.'
+import { fnAjaxMultiQueue } from './brs.ajaxmultiqueue'
 
 export function addEventListeners () {
     // from brs.js
@@ -717,6 +718,9 @@ export function addEventListeners () {
 
     // from brs.utils.js
     $.fn.tree = BRS.FnTree
+
+    // from brs.ajaxmultiqueue
+    $.ajaxMultiQueue = fnAjaxMultiQueue
 
     // from brs.blocks.js
     $('#block_info_latest_block').on('click', function (e) {
