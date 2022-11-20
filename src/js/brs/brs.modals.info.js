@@ -7,6 +7,14 @@
 
 import { BRS } from '.'
 
+import { sendRequest } from './brs.server'
+
+import {
+    formatVolume,
+    formatAmount,
+    formatTimestamp
+} from './brs.util'
+
 export function evBrsModalOnShowBsModal (e) {
     if (BRS.fetchingModalData) {
         return
@@ -14,16 +22,16 @@ export function evBrsModalOnShowBsModal (e) {
 
     BRS.fetchingModalData = true
 
-    BRS.sendRequest('getState', function (state) {
+    sendRequest('getState', function (state) {
         for (const key in state) {
             const el = $('#brs_node_state_' + key)
             if (el.length) {
                 if (key.indexOf('number') !== -1) {
-                    el.html(BRS.formatAmount(state[key]))
+                    el.html(formatAmount(state[key]))
                 } else if (key.indexOf('Memory') !== -1) {
-                    el.html(BRS.formatVolume(state[key]))
+                    el.html(formatVolume(state[key]))
                 } else if (key === 'time') {
-                    el.html(BRS.formatTimestamp(state[key]))
+                    el.html(formatTimestamp(state[key]))
                 } else {
                     el.html(String(state[key]).escapeHTML())
                 }

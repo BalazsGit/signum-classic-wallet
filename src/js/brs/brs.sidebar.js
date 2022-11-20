@@ -14,7 +14,7 @@ export function evSidebarContextOnContextmenu (e) {
         return
     }
 
-    BRS.closeContextMenu()
+    closeContextMenu()
 
     if ($(this).hasClass('no-context')) {
         return
@@ -24,7 +24,7 @@ export function evSidebarContextOnContextmenu (e) {
 
     BRS.selectedContext.addClass('context')
 
-    $(document).on('click.contextmenu', BRS.closeContextMenu)
+    $(document).on('click.contextmenu', closeContextMenu)
 
     let contextMenu = $(this).data('context')
 

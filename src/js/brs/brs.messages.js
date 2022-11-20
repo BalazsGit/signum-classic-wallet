@@ -7,12 +7,58 @@
 import converters from '../util/converters'
 import { BRS } from '.'
 
+import {
+    loadPage,
+    pageLoaded,
+    showFeeSuggestions
+} from './brs'
+
+import {
+    sendRequest
+} from './brs.server'
+
+import {
+    getAccountId,
+    setDecryptionPassword,
+    addDecryptedTransaction,
+    tryToDecryptMessage,
+    decryptAllMessages
+} from './brs.encryption'
+
+import {
+    addMessageData
+} from './brs.forms'
+
+import {
+    formatAmount,
+    formatTimestamp,
+    convertFromHex16,
+    convertFromHex8,
+    getAccountTitle,
+    getAccountFormatted,
+    getUnconfirmedTransactionsFromCache,
+    hasTransactionUpdates,
+    translateServerError
+} from './brs.util'
+
+import {
+    addUnconfirmedTransaction
+} from './brs.transactions'
+
+import {
+    closeContextMenu
+} from './brs.sidebar'
+
+import {
+    showAccountModal
+} from './brs.modals.account'
+
 export function pagesMessages (callback) {
     BRS._messages = {}
 
     $('.content.content-stretch:visible').width($('.page:visible').width())
 
-    BRS.sendRequest('getAccountTransactions+', {
+    sendRequest('getAccountTransactions+', {
         account: BRS.account,
         firstIndex: 0,
         lastIndex: 74,
@@ -36,7 +82,7 @@ export function pagesMessages (callback) {
             $('#no_message_selected').hide()
             $('#no_messages_available').show()
             $('#messages_sidebar').empty()
-            BRS.pageLoaded(callback)
+            pageLoaded(callback)
         }
     })
 }
@@ -91,10 +137,10 @@ function displayMessageSidebar (callback) {
         let extra = ''
 
         if (sortedMessage.user in BRS.contacts) {
-            extra = " data-contact='" + BRS.getAccountTitle(sortedMessage, 'user') + "' data-context='messages_sidebar_update_context'"
+            extra = " data-contact='" + getAccountTitle(sortedMessage, 'user') + "' data-context='messages_sidebar_update_context'"
         }
 
-        rows += "<a href='#' class='list-group-item' data-account='" + BRS.getAccountFormatted(sortedMessage, 'user') + "' data-account-id='" + BRS.getAccountFormatted(sortedMessage.user) + "'" + extra + "><h4 class='list-group-item-heading'>" + BRS.getAccountTitle(sortedMessage, 'user') + "</h4><p class='list-group-item-text'>" + BRS.formatTimestamp(sortedMessage.timestamp) + '</p></a>'
+        rows += "<a href='#' class='list-group-item' data-account='" + getAccountFormatted(sortedMessage, 'user') + "' data-account-id='" + getAccountFormatted(sortedMessage.user) + "'" + extra + "><h4 class='list-group-item-heading'>" + getAccountTitle(sortedMessage, 'user') + "</h4><p class='list-group-item-text'>" + formatTimestamp(sortedMessage.timestamp) + '</p></a>'
     }
 
     $('#messages_sidebar').empty().append(rows)
@@ -103,11 +149,11 @@ function displayMessageSidebar (callback) {
         $('#messages_sidebar a[data-account=' + activeAccount + ']').addClass('active').trigger('click')
     }
 
-    BRS.pageLoaded(callback)
+    pageLoaded(callback)
 }
 
 export function incomingMessages (transactions) {
-    if (BRS.hasTransactionUpdates(transactions)) {
+    if (hasTransactionUpdates(transactions)) {
     // save current scrollTop
         let activeAccount = $('#messages_sidebar a.active')
 
@@ -123,8 +169,8 @@ export function incomingMessages (transactions) {
                     if (trans.height >= BRS.lastBlockHeight - 3 && !BRS._latestMessages[trans.transaction]) {
                         BRS._latestMessages[trans.transaction] = trans
                         $.notify($.t('you_received_message', {
-                            account: BRS.getAccountFormatted(trans, 'sender'),
-                            name: BRS.getAccountTitle(trans, 'sender')
+                            account: getAccountFormatted(trans, 'sender'),
+                            name: getAccountTitle(trans, 'sender')
                         }), { type: 'success' })
                     }
                 }
@@ -132,14 +178,14 @@ export function incomingMessages (transactions) {
         }
 
         if (BRS.currentPage == 'messages') {
-            BRS.loadPage('messages')
+            loadPage('messages')
         }
     }
 }
 
 export function evMessagesSidebarClick (e) {
     e.preventDefault()
-    BRS.showFeeSuggestions('#send_message_fee_page', '#suggested_fee_response_messages_page')
+    showFeeSuggestions('#send_message_fee_page', '#suggested_fee_response_messages_page')
 
     $('#messages_sidebar a.active').removeClass('active')
     $(this).addClass('active')
@@ -168,7 +214,7 @@ export function evMessagesSidebarClick (e) {
                 decoded = $.t('message_empty')
             } else if (messages[i].attachment.encryptedMessage) {
                 try {
-                    decoded = BRS.tryToDecryptMessage(messages[i])
+                    decoded = tryToDecryptMessage(messages[i])
                     extra = 'decrypted'
                 } catch (err) {
                     if (err.errorCode && err.errorCode == 1) {
@@ -185,9 +231,9 @@ export function evMessagesSidebarClick (e) {
                     } catch (err) {
                         // legacy
                         if (messages[i].attachment.message.indexOf('feff') === 0) {
-                            decoded = BRS.convertFromHex16(messages[i].attachment.message)
+                            decoded = convertFromHex16(messages[i].attachment.message)
                         } else {
-                            decoded = BRS.convertFromHex8(messages[i].attachment.message)
+                            decoded = convertFromHex8(messages[i].attachment.message)
                         }
                     }
                 } else {
@@ -205,7 +251,7 @@ export function evMessagesSidebarClick (e) {
                     decoded = "<i class='fas fa-exclamation-triangle'></i> " + decoded
                 } else if (extra == 'decrypted') {
                     if (type == 'payment') {
-                        decoded = '<strong>+' + BRS.formatAmount(messages[i].amountNQT) + ' ' + BRS.valueSuffix + '</strong><br />' + decoded
+                        decoded = '<strong>+' + formatAmount(messages[i].amountNQT) + ' ' + BRS.valueSuffix + '</strong><br />' + decoded
                     }
 
                     decoded = "<i class='fas fa-lock'></i> " + decoded
@@ -215,7 +261,7 @@ export function evMessagesSidebarClick (e) {
                 extra = 'decryption_failed'
             }
 
-            const day = BRS.formatTimestamp(messages[i].timestamp, true)
+            const day = formatTimestamp(messages[i].timestamp, true)
 
             if (day != last_day) {
                 output += '<dt><strong>' + day + '</strong></dt>'
@@ -226,7 +272,7 @@ export function evMessagesSidebarClick (e) {
         }
     }
 
-    let unconfirmedTransactions = BRS.getUnconfirmedTransactionsFromCache(1, 0, {
+    let unconfirmedTransactions = getUnconfirmedTransactionsFromCache(1, 0, {
         recipient: otherUser
     })
 
@@ -246,7 +292,7 @@ export function evMessagesSidebarClick (e) {
             decoded = $.t('message_empty')
         } else if (unconfirmedTransaction.attachment.encryptedMessage) {
             try {
-                decoded = BRS.tryToDecryptMessage(unconfirmedTransaction)
+                decoded = tryToDecryptMessage(unconfirmedTransaction)
                 extra = 'decrypted'
             } catch (err) {
                 if (err.errorCode && err.errorCode == 1) {
@@ -263,9 +309,9 @@ export function evMessagesSidebarClick (e) {
                 } catch (err) {
                     // legacy
                     if (unconfirmedTransaction.attachment.message.indexOf('feff') === 0) {
-                        decoded = BRS.convertFromHex16(unconfirmedTransaction.attachment.message)
+                        decoded = convertFromHex16(unconfirmedTransaction.attachment.message)
                     } else {
-                        decoded = BRS.convertFromHex8(unconfirmedTransaction.attachment.message)
+                        decoded = convertFromHex8(unconfirmedTransaction.attachment.message)
                     }
                 }
             } else {
@@ -292,10 +338,10 @@ export function evMessagesSidebarClick (e) {
 export function evMessagesSidebarContextClick (e) {
     e.preventDefault()
 
-    const account = BRS.getAccountFormatted(BRS.selectedContext.data('account'))
+    const account = getAccountFormatted(BRS.selectedContext.data('account'))
     const option = $(this).data('option')
 
-    BRS.closeContextMenu()
+    closeContextMenu()
 
     if (option == 'add_contact') {
         $('#add_contact_account_id').val(account).trigger('blur')
@@ -304,7 +350,7 @@ export function evMessagesSidebarContextClick (e) {
         $('#send_money_recipient').val(account).trigger('blur')
         $('#send_money_modal').modal('show')
     } else if (option == 'account_info') {
-        BRS.showAccountModal(account)
+        showAccountModal(account)
     }
 }
 
@@ -324,7 +370,7 @@ export function evInlineMessageFormSubmit (e) {
             return
         }
 
-        const accountId = BRS.getAccountId(data.secretPhrase)
+        const accountId = getAccountId(data.secretPhrase)
 
         if (accountId != BRS.account) {
             $.notify($.t('error_passphrase_incorrect'), { type: 'danger' })
@@ -346,7 +392,7 @@ export function evInlineMessageFormSubmit (e) {
 
     if (data.message) {
         try {
-            data = BRS.addMessageData(data, 'sendMessage')
+            data = addMessageData(data, 'sendMessage')
         } catch (err) {
             $.notify(String(err.message).escapeHTMl(), { type: 'danger' })
             return
@@ -357,21 +403,21 @@ export function evInlineMessageFormSubmit (e) {
         }
     }
 
-    BRS.sendRequest(requestType, data, function (response, input) {
+    sendRequest(requestType, data, function (response, input) {
         if (response.errorCode) {
-            $.notify(BRS.translateServerError(response).escapeHTML(), { type: 'danger' })
+            $.notify(translateServerError(response).escapeHTML(), { type: 'danger' })
         } else if (response.fullHash) {
             $.notify($.t('success_message_sent'), { type: 'success' })
 
             $('#inline_message_text').val('')
 
             if (data._extra.message && data.encryptedMessageData) {
-                BRS.addDecryptedTransaction(response.transaction, {
+                addDecryptedTransaction(response.transaction, {
                     encryptedMessage: String(data._extra.message)
                 })
             }
 
-            BRS.addUnconfirmedTransaction(response.transaction, function (alreadyProcessed) {
+            addUnconfirmedTransaction(response.transaction, function (alreadyProcessed) {
                 if (!alreadyProcessed) {
                     $('#message_details dl.chat').append("<dd class='to tentative" + (data.encryptedMessageData ? ' decrypted' : '') + "'><p>" + (data.encryptedMessageData ? "<i class='fas fa-lock'></i> " : '') + (!data._extra.message ? $.t('message_empty') : String(data._extra.message).escapeHTML()) + '</p></dd>')
                     $('#messages_page .content-splitter-right-inner').scrollTop($('#messages_page .content-splitter-right-inner')[0].scrollHeight)
@@ -391,13 +437,13 @@ export function formsSendMessageComplete (response, data) {
     data.message = data._extra.message
 
     if (!(data._extra && data._extra.convertedAccount)) {
-        $.notify($.t('success_message_sent') + " <a href='#' data-account='" + BRS.getAccountFormatted(data, 'recipient') + "' data-toggle='modal' data-target='#add_contact_modal' style='text-decoration:underline'>" + $.t('add_recipient_to_contacts_q') + '</a>', { type: 'success' })
+        $.notify($.t('success_message_sent') + " <a href='#' data-account='" + getAccountFormatted(data, 'recipient') + "' data-toggle='modal' data-target='#add_contact_modal' style='text-decoration:underline'>" + $.t('add_recipient_to_contacts_q') + '</a>', { type: 'success' })
     } else {
         $.notify($.t('success_message_sent'), { type: 'success' })
     }
 
     if (data.message && data.encryptedMessageData) {
-        BRS.addDecryptedTransaction(response.transaction, {
+        addDecryptedTransaction(response.transaction, {
             encryptedMessage: String(data._extra.message)
         })
     }
@@ -409,14 +455,14 @@ export function formsSendMessageComplete (response, data) {
 
         const $sidebar = $('#messages_sidebar')
 
-        const $existing = $sidebar.find('a.list-group-item[data-account=' + BRS.getAccountFormatted(data, 'recipient') + ']')
+        const $existing = $sidebar.find('a.list-group-item[data-account=' + getAccountFormatted(data, 'recipient') + ']')
 
         if ($existing.length) {
             if (response.alreadyProcesed) {
                 return
             }
             $sidebar.prepend($existing)
-            $existing.find('p.list-group-item-text').html(BRS.formatTimestamp(now))
+            $existing.find('p.list-group-item-text').html(formatTimestamp(now))
 
             const isEncrypted = (!!data.encryptedMessageData)
 
@@ -424,7 +470,7 @@ export function formsSendMessageComplete (response, data) {
                 $('#message_details dl.chat').append("<dd class='to tentative" + (isEncrypted ? ' decrypted' : '') + "'><p>" + (isEncrypted ? "<i class='fas fa-lock'></i> " : '') + (data.message ? data.message.escapeHTML() : $.t('message_empty')) + '</p></dd>')
             }
         } else {
-            const accountTitle = BRS.getAccountTitle(data, 'recipient')
+            const accountTitle = getAccountTitle(data, 'recipient')
 
             let extra = ''
 
@@ -432,7 +478,7 @@ export function formsSendMessageComplete (response, data) {
                 extra = " data-context='messages_sidebar_update_context'"
             }
 
-            const listGroupItem = "<a href='#' class='list-group-item' data-account='" + BRS.getAccountFormatted(data, 'recipient') + "'" + extra + "><h4 class='list-group-item-heading'>" + accountTitle + "</h4><p class='list-group-item-text'>" + BRS.formatTimestamp(now) + '</p></a>'
+            const listGroupItem = "<a href='#' class='list-group-item' data-account='" + getAccountFormatted(data, 'recipient') + "'" + extra + "><h4 class='list-group-item-heading'>" + accountTitle + "</h4><p class='list-group-item-text'>" + formatTimestamp(now) + '</p></a>'
             $('#messages_sidebar').prepend(listGroupItem)
         }
         $('#messages_page .content-splitter-right-inner').scrollTop($('#messages_page .content-splitter-right-inner')[0].scrollHeight)
@@ -452,7 +498,7 @@ export function formsDecryptMessages (data) {
             }
         }
 
-        const unconfirmedMessages = BRS.getUnconfirmedTransactionsFromCache(1, 0)
+        const unconfirmedMessages = getUnconfirmedTransactionsFromCache(1, 0)
         if (unconfirmedMessages) {
             for (const unconfirmedMessage of unconfirmedMessages) {
                 if (unconfirmedMessage.attachment && unconfirmedMessage.attachment.encryptedMessage) {
@@ -461,7 +507,7 @@ export function formsDecryptMessages (data) {
             }
         }
 
-        success = BRS.decryptAllMessages(messagesToDecrypt, data.secretPhrase)
+        success = decryptAllMessages(messagesToDecrypt, data.secretPhrase)
     } catch (err) {
         if (err.errorCode && err.errorCode <= 2) {
             return {
@@ -475,7 +521,7 @@ export function formsDecryptMessages (data) {
     }
 
     if (data.rememberPassword) {
-        BRS.setDecryptionPassword(data.secretPhrase)
+        setDecryptionPassword(data.secretPhrase)
     }
 
     $('#messages_sidebar a.active').trigger('click')

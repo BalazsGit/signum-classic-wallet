@@ -5,6 +5,25 @@
 import { BRS } from '.'
 import converters from '../util/converters'
 
+import {
+    sendRequest
+} from './brs.server'
+
+import {
+    generatePublicKey,
+    encryptNote
+} from './brs.encryption'
+
+import {
+    convertToNQT,
+    formatAmount,
+    getTranslatedFieldName
+} from './brs.util'
+
+import {
+    addUnconfirmedTransaction
+} from './brs.transactions'
+
 /* global $ BigInteger */
 
 function getSuccessMessage (requestType) {
@@ -78,7 +97,7 @@ export function addMessageData (data, requestType) {
                 options.publicKey = data.recipientPublicKey
             }
 
-            encrypted = BRS.encryptNote(data.message, options, data.secretPhrase)
+            encrypted = encryptNote(data.message, options, data.secretPhrase)
 
             data.encryptedMessageData = encrypted.message
             data.encryptedMessageNonce = encrypted.nonce
@@ -93,8 +112,8 @@ export function addMessageData (data, requestType) {
     }
 
     if (data.add_note_to_self && data.note_to_self) {
-        encrypted = BRS.encryptNote(data.note_to_self, {
-            publicKey: converters.hexStringToByteArray(BRS.generatePublicKey(data.secretPhrase))
+        encrypted = encryptNote(data.note_to_self, {
+            publicKey: converters.hexStringToByteArray(generatePublicKey(data.secretPhrase))
         }, data.secretPhrase)
 
         data.encryptToSelfMessageData = encrypted.message
@@ -125,14 +144,14 @@ function checkInvalidFormFields ($form) {
         if ($(this).hasAttr('max')) {
             if (!/^[-\d.]+$/.test(value)) {
                 errorMessage = $.t('error_not_a_number', {
-                    field: BRS.getTranslatedFieldName(name).toLowerCase()
+                    field: getTranslatedFieldName(name).toLowerCase()
                 }).capitalize()
                 return
             } else {
                 const max = $(this).attr('max')
                 if (value > max) {
                     errorMessage = $.t('error_max_value', {
-                        field: BRS.getTranslatedFieldName(name).toLowerCase(),
+                        field: getTranslatedFieldName(name).toLowerCase(),
                         max
                     }).capitalize()
                     return
@@ -142,14 +161,14 @@ function checkInvalidFormFields ($form) {
         if ($(this).hasAttr('min')) {
             if (!/^[-\d.]+$/.test(value)) {
                 errorMessage = $.t('error_not_a_number', {
-                    field: BRS.getTranslatedFieldName(name).toLowerCase()
+                    field: getTranslatedFieldName(name).toLowerCase()
                 }).capitalize()
                 return
             } else {
                 const min = $(this).attr('min')
                 if (value < min) {
                     errorMessage = $.t('error_min_value', {
-                        field: BRS.getTranslatedFieldName(name).toLowerCase(),
+                        field: getTranslatedFieldName(name).toLowerCase(),
                         min
                     }).capitalize()
                     return
@@ -158,7 +177,7 @@ function checkInvalidFormFields ($form) {
         }
         if (!errorMessage) {
             errorMessage = $.t('error_invalid_field', {
-                field: BRS.getTranslatedFieldName(name).toLowerCase()
+                field: getTranslatedFieldName(name).toLowerCase()
             }).capitalize()
         }
     })
@@ -269,7 +288,7 @@ export function submitForm ($btn) {
         if (formErrorFunction) {
             formErrorFunction(false, data)
         }
-        BRS.unlockForm($modal, $btn)
+        unlockForm($modal, $btn)
     }
 
     let requestType = $form.find('input[name=request_type]').val()
@@ -325,7 +344,7 @@ export function submitForm ($btn) {
             errorMessage = output.errorMessage
         }
         if (output.stop) {
-            BRS.unlockForm($modal, $btn, true)
+            unlockForm($modal, $btn, true)
             return
         }
     }
@@ -353,7 +372,7 @@ export function submitForm ($btn) {
     }
 
     try {
-        data = BRS.addMessageData(data, requestType)
+        data = addMessageData(data, requestType)
     } catch (err) {
         errorStr = err.message
         if (!errorStr) {
@@ -386,10 +405,10 @@ export function submitForm ($btn) {
 
     if (!BRS.showedFormWarning) {
         if ('amountNXT' in data && BRS.settings.amount_warning && BRS.settings.amount_warning !== '0') {
-            if (new BigInteger(BRS.convertToNQT(data.amountNXT)).compareTo(new BigInteger(BRS.settings.amount_warning)) > 0) {
+            if (new BigInteger(convertToNQT(data.amountNXT)).compareTo(new BigInteger(BRS.settings.amount_warning)) > 0) {
                 BRS.showedFormWarning = true
                 endWithError($.t('error_max_amount_warning', {
-                    burst: BRS.formatAmount(BRS.settings.amount_warning),
+                    burst: formatAmount(BRS.settings.amount_warning),
                     valueSuffix: BRS.valueSuffix
                 }))
                 return
@@ -397,10 +416,10 @@ export function submitForm ($btn) {
         }
 
         if ('feeNXT' in data && BRS.settings.fee_warning && BRS.settings.fee_warning !== '0') {
-            if (new BigInteger(BRS.convertToNQT(data.feeNXT)).compareTo(new BigInteger(BRS.settings.fee_warning)) > 0) {
+            if (new BigInteger(convertToNQT(data.feeNXT)).compareTo(new BigInteger(BRS.settings.fee_warning)) > 0) {
                 BRS.showedFormWarning = true
                 endWithError($.t('error_max_fee_warning', {
-                    burst: BRS.formatAmount(BRS.settings.fee_warning),
+                    burst: formatAmount(BRS.settings.fee_warning),
                     valueSuffix: BRS.valueSuffix
                 }))
                 return
@@ -412,11 +431,11 @@ export function submitForm ($btn) {
     delete data.converted_account_id
     delete data.merchant_info
 
-    BRS.sendRequest(requestType, data, function (response) {
+    sendRequest(requestType, data, function (response) {
         // todo check again.. response.error
         let formCompleteFunction
         if (response.fullHash) {
-            BRS.unlockForm($modal, $btn)
+            unlockForm($modal, $btn)
 
             if (!$modal.hasClass('modal-no-hide')) {
                 $modal.modal('hide')
@@ -433,7 +452,7 @@ export function submitForm ($btn) {
                     data.requestType = requestType
 
                     if (response.transaction) {
-                        BRS.addUnconfirmedTransaction(response.transaction, function (alreadyProcessed) {
+                        addUnconfirmedTransaction(response.transaction, function (alreadyProcessed) {
                             response.alreadyProcessed = alreadyProcessed
                             formCompleteFunction(response, data)
                         })
@@ -442,7 +461,7 @@ export function submitForm ($btn) {
                         formCompleteFunction(response, data)
                     }
                 } else {
-                    BRS.addUnconfirmedTransaction(response.transaction)
+                    addUnconfirmedTransaction(response.transaction)
                 }
             } else {
                 if (typeof formCompleteFunction === 'function') {
@@ -461,7 +480,7 @@ export function submitForm ($btn) {
                 formErrorFunction(response, data)
             }
 
-            BRS.unlockForm($modal, $btn)
+            unlockForm($modal, $btn)
         } else {
             let sentToFunction = false
 
@@ -472,7 +491,7 @@ export function submitForm ($btn) {
                     sentToFunction = true
                     data.requestType = requestType
 
-                    BRS.unlockForm($modal, $btn)
+                    unlockForm($modal, $btn)
 
                     if (!$modal.hasClass('modal-no-hide')) {
                         $modal.modal('hide')
@@ -484,7 +503,7 @@ export function submitForm ($btn) {
             }
 
             if (!sentToFunction) {
-                BRS.unlockForm($modal, $btn, true)
+                unlockForm($modal, $btn, true)
 
                 $.notify(errorMessage.escapeHTML(), { type: 'danger' })
             }

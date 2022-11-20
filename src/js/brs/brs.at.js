@@ -3,16 +3,25 @@
  */
 import { BRS } from '.'
 
+import {
+    sendRequest
+} from './brs.server'
+
+import {
+    formatAmount,
+    dataLoaded
+} from './brs.util'
+
 export function pagesAt () {
-    BRS.sendRequest('getAccountATs', {
+    sendRequest('getAccountATs', {
         account: BRS.account
     }, function (response) {
         let rows = ''
         if (response.ats && response.ats.length) {
             for (const at of response.ats) {
-                rows += '<tr><td>' + String(at.atRS).escapeHTML() + '</td><td>' + String(at.name).escapeHTML() + '</td><td>' + String(at.description).escapeHTML() + '</td><td>' + BRS.formatAmount(at.balanceNQT) + '</td></tr>'
+                rows += '<tr><td>' + String(at.atRS).escapeHTML() + '</td><td>' + String(at.name).escapeHTML() + '</td><td>' + String(at.description).escapeHTML() + '</td><td>' + formatAmount(at.balanceNQT) + '</td></tr>'
             }
         }
-        BRS.dataLoaded(rows)
+        dataLoaded(rows)
     })
 }

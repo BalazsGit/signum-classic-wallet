@@ -7,6 +7,10 @@
 import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
 
+import { pageLoaded } from './brs'
+
+import { sendRequest } from './brs.server'
+
 export function formatVolume (volume) {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
     if (volume === 0) return '0 B'
@@ -31,9 +35,9 @@ export function formatVolume (volume) {
 }
 
 export function formatOrderPricePerWholeQNT (price, decimals) {
-    price = BRS.calculateOrderPricePerWholeQNT(price, decimals, true)
+    price = calculateOrderPricePerWholeQNT(price, decimals, true)
 
-    return BRS.format(price)
+    return format(price)
 }
 
 export function calculateOrderPricePerWholeQNT (price, decimals, returnAsObject) {
@@ -41,7 +45,7 @@ export function calculateOrderPricePerWholeQNT (price, decimals, returnAsObject)
         price = new BigInteger(String(price))
     }
 
-    return BRS.convertToNXT(price.multiply(new BigInteger('' + Math.pow(10, decimals))), returnAsObject)
+    return convertToNXT(price.multiply(new BigInteger('' + Math.pow(10, decimals))), returnAsObject)
 }
 
 export function calculatePricePerWholeQNT (price, decimals) {
@@ -84,7 +88,7 @@ export function calculateOrderTotal (quantityQNT, priceNQT) {
         priceNQT = new BigInteger(String(priceNQT))
     }
 
-    return BRS.convertToNXT(quantityQNT.multiply(priceNQT))
+    return convertToNXT(quantityQNT.multiply(priceNQT))
 }
 
 export function calculatePercentage (a, b) {
@@ -319,7 +323,7 @@ export function format (params, no_escaping) {
 }
 
 export function formatQuantity (quantity, decimals, no_escaping) {
-    return BRS.format(BRS.convertToQNTf(quantity, decimals, true), no_escaping)
+    return format(convertToQNTf(quantity, decimals, true), no_escaping)
 }
 
 /** If amount is string or BigInteger, then assume it is NQT
@@ -336,7 +340,7 @@ export function formatAmount (amount, round, no_escaping) {
     let afterComma = ''
 
     if (typeof amount === 'object') {
-        const params = BRS.convertToNXT(amount, true)
+        const params = convertToNXT(amount, true)
 
         negative = params.negative
         amount = params.amount
@@ -362,7 +366,7 @@ export function formatAmount (amount, round, no_escaping) {
         }
     }
 
-    return BRS.format({
+    return format({
         negative,
         amount,
         afterComma
@@ -449,7 +453,7 @@ export function getAccountLink (object, acc) {
         }
         return '/'
     } else {
-        return "<a href='#' data-user='" + String(object[acc + 'RS']).escapeHTML() + "' class='user-info'>" + BRS.getAccountTitle(object, acc) + '</a>'
+        return "<a href='#' data-user='" + String(object[acc + 'RS']).escapeHTML() + "' class='user-info'>" + getAccountTitle(object, acc) + '</a>'
     }
 }
 
@@ -587,10 +591,10 @@ export function dataLoaded (data, noPageLoad) {
         $el.find('tbody').empty().append(data)
     }
 
-    BRS.dataLoadFinished($el)
+    dataLoadFinished($el)
 
     if (!noPageLoad) {
-        BRS.pageLoaded()
+        pageLoaded()
     }
 }
 
@@ -672,14 +676,14 @@ export function createInfoTable (data, fixed) {
             value = String(value).escapeHTML()
         } else if (key === 'quantity' && $.isArray(value)) {
             if ($.isArray(value)) {
-                value = BRS.formatQuantity(value[0], value[1])
+                value = formatQuantity(value[0], value[1])
             } else {
-                value = BRS.formatQuantity(value, 0)
+                value = formatQuantity(value, 0)
             }
         } else if (key === 'price' || key === 'total' || key === 'amount' || key === 'fee' || key === 'refund' || key === 'discount') {
-            value = BRS.formatAmount(new BigInteger(String(value))) + ' ' + BRS.valueSuffix
+            value = formatAmount(new BigInteger(String(value))) + ' ' + BRS.valueSuffix
         } else if (key === 'sender' || key === 'recipient' || key === 'account' || key === 'seller' || key === 'buyer') {
-            value = "<a href='#' data-user='" + String(value).escapeHTML() + "'>" + BRS.getAccountTitle(value) + '</a>'
+            value = "<a href='#' data-user='" + String(value).escapeHTML() + "'>" + getAccountTitle(value) + '</a>'
         } else {
             value = String(value).escapeHTML().nl2br()
         }
@@ -703,7 +707,7 @@ export function getSelectedText () {
 }
 
 export function formatStyledAmount (amount, round) {
-    amount = BRS.formatAmount(amount, round)
+    amount = formatAmount(amount, round)
 
     amount = amount.split('.')
     if (amount.length === 2) {
@@ -769,7 +773,7 @@ export function getUnconfirmedTransactionsFromCache (type, subtype, fields, sing
 
 function completeUnconfirmedTransactionDetails (unconfirmedTransaction) {
     if (unconfirmedTransaction.type === 3 && unconfirmedTransaction.subtype === 4 && !unconfirmedTransaction.name) {
-        BRS.sendRequest('getDGSGood', {
+        sendRequest('getDGSGood', {
             goods: unconfirmedTransaction.attachment.goods
         }, function (response) {
             unconfirmedTransaction.name = response.name
@@ -930,7 +934,7 @@ export function translateServerError (response) {
         match = response.errorDescription.match(/"([^"]+)" not specified/i)
         if (match && match[1]) {
             return $.t('error_not_specified', {
-                name: BRS.getTranslatedFieldName(match[1]).toLowerCase()
+                name: getTranslatedFieldName(match[1]).toLowerCase()
             }).capitalize()
         }
 
@@ -940,7 +944,7 @@ export function translateServerError (response) {
             const translatedFieldNames = []
 
             $.each(fieldNames, function (fieldName) {
-                translatedFieldNames.push(BRS.getTranslatedFieldName(fieldName).toLowerCase())
+                translatedFieldNames.push(getTranslatedFieldName(fieldName).toLowerCase())
             })
 
             const translatedFieldNamesJoined = translatedFieldNames.join(', ')
@@ -957,7 +961,7 @@ export function translateServerError (response) {
 
         if (match && match[1]) {
             return $.t('error_incorrect_name', {
-                name: BRS.getTranslatedFieldName(match[1]).toLowerCase()
+                name: getTranslatedFieldName(match[1]).toLowerCase()
             }).capitalize()
         }
         return response.errorDescription
@@ -965,7 +969,7 @@ export function translateServerError (response) {
         match = response.errorDescription.match(/Unknown (.*)/i)
         if (match && match[1]) {
             return $.t('error_unknown_name', {
-                name: BRS.getTranslatedFieldName(match[1]).toLowerCase()
+                name: getTranslatedFieldName(match[1]).toLowerCase()
             }).capitalize()
         }
         return response.errorDescription

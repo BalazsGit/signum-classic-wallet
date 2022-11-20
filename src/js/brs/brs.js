@@ -17,6 +17,68 @@
 
 /* global $ WebDB BigInteger */
 
+import {
+    getSettings
+} from './brs.settings'
+
+import { theme } from './brs.theme'
+
+import {
+    sendRequest
+} from './brs.server'
+
+import {
+    allowLoginViaEnter,
+    showLockscreen,
+    logout
+} from './brs.login'
+
+import {
+    getBlock,
+    handleInitialBlocks,
+    handleNewBlocks
+} from './brs.blocks'
+
+import {
+    evAliasShowSearchResult
+} from './brs.aliases'
+
+import {
+    formatQuantity,
+    convertNumericToRSAccountFormat,
+    formatStyledAmount
+} from './brs.util'
+
+import {
+    saveCachedAssets,
+    cacheUserAssets,
+    positionAssetSidebar,
+    goToAsset
+} from './brs.assetexchange'
+
+import {
+    getInitialTransactions,
+    getNewTransactions,
+    getUnconfirmedTransactions,
+    handleIncomingTransactions
+} from './brs.transactions'
+
+import {
+    automaticallyCheckRecipient
+} from './brs.recipient'
+
+import {
+    showAccountModal
+} from './brs.modals.account'
+
+import {
+    showBlockModal
+} from './brs.modals.block'
+
+import {
+    showTransactionModal
+} from './brs.modals.transaction'
+
 import { BRS } from '.'
 
 export function init () {
@@ -32,21 +94,21 @@ export function init () {
         placement: { from: 'bottom', align: 'right' },
         offset: 10
     })
-    BRS.theme()
+    theme()
 
-    BRS.createDatabase(function () {
-        BRS.getSettings()
+    createDatabase(function () {
+        getSettings()
     })
 
     // Give some more time to loading settings
     setTimeout(function () {
         if (BRS.settings.automatic_node_selection) {
-            BRS.autoSelectServer()
+            autoSelectServer()
         } else {
             // use user saved choice
-            BRS.getState()
+            getState()
         }
-        BRS.showLockscreen()
+        showLockscreen()
     }, 250)
 
     if (window.parent) {
@@ -80,10 +142,10 @@ export function init () {
         }
     }
 
-    BRS.setStateInterval(30)
+    setStateInterval(30)
 
-    BRS.allowLoginViaEnter()
-    BRS.automaticallyCheckRecipient()
+    allowLoginViaEnter()
+    automaticallyCheckRecipient()
 
     $('.show_popover').popover({
         trigger: 'hover'
@@ -102,7 +164,7 @@ export function init () {
         _fix()
 
         if (BRS.currentPage === 'asset_exchange') {
-            BRS.positionAssetSidebar()
+            positionAssetSidebar()
         }
     })
 
@@ -153,7 +215,7 @@ export function setStateInterval (seconds) {
     BRS.stateIntervalSeconds = seconds
 
     BRS.stateInterval = setInterval(function () {
-        BRS.getState()
+        getState()
     }, 1000 * seconds)
 }
 
@@ -162,7 +224,7 @@ export function checkSelectedNode () {
     if (preferedNode !== BRS.server) {
         // Server changed, get new network details
         BRS.server = preferedNode
-        BRS.sendRequest('getConstants', function (response) {
+        sendRequest('getConstants', function (response) {
             if (response.errorCode) {
                 return
             }
@@ -198,7 +260,7 @@ export function autoSelectServer () {
         // choose winner
         responses.sort((a, b) => b[2] - a[2])
         $('#prefered_node').val(responses[0][0])
-        BRS.getState()
+        getState()
     }, 2100)
     for (const server of mainnetServers) {
         ajaxCall({
@@ -232,11 +294,11 @@ function setHeaderClock () {
 export function getState (callback) {
     checkSelectedNode()
 
-    BRS.sendRequest('getBlockchainStatus', function (response) {
+    sendRequest('getBlockchainStatus', function (response) {
         if (response.errorCode) {
             if (response.errorCode == -1) {
                 if (BRS.settings.automatic_node_selection) {
-                    BRS.autoSelectServer()
+                    autoSelectServer()
                     return
                 }
                 $('#node_alert').show()
@@ -256,7 +318,7 @@ export function getState (callback) {
         setHeaderClock()
         switch (true) {
         case firstTime:
-            BRS.getBlock(BRS.state.lastBlock, BRS.handleInitialBlocks)
+            getBlock(BRS.state.lastBlock, handleInitialBlocks)
             break
         case BRS.state.isScanning:
             // do nothing but reset BRS.state so that when isScanning is done, everything is reset.
@@ -267,31 +329,31 @@ export function getState (callback) {
             BRS.isScanning = false
             BRS.blocks = []
             BRS.tempBlocks = []
-            BRS.getBlock(BRS.state.lastBlock, BRS.handleInitialBlocks)
+            getBlock(BRS.state.lastBlock, handleInitialBlocks)
             if (BRS.account) {
-                BRS.getInitialTransactions()
-                BRS.getAccountInfo()
+                getInitialTransactions()
+                getAccountInfo()
             }
             break
         case (previousLastBlock !== BRS.state.lastBlock):
             BRS.tempBlocks = []
             if (BRS.account) {
-                BRS.getAccountInfo(false, BRS.cacheUserAssets)
+                getAccountInfo(false, cacheUserAssets)
             }
-            BRS.getBlock(BRS.state.lastBlock, BRS.handleNewBlocks)
+            getBlock(BRS.state.lastBlock, handleNewBlocks)
             if (BRS.account) {
-                BRS.getNewTransactions()
+                getNewTransactions()
             }
             break
         default:
             if (BRS.account) {
-                BRS.getUnconfirmedTransactions(function (unconfirmedTransactions) {
-                    BRS.handleIncomingTransactions(unconfirmedTransactions, false)
+                getUnconfirmedTransactions(function (unconfirmedTransactions) {
+                    handleIncomingTransactions(unconfirmedTransactions, false)
                 })
             }
             // only done so that download progress meter updates correctly based on lastFeederHeight
             if (BRS.downloadingBlockchain) {
-                BRS.updateBlockchainDownloadProgress()
+                updateBlockchainDownloadProgress()
             }
         }
 
@@ -300,7 +362,7 @@ export function getState (callback) {
         }
     })
 
-    BRS.saveCachedAssets()
+    saveCachedAssets()
 }
 
 export function logoSidebarClick (e, data) {
@@ -358,7 +420,7 @@ export function logoSidebarClick (e, data) {
     BRS.showPageNumbers = false
 
     if (BRS.pages[page]) {
-        BRS.pageLoading()
+        pageLoading()
 
         if (data && data.callback) {
             BRS.pages[page](data.callback)
@@ -371,7 +433,7 @@ export function logoSidebarClick (e, data) {
 }
 
 export function loadPage (page, callback) {
-    BRS.pageLoading()
+    pageLoading()
     BRS.pages[page](callback)
 }
 
@@ -404,7 +466,7 @@ export function goToPage (page, callback) {
         $('.page').hide()
         $('#' + page + '_page').show()
         if (BRS.pages[page]) {
-            BRS.pageLoading()
+            pageLoading()
             BRS.pages[page](callback)
         }
     }
@@ -424,7 +486,7 @@ export function pageLoaded (callback) {
     $currentPage.find('.content-header h1 .loading_dots').remove()
 
     if ($currentPage.hasClass('paginated')) {
-        BRS.addPagination()
+        addPagination()
     }
 
     window.scrollTo({
@@ -466,7 +528,7 @@ export function goToPageNumber (pageNumber) {
           } */
     BRS.pageNumber = pageNumber
 
-    BRS.pageLoading()
+    pageLoading()
 
     BRS.pages[BRS.currentPage]()
 }
@@ -590,11 +652,11 @@ export function clearData () {
         }
     }
 
-    setTimeout(BRS.logout, 250)
+    setTimeout(logout, 250)
 }
 
 export function getAccountInfo (firstRun, callback) {
-    BRS.sendRequest('getAccount', {
+    sendRequest('getAccount', {
         account: BRS.account,
         getCommittedAmount: 'true'
     }, function (response) {
@@ -690,10 +752,10 @@ export function getAccountInfo (firstRun, callback) {
                 }
             }
 
-            $('#account_balance, #account_balance_sendmoney').html(BRS.formatStyledAmount(response.unconfirmedBalanceNQT))
-            $('#account_balance_locked, #account_balance_sendmoney').html(BRS.formatStyledAmount((new BigInteger(response.balanceNQT) - new BigInteger(response.unconfirmedBalanceNQT)).toString()))
-            $('#account_committed_balance, #account_balance_sendmoney').html(BRS.formatStyledAmount(response.committedBalanceNQT))
-            $('#account_forged_balance').html(BRS.formatStyledAmount(response.committedBalanceNQT))
+            $('#account_balance, #account_balance_sendmoney').html(formatStyledAmount(response.unconfirmedBalanceNQT))
+            $('#account_balance_locked, #account_balance_sendmoney').html(formatStyledAmount((new BigInteger(response.balanceNQT) - new BigInteger(response.unconfirmedBalanceNQT)).toString()))
+            $('#account_committed_balance, #account_balance_sendmoney').html(formatStyledAmount(response.committedBalanceNQT))
+            $('#account_forged_balance').html(formatStyledAmount(response.committedBalanceNQT))
 
             let nr_assets = 0
 
@@ -762,7 +824,7 @@ function checkAssetDifferences (current_balances, previous_balances) {
     }
     if (nr <= 3) {
         for (const k in diff) {
-            BRS.sendRequest('getAsset', {
+            sendRequest('getAsset', {
                 asset: k,
                 _extra: {
                     asset: k,
@@ -776,7 +838,7 @@ function checkAssetDifferences (current_balances, previous_balances) {
                 asset.asset = input._extra.asset
                 let quantity
                 if (asset.difference.charAt(0) != '-') {
-                    quantity = BRS.formatQuantity(asset.difference, asset.decimals)
+                    quantity = formatQuantity(asset.difference, asset.decimals)
 
                     if (quantity != '0') {
                         $.notify($.t('you_received_assets', {
@@ -788,7 +850,7 @@ function checkAssetDifferences (current_balances, previous_balances) {
                 } else {
                     asset.difference = asset.difference.substring(1)
 
-                    quantity = BRS.formatQuantity(asset.difference, asset.decimals)
+                    quantity = formatQuantity(asset.difference, asset.decimals)
 
                     if (quantity !== '0') {
                         $.notify($.t('you_sold_assets', {
@@ -815,7 +877,7 @@ export function checkLocationHash (password) {
             } else if (hash[0] === 'send') {
                 $modal = $('#send_money_modal')
             } else if (hash[0] === 'asset') {
-                BRS.goToAsset(hash[1])
+                goToAsset(hash[1])
                 return
             } else {
                 $modal = ''
@@ -886,7 +948,7 @@ export function checkMinimumFee (value) {
 
 export function showFeeSuggestions (input_fee_field_id, response_span_id, fee_id) {
     $("[name='suggested_fee_spinner']").removeClass('suggested_fee_spinner_display_none')
-    BRS.sendRequest('suggestFee', {
+    sendRequest('suggestFee', {
     }, function (response) {
         if (!response.errorCode) {
             $(input_fee_field_id).val((response.standard / 100000000))
@@ -899,7 +961,7 @@ export function showFeeSuggestions (input_fee_field_id, response_span_id, fee_id
                 $(input_fee_field_id).val($(this).text())
                 if (fee_id === undefined) {
                     $(input_fee_field_id).trigger('change')
-                } /// / --> for modals with Total field trigger BRS.sendMoneyCalculateTotal
+                } /// / --> for modals with Total field trigger sendMoneyCalculateTotal
                 else {
                     $(fee_id).html($(this).text() + ' ' + BRS.valueSuffix)
                 } /// --> for modals without Total field set Fee field
@@ -913,11 +975,11 @@ export function showFeeSuggestions (input_fee_field_id, response_span_id, fee_id
 
 function showAccountSearchResults (accountsList) {
     if (BRS.currentPage !== 'search_results') {
-        BRS.goToPage('search_results')
+        goToPage('search_results')
     }
     let items = '<ul>'
     for (const account of accountsList) {
-        const accountRS = BRS.convertNumericToRSAccountFormat(account)
+        const accountRS = convertNumericToRSAccountFormat(account)
         items += `<li><a href="#" data-user="${accountRS}" class="user-info">${accountRS}</a></li>`
     }
     items += '</ul>'
@@ -926,7 +988,7 @@ function showAccountSearchResults (accountsList) {
 
 function showAssetSearchResults (assets) {
     if (BRS.currentPage !== 'search_results') {
-        BRS.goToPage('search_results')
+        goToPage('search_results')
     }
     let items = '<table class="table table-striped">' +
             '<thead><tr>' +
@@ -958,7 +1020,7 @@ export function evIdSearchSubmit (e) {
         }
     }
     if (BRS.rsRegEx.test(searchText)) {
-        BRS.sendRequest('getAccount', {
+        sendRequest('getAccount', {
             account: searchText
         }, function (response, input) {
             if (response.errorCode) {
@@ -966,12 +1028,12 @@ export function evIdSearchSubmit (e) {
                 return
             }
             response.account = input.account
-            BRS.showAccountModal(response)
+            showAccountModal(response)
         })
         return
     }
     if (BRS.idRegEx.test(searchText)) {
-        BRS.sendRequest('getTransaction', {
+        sendRequest('getTransaction', {
             transaction: searchText
         }, function (response, input) {
             if (response.errorCode) {
@@ -979,7 +1041,7 @@ export function evIdSearchSubmit (e) {
                 return
             }
             response.transaction = input.transaction
-            BRS.showTransactionModal(response)
+            showTransactionModal(response)
         })
         return
     }
@@ -991,7 +1053,7 @@ export function evIdSearchSubmit (e) {
     switch (splitted[0].trim()) {
     case 'a':
     case 'address':
-        BRS.sendRequest('getAccount', {
+        sendRequest('getAccount', {
             account: splitted[1].trim()
         }, function (response, input) {
             if (response.errorCode) {
@@ -999,26 +1061,26 @@ export function evIdSearchSubmit (e) {
                 return
             }
             response.account = input.account
-            BRS.showAccountModal(response)
+            showAccountModal(response)
         })
         return
     case 'b':
     case 'block':
-        BRS.sendRequest('getBlock', {
+        sendRequest('getBlock', {
             block: splitted[1].trim(),
             includeTransactions: 'true'
         }, function (response, input) {
             if (!response.errorCode) {
                 // response.block = input.block;
-                BRS.showBlockModal(response)
+                showBlockModal(response)
             } else {
-                BRS.sendRequest('getBlock', {
+                sendRequest('getBlock', {
                     height: splitted[1].trim(),
                     includeTransactions: 'true'
                 }, function (response, input) {
                     if (!response.errorCode) {
                         // response.block = input.block;
-                        BRS.showBlockModal(response)
+                        showBlockModal(response)
                     } else {
                         $.notify($.t('error_search_no_results'), { type: 'danger' })
                     }
@@ -1027,18 +1089,18 @@ export function evIdSearchSubmit (e) {
         })
         return
     case 'alias':
-        BRS.sendRequest('getAlias', {
+        sendRequest('getAlias', {
             aliasName: splitted[1].trim()
         }, function (response) {
             if (response.errorCode) {
                 $.notify($.t('error_search_no_results'), { type: 'danger' })
                 return
             }
-            BRS.evAliasShowSearchResult(response)
+            evAliasShowSearchResult(response)
         })
         return
     case 'name':
-        BRS.sendRequest('getAccountsWithName', {
+        sendRequest('getAccountsWithName', {
             name: splitted[1].trim()
         }, function (response) {
             if (response.errorCode || !response.accounts || response.accounts.length === 0) {
@@ -1046,14 +1108,14 @@ export function evIdSearchSubmit (e) {
                 return
             }
             if (response.accounts.length === 1) {
-                BRS.sendRequest('getAccount', {
+                sendRequest('getAccount', {
                     account: response.accounts[0]
                 }, function (response2, input) {
                     if (response2.errorCode) {
                         $.notify($.t('error_search_no_results'), { type: 'danger' })
                         return
                     }
-                    BRS.showAccountModal(response2)
+                    showAccountModal(response2)
                 })
                 return
             }
@@ -1062,7 +1124,7 @@ export function evIdSearchSubmit (e) {
         })
         return
     case 'token':
-        BRS.sendRequest('getAssetsByName', {
+        sendRequest('getAssetsByName', {
             name: splitted[1].trim()
         }, function (response) {
             if (response.errorCode || !response.assets || response.assets.length === 0) {

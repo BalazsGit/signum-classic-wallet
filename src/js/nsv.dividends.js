@@ -77,7 +77,7 @@ var NSV = (function(NSV, $, undefined) {
             return;
         }
         else {
-            BRS.sendRequest("getAsset", {
+            sendRequest("getAsset", {
                 "asset": asset
             }, function(response) {
                 if (response.errorCode) {
@@ -98,7 +98,7 @@ var NSV = (function(NSV, $, undefined) {
 
                 }
                 try {
-                    qnt_amt = BRS.convertToQNT(amount,dec1);
+                    qnt_amt = convertToQNT(amount,dec1);
                 }
                 catch(err) {
                     $("#nsv_div_ad_error_message").html("<b>Error!</b>: Amount not set correctly.");
@@ -193,7 +193,7 @@ var NSV = (function(NSV, $, undefined) {
             if (!BRS.rememberPassword) {
 
 
-                var accountId = BRS.getAccountId(secret);
+                var accountId = getAccountId(secret);
                 //var accountId = BRS.generateAccountId(secret);
                 if (accountId != BRS.account) {
                     err_message = "Password doesn't match";
@@ -263,7 +263,7 @@ var NSV = (function(NSV, $, undefined) {
             pres_req.recipient=tmp_sm_acc;
             pres_req.quantityQNT=tmp_sm_amt;
 
-            BRS.sendRequest("transferAsset", pres_req, function(response) {
+            sendRequest("transferAsset", pres_req, function(response) {
                 if (response.errorCode) {
                     out_message = out_message.concat("Encountered a problem. ",String(response.errorDescription),"\n");
                     document.getElementById("nsv_div_ad_disp_results").value = out_message;
@@ -290,13 +290,13 @@ var NSV = (function(NSV, $, undefined) {
     };
 
     NSV.getAccountError = function(accountId, callback) {
-        BRS.sendRequest("getAccount", {
+        sendRequest("getAccount", {
             "account": accountId
         }, function(response) {
             if (response.publicKey) {
                 callback({
                     "type": "info",
-                    "message": "The recipient account has a public key and a balance of " + BRS.formatAmount(response.unconfirmedBalanceNQT, false, true) + " Signa.",
+                    "message": "The recipient account has a public key and a balance of " + formatAmount(response.unconfirmedBalanceNQT, false, true) + " Signa.",
                     "account": response
                 });
             }
@@ -327,7 +327,7 @@ var NSV = (function(NSV, $, undefined) {
                 else {
                     callback({
                         "type": "warning",
-                        "message": "The recipient account does not have a public key, meaning it has never had an outgoing transaction. The account has a balance of " + BRS.formatAmount(response.unconfirmedBalanceNQT, false, true) + " Signa. Please double check your recipient address before submitting.",
+                        "message": "The recipient account does not have a public key, meaning it has never had an outgoing transaction. The account has a balance of " + formatAmount(response.unconfirmedBalanceNQT, false, true) + " Signa. Please double check your recipient address before submitting.",
                         "account": response
                     });
                 }
@@ -444,7 +444,7 @@ var NSV = (function(NSV, $, undefined) {
             return;
         }
         else {
-            BRS.sendOutsideRequest("/burst?requestType=" + "getAsset", {
+            sendOutsideRequest("/burst?requestType=" + "getAsset", {
                 "asset": asset
             }, function(response) {
                 if (response.errorCode) {
@@ -467,7 +467,7 @@ var NSV = (function(NSV, $, undefined) {
 
                     }
                     else {
-                        BRS.sendOutsideRequest("/burst?requestType=" + "getAsset", {
+                        sendOutsideRequest("/burst?requestType=" + "getAsset", {
                             "asset": outasset
                         }, function(response) {
                             if (response.errorCode) {
@@ -496,17 +496,17 @@ var NSV = (function(NSV, $, undefined) {
                 try {
                     if (NSV_div_send_out_burst) {
                         outasset_dec1 = 8;
-                        qnt_amt = BRS.convertToNQT(amount);
+                        qnt_amt = convertToNQT(amount);
                     }
                     else {
-                        qnt_amt = BRS.convertToQNT(amount,outasset_dec1);
+                        qnt_amt = convertToQNT(amount,outasset_dec1);
                     }
                 }
                 catch(err) {
                     err_message = "<b>Error!</b>: Amount not set correctly.";
                 }
                 //assetID =transaction ID which issued it. This has the timestamp info
-                BRS.sendOutsideRequest("/burst?requestType=" + "getTransaction", {"transaction": asset}, function(response) {
+                sendOutsideRequest("/burst?requestType=" + "getTransaction", {"transaction": asset}, function(response) {
                     if (response.errorCode) {
                         err_message = "Unknown error, couldn't getTransaction for asset issuing block.";
                         return;
@@ -515,7 +515,7 @@ var NSV = (function(NSV, $, undefined) {
                         issued_time = response.timestamp;
                     }
                 },false);
-                BRS.sendOutsideRequest("/burst?requestType=" + "getTime", {}, function(response) {
+                sendOutsideRequest("/burst?requestType=" + "getTime", {}, function(response) {
                     if (response.errorCode) {
                         err_message = "Unknown error, couldn't getTime.";
                     }
@@ -548,7 +548,7 @@ var NSV = (function(NSV, $, undefined) {
                         var account_array = list_nodist_acc.split(',');
                         for (i=0; i<account_array.length; ++i) {
                             var act_acc = account_array[i];
-                            BRS.sendOutsideRequest("/burst?requestType=" + "getAccount", {
+                            sendOutsideRequest("/burst?requestType=" + "getAccount", {
                                 "account": act_acc
                             }, function(response) {
                                 if (response.errorCode) {
@@ -583,7 +583,7 @@ var NSV = (function(NSV, $, undefined) {
                 init_object.amount = NSV_div_cur_ass_issued_amount;
                 NSV_div_send_acc_array.push(init_object);
 
-                BRS.sendOutsideRequest("/burst?requestType=" + "getTrades", {
+                sendOutsideRequest("/burst?requestType=" + "getTrades", {
                     "asset": asset
                 }, function(response) {
                     if (response.errorCode) {
@@ -599,7 +599,7 @@ var NSV = (function(NSV, $, undefined) {
                                 var tmp_tran_bid = trade_arr[i].bidOrder;
                                 var trade_amt = parseInt(trade_arr[i].quantityQNT,10);
                                 var sender, recip,sender_amt,recip_amt;
-                                BRS.sendOutsideRequest("/burst?requestType=" + "getTransaction", {
+                                sendOutsideRequest("/burst?requestType=" + "getTransaction", {
                                     "transaction": tmp_tran_ask, "_":tmp_tran_bid
                                 }, function(response,input) {
                                     tmp2_tran_bid = input._;
@@ -613,7 +613,7 @@ var NSV = (function(NSV, $, undefined) {
                                         sender_amt = parseInt(response.attachment.quantityQNT,10);
                                     }
 
-                                    BRS.sendOutsideRequest("/burst?requestType=" + "getTransaction", {
+                                    sendOutsideRequest("/burst?requestType=" + "getTransaction", {
                                         "transaction": tmp2_tran_bid
                                     }, function(response) {
                                         if (response.errorCode) {
@@ -754,7 +754,7 @@ var NSV = (function(NSV, $, undefined) {
                 err_message = "Password not specified";
             }
             else {
-                var accountId = BRS.getAccountId(secret);
+                var accountId = getAccountId(secret);
                 //var accountId = BRS.generateAccountId(secret);
                 if (accountId != BRS.account) {
                     err_message = "Password doesn't match";
@@ -788,7 +788,7 @@ var NSV = (function(NSV, $, undefined) {
         var i;
         var pro_pct;
         if (NSV_div_send_out_burst) {
-            var tot_quant = BRS.convertToNQT(tot_amount);
+            var tot_quant = convertToNQT(tot_amount);
             var total_cost = len*100000000 + parseInt(tot_quant,10);
 
             if (BRS.accountInfo.unconfirmedBalanceNQT) {
@@ -817,7 +817,7 @@ var NSV = (function(NSV, $, undefined) {
                 tmp_sm_acc = NSV_div_send_acc_array[i].account;
                 tmp_sm_amt = String(NSV_div_send_acc_array[i].amount);
                 document.getElementById("nsv_div_send_disp_results").value = out_message;
-                BRS.sendRequest("sendMoney", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"amountNQT":tmp_sm_amt}, function(response, input) {
+                sendRequest("sendMoney", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"amountNQT":tmp_sm_amt}, function(response, input) {
                     tmp_sm_amt2 = String(parseInt(input.amountNQT, 10 )/NSV_div_unquant_out_mult);
                     if (response.errorCode) {
                         out_message = out_message.concat("***",tmp_sm_amt2,", ",input.recipientRS,", Encountered a problem. ",String(response.errorDescription),"\n");
@@ -898,7 +898,7 @@ var NSV = (function(NSV, $, undefined) {
                 tmp_sm_acc = NSV_div_send_acc_array[i].account;
                 tmp_sm_amt = String(NSV_div_send_acc_array[i].amount);
                 document.getElementById("nsv_div_send_disp_results").value = out_message;
-                BRS.sendRequest("transferAsset", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"quantityQNT":tmp_sm_amt,"asset":NSV_div_send_out_asset}, function(response, input) {
+                sendRequest("transferAsset", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"quantityQNT":tmp_sm_amt,"asset":NSV_div_send_out_asset}, function(response, input) {
                     tmp_sm_amt2 = String(parseInt(input.quantityQNT, 10 )/NSV_div_unquant_out_mult);
                     if (response.errorCode) {
                         out_message = out_message.concat("***",tmp_sm_amt2,", ",input.recipientRS,", Encountered a problem. ",String(response.errorDescription),"\n");
@@ -973,7 +973,7 @@ var NSV = (function(NSV, $, undefined) {
             var warn_mess = "This calculation can take several minutes, please be patient. Progress ".concat(String(pro_pct),"%");
             $("#nsv_div_send_warn_message").html(warn_mess);
             var tmp_acc = asset_array[i].account;
-            BRS.sendOutsideRequest("/burst?requestType=" + "getAccountTransactionIds", {
+            sendOutsideRequest("/burst?requestType=" + "getAccountTransactionIds", {
                 "account":tmp_acc , "type":"2", "subtype":"1","timestamp":str_init_time
             }, function(response,input) {
                 if (response.errorCode) {
@@ -1104,7 +1104,7 @@ var NSV = (function(NSV, $, undefined) {
             err_message = "Asset ID is Invalid for Replacement Asset";
         }
         else {
-            BRS.sendRequest("getAsset", {
+            sendRequest("getAsset", {
                 "asset": asset2
             }, function(response) {
                 if (response.errorCode) {
@@ -1123,7 +1123,7 @@ var NSV = (function(NSV, $, undefined) {
             err_message = "Asset ID is Invalid for Original Asset";
         }
         else {
-            BRS.sendRequest("getAsset", {
+            sendRequest("getAsset", {
                 "asset": asset1
             }, function(response) {
                 if (response.errorCode) {
@@ -1146,7 +1146,7 @@ var NSV = (function(NSV, $, undefined) {
             err_message = "Original asset not specified";
         }
         else {
-            BRS.sendOutsideRequest("/burst?requestType=" + "getAccountTransactionIds", {
+            sendOutsideRequest("/burst?requestType=" + "getAccountTransactionIds", {
                 "account":redeem_ac , "type":"2", "subtype":"1"
             }, function(response,input) {
                 if (response.errorCode) {
@@ -1186,7 +1186,7 @@ var NSV = (function(NSV, $, undefined) {
         else {
             out_message = out_message + "Assets Sent, Account, Sending TX, Assets Recieved, Recieving TX\n";
             for (var k=0; k<NSV_redeemed_assets.length; k++) {
-                BRS.sendOutsideRequest("/burst?requestType=" + "getAccountTransactionIds", {
+                sendOutsideRequest("/burst?requestType=" + "getAccountTransactionIds", {
                     "account":NSV_redeemed_assets[k].sender , "type":"2", "subtype":"1"
                 }, function(response,input) {
                     if (response.errorCode) {
@@ -1280,7 +1280,7 @@ var NSV = (function(NSV, $, undefined) {
                 err_message = "Password not specified";
             }
             else {
-                var accountId = BRS.getAccountId(secret);
+                var accountId = getAccountId(secret);
                 if (accountId != BRS.account) {
                     err_message = "Password doesn't match";
                 }
@@ -1302,7 +1302,7 @@ var NSV = (function(NSV, $, undefined) {
             var tmp_acc = NSV_shareswap_unredeemed[i].sender;
             var tmp_amt = NSV_shareswap_unredeemed[i].amount;
             var tmp_mess = NSV_shareswap_unredeemed[i].tran;
-            BRS.sendRequest("transferAsset", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_acc,"quantityQNT":tmp_amt,"asset":NSV_shareswap_repl_asset, "message":tmp_mess}, function(response, input) {
+            sendRequest("transferAsset", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_acc,"quantityQNT":tmp_amt,"asset":NSV_shareswap_repl_asset, "message":tmp_mess}, function(response, input) {
                 if (response.errorCode) {
                     out_message = out_message + "Problem with sending to Account " + input.account + "\n";
                 }

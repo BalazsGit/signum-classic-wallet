@@ -5,7 +5,7 @@
 
 /* global $ */
 
-import { BRS } from '.'
+import { createInfoTable } from './brs.util'
 
 export function showRawTransactionModal (transaction) {
     $('#raw_transaction_modal_unsigned_transaction_bytes').val(transaction.unsignedTransactionBytes)
@@ -56,7 +56,7 @@ export function formsBroadcastTransactionComplete (response, data) {
 
 export function formsParseTransactionComplete (response, data) {
     $('#parse_transaction_form').find('.error_message').hide()
-    $('#parse_transaction_output_table tbody').empty().append(BRS.createInfoTable(response, true))
+    $('#parse_transaction_output_table tbody').empty().append(createInfoTable(response, true))
     $('#parse_transaction_output').show()
 }
 
@@ -67,7 +67,7 @@ export function formsParseTransactionError () {
 
 export function formsCalculateFullHashComplete (response, data) {
     $('#calculate_full_hash_form').find('.error_message').hide()
-    $('#calculate_full_hash_output_table tbody').empty().append(BRS.createInfoTable(response, true))
+    $('#calculate_full_hash_output_table tbody').empty().append(createInfoTable(response, true))
     $('#calculate_full_hash_output').show()
 }
 

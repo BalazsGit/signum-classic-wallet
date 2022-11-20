@@ -4,8 +4,17 @@
 
 import { BRS } from '.'
 
+import {
+    sendRequest
+} from './brs.server'
+
+import {
+    formatAmount,
+    dataLoaded
+} from './brs.util'
+
 export function pagesEscrow () {
-    BRS.sendRequest('getAccountEscrowTransactions', {
+    sendRequest('getAccountEscrowTransactions', {
         account: BRS.account
     }, function (response) {
         let rows = ''
@@ -15,10 +24,10 @@ export function pagesEscrow () {
                 rows += `<td><a href='#' data-escrow='${escrow.id}'>${escrow.id}</a></td>`
                 rows += `<td>${escrow.senderRS}</td>`
                 rows += `<td>${escrow.recipientRS}</td>`
-                rows += `<td>${BRS.formatAmount(escrow.amountNQT)}</td>`
+                rows += `<td>${formatAmount(escrow.amountNQT)}</td>`
                 rows += '</tr>'
             }
         }
-        BRS.dataLoaded(rows)
+        dataLoaded(rows)
     })
 }

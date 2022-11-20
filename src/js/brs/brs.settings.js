@@ -6,11 +6,20 @@
 
 import { BRS } from '.'
 
+import { pageLoaded } from './brs'
+
+import { submitForm } from './brs.forms'
+
+import {
+    convertToNXT,
+    formatTimestamp
+} from './brs.util'
+
 export function pagesSettings () {
     for (const key in BRS.settings) {
         if (/_warning/i.test(key) && key != 'asset_transfer_warning') {
             if ($('#settings_' + key).length) {
-                $('#settings_' + key).val(BRS.convertToNXT(BRS.settings[key]))
+                $('#settings_' + key).val(convertToNXT(BRS.settings[key]))
             }
         } else if (!/_color/i.test(key)) {
             if ($('#settings_' + key).length) {
@@ -23,7 +32,7 @@ export function pagesSettings () {
         $('#settings_console_log_div').hide()
     }
 
-    BRS.pageLoaded()
+    pageLoaded()
 }
 
 export function getSettings () {
@@ -67,7 +76,7 @@ function applySettings (key) {
                 e.preventDefault()
                 const $modal = $(this).closest('.modal')
                 const $btn = $modal.find('button.btn-primary:not([data-dismiss=modal])')
-                BRS.submitForm($btn)
+                submitForm($btn)
             })
         } else {
             $('.modal form').off('submit.onEnter')
@@ -105,7 +114,7 @@ function applySettings (key) {
     if (key == '24_hour_format') {
         const $dashboard_dates = $('#dashboard_transactions_table a[data-timestamp], #dashboard_blocks_table td[data-timestamp]')
         $.each($dashboard_dates, function (key, value) {
-            $(this).html(BRS.formatTimestamp($(this).data('timestamp')))
+            $(this).html(formatTimestamp($(this).data('timestamp')))
         })
     }
 

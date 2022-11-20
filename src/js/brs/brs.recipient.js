@@ -7,6 +7,20 @@
 import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
 
+import { sendRequest } from './brs.server'
+
+import { getContactByName } from './brs.contacts'
+
+import { getAccountIdFromPublicKey } from './brs.encryption'
+
+import {
+    convertToNQT,
+    formatAmount,
+    formatTimestamp,
+    convertRSAccountToNumeric,
+    getAccountFormatted
+} from './brs.util'
+
 export function automaticallyCheckRecipient () {
     const $recipientFields = $('#add_contact_account_id, #update_contact_account_id, #buy_alias_recipient, #escrow_create_recipient, #inline_message_recipient, #reward_recipient, #sell_alias_recipient, #send_message_recipient, #send_money_recipient, #subscription_cancel_recipient, #subscription_create_recipient, #transfer_alias_recipient, #transfer_asset_recipient, #transfer_asset_multi_recipient')
 
@@ -18,7 +32,7 @@ export function automaticallyCheckRecipient () {
         const value = $(this).val()
         const form = $(this).closest('form')
         if (value) {
-            BRS.checkRecipient(value, form)
+            checkRecipient(value, form)
         } else {
             form.find('.account_info').hide()
         }
@@ -35,7 +49,7 @@ export function sendMoneyCalculateTotal (element) {
 
     $('#send_money_fee').val(fee.toFixed(8))
 
-    $(element).closest('.modal').find('.total_amount_ordinary').html(BRS.formatAmount(BRS.convertToNQT(amount + fee)) + ' ' + BRS.valueSuffix)
+    $(element).closest('.modal').find('.total_amount_ordinary').html(formatAmount(convertToNQT(amount + fee)) + ' ' + BRS.valueSuffix)
 }
 
 export function commitmentCalculateTotal (element) {
@@ -46,12 +60,12 @@ export function commitmentCalculateTotal (element) {
 
     $('#commitment_fee').val(fee.toFixed(8))
 
-    $(element).closest('.modal').find('.total_amount_commitment').html(BRS.formatAmount(BRS.convertToNQT(amount + fee)) + ' ' + BRS.valueSuffix)
+    $(element).closest('.modal').find('.total_amount_commitment').html(formatAmount(convertToNQT(amount + fee)) + ' ' + BRS.valueSuffix)
 }
 
 export function formsSendMoneyComplete (response, data) {
     if (!(data._extra && data._extra.convertedAccount) && !(data.recipient in BRS.contacts)) {
-        $.notify($.t('success_send_money', { valueSuffix: BRS.valueSuffix }) + " <a href='#' data-account='" + BRS.getAccountFormatted(data, 'recipient') + "' data-toggle='modal' data-target='#add_contact_modal' style='text-decoration:underline'>" + $.t('add_recipient_to_contacts_q') + '</a>', {
+        $.notify($.t('success_send_money', { valueSuffix: BRS.valueSuffix }) + " <a href='#' data-account='" + getAccountFormatted(data, 'recipient') + "' data-toggle='modal' data-target='#add_contact_modal' style='text-decoration:underline'>" + $.t('add_recipient_to_contacts_q') + '</a>', {
             type: 'success'
         })
     } else {
@@ -65,11 +79,11 @@ export function formsSendMoneyComplete (response, data) {
 function recipientToId (recipient) {
     let accountId = ''
     if (BRS.rsRegEx.test(recipient)) {
-        accountId = BRS.convertRSAccountToNumeric(recipient)
+        accountId = convertRSAccountToNumeric(recipient)
     } else if (BRS.idRegEx.test(recipient)) {
         accountId = BigInt(recipient).toString(10)
     } else {
-        const foundContact = BRS.getContactByName(recipient)
+        const foundContact = getContactByName(recipient)
         if (foundContact) {
             accountId = foundContact.account
         }
@@ -87,7 +101,7 @@ export function formsSendMoneyMulti (data) {
     if (data.same_out_checkbox === '1') {
         requestType = 'sendMoneyMultiSame'
         try {
-            rowAmountNQT = BRS.convertToNQT(data.amount_multi_out_same)
+            rowAmountNQT = convertToNQT(data.amount_multi_out_same)
         } catch (e) {
             return { error: 'Invalid amount' }
         }
@@ -123,7 +137,7 @@ export function formsSendMoneyMulti (data) {
                 }
             }
             try {
-                rowAmountNQT = BRS.convertToNQT(data.amount_multi_out[i])
+                rowAmountNQT = convertToNQT(data.amount_multi_out[i])
             } catch (e) {
                 return { error: 'Invalid amount' }
             }
@@ -156,7 +170,7 @@ export function formsSendMoneyMulti (data) {
         BRS.showedFormWarning = true
         return {
             error: $.t('error_max_amount_warning', {
-                burst: BRS.formatAmount(BRS.settings.amount_warning),
+                burst: formatAmount(BRS.settings.amount_warning),
                 valueSuffix: BRS.valueSuffix
             })
         }
@@ -188,7 +202,7 @@ function getAccountTypeAndMessage (accountId, callback) {
     // accountId sometimes comes with an RS-Address
     let sureItIsId = accountId
     if (BRS.rsRegEx.test(accountId)) {
-        sureItIsId = BRS.convertRSAccountToNumeric(accountId)
+        sureItIsId = convertRSAccountToNumeric(accountId)
         if (sureItIsId === '') {
             callback({
                 type: 'danger',
@@ -208,14 +222,14 @@ function getAccountTypeAndMessage (accountId, callback) {
         return
     }
     // first guess it is an AT
-    BRS.sendRequest('getAT', {
+    sendRequest('getAT', {
         at: sureItIsId
     }, function (newResponse) {
         if (newResponse.errorCode === undefined) {
             callback({
                 type: 'info',
                 message: $.t('recipient_smart_contract', {
-                    burst: BRS.formatAmount(newResponse.balanceNQT, false, true),
+                    burst: formatAmount(newResponse.balanceNQT, false, true),
                     valueSuffix: BRS.valueSuffix
                 }),
                 account: newResponse,
@@ -225,7 +239,7 @@ function getAccountTypeAndMessage (accountId, callback) {
         }
 
         // It is not an AT, get account
-        BRS.sendRequest('getAccount', {
+        sendRequest('getAccount', {
             account: sureItIsId
         }, function (response) {
             switch (response.errorCode) {
@@ -259,7 +273,7 @@ function getAccountTypeAndMessage (accountId, callback) {
                 callback({
                     type: 'warning',
                     message: $.t('recipient_no_public_key', {
-                        burst: BRS.formatAmount(response.unconfirmedBalanceNQT, false, true),
+                        burst: formatAmount(response.unconfirmedBalanceNQT, false, true),
                         valueSuffix: BRS.valueSuffix
                     }),
                     account: response,
@@ -270,7 +284,7 @@ function getAccountTypeAndMessage (accountId, callback) {
             callback({
                 type: 'info',
                 message: $.t('recipient_info', {
-                    burst: BRS.formatAmount(response.unconfirmedBalanceNQT, false, true),
+                    burst: formatAmount(response.unconfirmedBalanceNQT, false, true),
                     valueSuffix: BRS.valueSuffix
                 }),
                 account: response
@@ -305,7 +319,7 @@ export function checkRecipient (account, modal) {
             if (accountParts[3] !== undefined) {
                 // Account is extended RS Address. Verify the public key
                 const publicKey = new BigNumber(accountParts[3], 36).toString(16)
-                const checkRS = BRS.getAccountIdFromPublicKey(publicKey, true)
+                const checkRS = getAccountIdFromPublicKey(publicKey, true)
 
                 if (!checkRS.includes(accountParts[2])) {
                     // Public key does not match RS Address
@@ -348,7 +362,7 @@ export function checkRecipient (account, modal) {
                 // There is no error correction suggestion
                 callout.removeClass(classes).addClass('callout-danger').html($.t('recipient_malformed')).show()
             }
-            callout.find('.malformed_address').on('click', BRS.correctAddressMistake)
+            callout.find('.malformed_address').on('click', correctAddressMistake)
         }
         return
     }
@@ -379,7 +393,7 @@ export function checkRecipient (account, modal) {
                 checkForMerchant(response.account.description, modal)
             }
             callout.removeClass(classes).addClass('callout-' + response.type).html($.t('contact_account_link', {
-                account_id: BRS.getAccountFormatted(contact, 'account')
+                account_id: getAccountFormatted(contact, 'account')
             }) + ' ' + response.message.escapeHTML()).show()
             if (response.type === 'info' || response.type === 'warning') {
                 accountInputField.val(contact.accountRS)
@@ -397,7 +411,7 @@ function checkRecipientAlias (account, modal) {
 
     accountInputField.val('')
 
-    BRS.sendRequest('getAlias', {
+    sendRequest('getAlias', {
         aliasName: account
     }, function (response) {
         if (response.errorCode) {
@@ -434,7 +448,7 @@ function checkRecipientAlias (account, modal) {
                         callout.html($.t('alias_account_link', {
                             account_id: address.getAccountRS(BRS.prefix)
                         }) + '.<br>' + $.t('alias_last_adjusted', {
-                            timestamp: BRS.formatTimestamp(timestamp)
+                            timestamp: formatTimestamp(timestamp)
                         }) + '<br>' + response.message).removeClass(classes).addClass('callout-' + response.type).show()
                     })
                 } else {

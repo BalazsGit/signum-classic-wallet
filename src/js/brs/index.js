@@ -5,218 +5,62 @@
 /* global $ */
 
 import {
-    init,
-    setStateInterval,
-    checkSelectedNode,
-    autoSelectServer,
-    getState,
-    logoSidebarClick,
-    loadPage,
-    goToPage,
-    pageLoading,
-    pageLoaded,
-    addPagination,
-    goToPageNumber,
-    createDatabase,
-    clearData,
-    getAccountInfo,
-    checkLocationHash,
-    updateBlockchainDownloadProgress,
-    checkIfOnAFork,
-    checkMinimumFee,
-    showFeeSuggestions,
-    evIdSearchSubmit
-} from './brs'
-
-import {
-    pagesSettings,
-    getSettings,
-    updateSettings
+    pagesSettings
 } from './brs.settings'
 
-import { theme } from './brs.theme'
-
 import {
-    setServerPassword,
-    getServerPassword,
-    sendOutsideRequest,
-    sendRequest,
-    processAjaxRequest,
-    verifyAndSignTransactionBytes,
-    broadcastTransactionBytes
-} from './brs.server'
-
-import {
-    allowLoginViaEnter,
-    showLoginOrWelcomeScreen,
-    showLoginScreen,
-    registerUserDefinedAccount,
-    registerAccount,
-    verifyGeneratedPassphrase,
-    evAccountPhraseCustomPanelSubmit,
-    loginCommon,
-    evLoginButtonClick,
-    showLockscreen,
-    logout
-} from './brs.login'
-
-import {
-    getBlock,
-    handleInitialBlocks,
-    handleNewBlocks,
-    checkBlockHeight,
     incomingUpdateDashboardBlocks,
     pagesBlocksForged,
     pagesBlockInfo,
-    blocksInfoLoad,
     pagesBlocks,
-    incomingBlocks,
-    finish100Blocks,
-    blocksPageLoaded
+    incomingBlocks
 } from './brs.blocks'
 
 import {
     pagesAliases,
-    evAliasModalOnShowBsModal,
     formsSellAlias,
     formsSellAliasComplete,
-    evSellAliasClick,
-    evBuyAliasModalOnShowBsModal,
     formsBuyAliasError,
     formsBuyAliasComplete,
-    evRegisterAliasModalOnShowBsModal,
     incomingAliases,
     formsSetAlias,
-    setAliasType,
     formsSetAliasError,
-    formsSetAliasComplete,
-    evAliasSearchSubmit,
-    evAliasShowSearchResult
+    formsSetAliasComplete
 } from './brs.aliases'
 
 import { pagesAt } from './brs.at'
 
 import {
-    showConsole,
-    addToConsole
-} from './brs.console'
-
-import {
-    getContactByName,
     pagesContacts,
     formsAddContact,
-    evUpdateContactModalOnShowBsModal,
     formsUpdateContact,
-    formsDeleteContact,
-    exportContacts,
-    importContacts
+    formsDeleteContact
 } from './brs.contacts'
-
-import {
-    generatePublicKey,
-    getAccountPublicKey,
-    getPublicKey,
-    getAccountId,
-    getAccountIdFromPublicKey,
-    encryptNote,
-    signBytes,
-    verifyBytes,
-    setEncryptionPassword,
-    getEncryptionPassword,
-    setDecryptionPassword,
-    addDecryptedTransaction,
-    tryToDecryptMessage,
-    tryToDecrypt,
-    removeDecryptionForm,
-    decryptNoteFormSubmit,
-    decryptAllMessages
-} from './brs.encryption'
 
 import { pagesEscrow } from './brs.escrow'
 
 import {
-    addMessageData,
-    submitForm,
-    formsAddCommitment,
-    unlockForm
+    formsAddCommitment
 } from './brs.forms'
-
-import {
-    formatVolume,
-    formatOrderPricePerWholeQNT,
-    calculateOrderPricePerWholeQNT,
-    calculatePricePerWholeQNT,
-    calculateOrderTotalNQT,
-    calculateOrderTotal,
-    calculatePercentage,
-    convertToNXT,
-    amountToPrecision,
-    convertToNQT,
-    convertToQNTf,
-    convertToQNT,
-    format,
-    formatQuantity,
-    formatAmount,
-    formatTimestamp,
-    convertFromHex16,
-    convertFromHex8,
-    convertNumericToRSAccountFormat,
-    convertRSAccountToNumeric,
-    getAccountLink,
-    getAssetLink,
-    fullHashToId,
-    getAccountTitle,
-    getAccountFormatted,
-    setupClipboardFunctionality,
-    dataLoaded,
-    dataLoadFinished,
-    createInfoTable,
-    getSelectedText,
-    formatStyledAmount,
-    getUnconfirmedTransactionsFromCache,
-    hasTransactionUpdates,
-    FnTree,
-    translateServerError,
-    getTranslatedFieldName
-} from './brs.util'
 
 import { addEventListeners } from './brs.eventlisteners'
 
 import {
     pagesAssetExchange,
-    loadCachedAssets,
-    saveCachedAssets,
-    getAssetDetails,
-    cacheUserAssets,
-    sortCachedAssets,
-    bookmarkAllUserAssets,
     formsAddAssetBookmark,
     formsAddAssetBookmarkComplete,
-    saveAssetBookmarks,
-    positionAssetSidebar,
     incomingAssetExchange,
-    evAssetExchangeSidebarClick,
-    updateMiniTradeHistory,
-    evAssetExchangeSearchInput,
-    evAssetExchangeOrdersTableClick,
-    evSellBuyAutomaticPriceClick,
-    evAssetExchangeQuantityPriceKeydown,
-    evCalculatePricePreviewKeyup,
-    evAssetOrderModalOnShowBsModal,
     formsOrderAsset,
     formsOrderAssetComplete,
     formsIssueAsset,
     formsAssetExchangeChangeGroupName,
-    evAssetExchangeSidebarContextClick,
     formsAssetExchangeGroup,
     pagesTransferHistory,
     pagesMyAssets,
     incomingMyAssets,
-    evTransferAssetModalOnShowBsModal,
     formsTransferAssetMulti,
     formsTransferAsset,
     formsTransferAssetComplete,
-    goToAsset,
     pagesOpenOrders,
     incomingOpenOrders,
     formsCancelOrder,
@@ -224,29 +68,14 @@ import {
 } from './brs.assetexchange'
 
 import {
-    getInitialTransactions,
-    getNewTransactions,
-    getUnconfirmedTransactions,
-    handleIncomingTransactions,
     incomingUpdateDashboardTransactions,
-    addUnconfirmedTransaction,
     pagesTransactions,
-    incomingTransactions,
-    getTransactionDetails,
-    evTransactionsPageTypeClick
+    incomingTransactions
 } from './brs.transactions'
-
-import {
-    evSidebarContextOnContextmenu,
-    closeContextMenu
-} from './brs.sidebar'
 
 import {
     pagesMessages,
     incomingMessages,
-    evMessagesSidebarClick,
-    evMessagesSidebarContextClick,
-    evInlineMessageFormSubmit,
     formsSendMessageComplete,
     formsDecryptMessages
 } from './brs.messages'
@@ -257,15 +86,8 @@ import {
 } from './brs.peers'
 
 import {
-    automaticallyCheckRecipient,
-    sendMoneyCalculateTotal,
-    commitmentCalculateTotal,
     formsSendMoneyComplete,
-    formsSendMoneyMulti,
-    correctAddressMistake,
-    checkRecipient,
-    evSpanRecipientSelectorClickButton,
-    evSpanRecipientSelectorClickUlLiA
+    formsSendMoneyMulti
 } from './brs.recipient'
 
 import {
@@ -273,36 +95,10 @@ import {
 } from './brs.subscription'
 
 import {
-    setupLockableModal,
-    evAddRecipientsClick,
-    evDocumentOnClickRemoveRecipient,
-    evMultiOutAmountChange,
-    evMultiOutSameAmountChange,
-    evSameOutCheckboxChange,
-    evMultiOutFeeChange,
-    evModalOnShowBsModal,
-    resetModalMultiOut,
-    evModalOnHiddenBsModal,
-    showModalError,
-    evAdvancedInfoClick
-} from './brs.modals'
-
-import {
-    evAccountDetailsModalOnShowBsModal
-} from './brs.modals.accountdetails'
-
-import {
     formsSetAccountInfoComplete
 } from './brs.modals.accountinfo'
 
 import {
-    showAccountModal,
-    loadUserInfoModal
-} from './brs.modals.account'
-
-import {
-    showRawTransactionModal,
-    evTransactionOperationsModalClick,
     formsBroadcastTransactionComplete,
     formsParseTransactionComplete,
     formsParseTransactionError,
@@ -311,38 +107,11 @@ import {
 } from './brs.modals.advanced'
 
 import {
-    evBlocksTableClick,
-    showBlockModal
-} from './brs.modals.block'
-
-import {
-    showEscrowDecisionModal,
-    processEscrowDecisionModalData
-} from './brs.modals.escrow'
-
-import {
-    evBrsModalOnShowBsModal
-} from './brs.modals.info'
-
-import {
-    evRequestBurstQrModalOnShowBsModal,
-    evGenerateQrButtonClick
-} from './brs.modals.request'
-
-import {
     formsSignModalButtonClicked,
     formsSignMessage,
     formsVerifyMessage
 } from './brs.modals.signmessage'
-
-import {
-    showSubscriptionCancelModal,
-    processSubscriptionCancelModalData
-} from './brs.modals.subscription'
-
-import {
-    showTransactionModal
-} from './brs.modals.transaction'
+import { init } from './brs'
 
 export const BRS = {
     server: '',
@@ -544,248 +313,10 @@ export const BRS = {
     // from modals.account
     userInfoModal: {
         user: 0
-    },
-
-    // From brs.js
-    init,
-    setStateInterval,
-    checkSelectedNode,
-    autoSelectServer,
-    getState,
-    logoSidebarClick,
-    loadPage,
-    goToPage,
-    pageLoading,
-    pageLoaded,
-    addPagination,
-    goToPageNumber,
-    createDatabase,
-    clearData,
-    getAccountInfo,
-    checkLocationHash,
-    updateBlockchainDownloadProgress,
-    checkIfOnAFork,
-    checkMinimumFee,
-    showFeeSuggestions,
-    evIdSearchSubmit,
-
-    // From settings
-    getSettings,
-    updateSettings,
-
-    // From theme
-    theme,
-
-    // From server
-    setServerPassword,
-    getServerPassword,
-    sendOutsideRequest,
-    sendRequest,
-    processAjaxRequest,
-    verifyAndSignTransactionBytes,
-    broadcastTransactionBytes,
-
-    // From login
-    allowLoginViaEnter,
-    showLoginOrWelcomeScreen,
-    showLoginScreen,
-    registerUserDefinedAccount,
-    registerAccount,
-    verifyGeneratedPassphrase,
-    evAccountPhraseCustomPanelSubmit,
-    loginCommon,
-    evLoginButtonClick,
-    showLockscreen,
-    logout,
-
-    // From blocks
-    getBlock,
-    handleInitialBlocks,
-    handleNewBlocks,
-    checkBlockHeight,
-    blocksInfoLoad,
-    finish100Blocks,
-    blocksPageLoaded,
-
-    // From aliases
-    evAliasModalOnShowBsModal,
-    evSellAliasClick,
-    evBuyAliasModalOnShowBsModal,
-    evRegisterAliasModalOnShowBsModal,
-    setAliasType,
-    evAliasSearchSubmit,
-    evAliasShowSearchResult,
-
-    // From console
-    showConsole,
-    addToConsole,
-
-    // From contacts
-    getContactByName,
-    evUpdateContactModalOnShowBsModal,
-    exportContacts,
-    importContacts,
-
-    // From encryption
-    generatePublicKey,
-    getAccountPublicKey,
-    getPublicKey,
-    getAccountId,
-    getAccountIdFromPublicKey,
-    encryptNote,
-    signBytes,
-    verifyBytes,
-    setEncryptionPassword,
-    getEncryptionPassword,
-    setDecryptionPassword,
-    addDecryptedTransaction,
-    tryToDecryptMessage,
-    tryToDecrypt,
-    removeDecryptionForm,
-    decryptNoteFormSubmit,
-    decryptAllMessages,
-
-    // From forms
-    addMessageData,
-    submitForm,
-    unlockForm,
-
-    // From util
-    formatVolume,
-    formatOrderPricePerWholeQNT,
-    calculateOrderPricePerWholeQNT,
-    calculatePricePerWholeQNT,
-    calculateOrderTotalNQT,
-    calculateOrderTotal,
-    calculatePercentage,
-    convertToNXT,
-    amountToPrecision,
-    convertToNQT,
-    convertToQNTf,
-    convertToQNT,
-    format,
-    formatQuantity,
-    formatAmount,
-    formatTimestamp,
-    convertFromHex16,
-    convertFromHex8,
-    convertNumericToRSAccountFormat,
-    convertRSAccountToNumeric,
-    getAccountLink,
-    getAssetLink,
-    fullHashToId,
-    getAccountTitle,
-    getAccountFormatted,
-    setupClipboardFunctionality,
-    dataLoaded,
-    dataLoadFinished,
-    createInfoTable,
-    getSelectedText,
-    formatStyledAmount,
-    getUnconfirmedTransactionsFromCache,
-    hasTransactionUpdates,
-    FnTree,
-    translateServerError,
-    getTranslatedFieldName,
-
-    // From assetexchange
-    loadCachedAssets,
-    saveCachedAssets,
-    getAssetDetails,
-    cacheUserAssets,
-    sortCachedAssets,
-    bookmarkAllUserAssets,
-    saveAssetBookmarks,
-    positionAssetSidebar,
-    incomingAssetExchange,
-    evAssetExchangeSidebarClick,
-    updateMiniTradeHistory,
-    evAssetExchangeSearchInput,
-    evAssetExchangeOrdersTableClick,
-    evSellBuyAutomaticPriceClick,
-    evAssetExchangeQuantityPriceKeydown,
-    evCalculatePricePreviewKeyup,
-    evAssetOrderModalOnShowBsModal,
-    evAssetExchangeSidebarContextClick,
-    evTransferAssetModalOnShowBsModal,
-    goToAsset,
-
-    // From transactions
-    getInitialTransactions,
-    getNewTransactions,
-    getUnconfirmedTransactions,
-    handleIncomingTransactions,
-    addUnconfirmedTransaction,
-    getTransactionDetails,
-    evTransactionsPageTypeClick,
-
-    // From recipient
-    automaticallyCheckRecipient,
-    sendMoneyCalculateTotal,
-    commitmentCalculateTotal,
-    correctAddressMistake,
-    checkRecipient,
-    evSpanRecipientSelectorClickButton,
-    evSpanRecipientSelectorClickUlLiA,
-
-    // From messages
-    evMessagesSidebarClick,
-    evMessagesSidebarContextClick,
-    evInlineMessageFormSubmit,
-
-    // From sidebar
-    evSidebarContextOnContextmenu,
-    closeContextMenu,
-
-    // From modals
-    setupLockableModal,
-    evAddRecipientsClick,
-    evDocumentOnClickRemoveRecipient,
-    evMultiOutAmountChange,
-    evMultiOutSameAmountChange,
-    evSameOutCheckboxChange,
-    evMultiOutFeeChange,
-    evModalOnShowBsModal,
-    resetModalMultiOut,
-    evModalOnHiddenBsModal,
-    showModalError,
-    evAdvancedInfoClick,
-
-    // From modals.accountdetails
-    evAccountDetailsModalOnShowBsModal,
-
-    // From modals.account
-    showAccountModal,
-    loadUserInfoModal,
-
-    // From modals.advanced
-    showRawTransactionModal,
-    evTransactionOperationsModalClick,
-
-    // From modals.block
-    evBlocksTableClick,
-    showBlockModal,
-
-    // From modals.escrow
-    showEscrowDecisionModal,
-    processEscrowDecisionModalData,
-
-    // from modals.info
-    evBrsModalOnShowBsModal,
-
-    // From modals.request
-    evRequestBurstQrModalOnShowBsModal,
-    evGenerateQrButtonClick,
-
-    // From modals.subscription
-    showSubscriptionCancelModal,
-    processSubscriptionCancelModalData,
-
-    // From modals.transaction
-    showTransactionModal
+    }
 }
 
-window.BRS = BRS
+// window.BRS = BRS
 
 $(document).ready(function () {
     let done = 0
@@ -838,7 +369,7 @@ $(document).ready(function () {
     function loadingDone () {
         addEventListeners()
         $('#loading_bar').val(100)
-        BRS.init()
+        init()
     }
     for (const page of pages) {
         loadHTMLOn(page.location, page.path)

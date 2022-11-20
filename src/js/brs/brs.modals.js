@@ -5,6 +5,22 @@
 
 import { BRS } from '.'
 
+import { checkMinimumFee } from './brs'
+
+import {
+    unlockForm
+} from './brs.forms'
+
+import {
+    convertToNQT,
+    formatAmount
+} from './brs.util'
+
+import {
+    evSpanRecipientSelectorClickButton,
+    evSpanRecipientSelectorClickUlLiA
+} from './brs.recipient'
+
 export function setupLockableModal () {
     // save the original function object
     const _superModal = $.fn.modal
@@ -45,13 +61,13 @@ export function evAddRecipientsClick (e) {
     } else {
         $('#multi_out_recipients').append($('#additional_multi_out_recipient').html()) // add input box
     }
-    $('input[name=recipient_multi_out_same]').off('blur').on('blur', BRS.evMultiOutSameAmountChange)
-    $('input[name=recipient_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
-    $('input[name=amount_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
-    $('.remove_recipient .remove_recipient_button').off('click').on('click', BRS.evDocumentOnClickRemoveRecipient)
+    $('input[name=recipient_multi_out_same]').off('blur').on('blur', evMultiOutSameAmountChange)
+    $('input[name=recipient_multi_out]').off('blur').on('blur', evMultiOutAmountChange)
+    $('input[name=amount_multi_out]').off('blur').on('blur', evMultiOutAmountChange)
+    $('.remove_recipient .remove_recipient_button').off('click').on('click', evDocumentOnClickRemoveRecipient)
 
-    $('span.recipient_selector').on('click', 'button', BRS.evSpanRecipientSelectorClickButton)
-    $('span.recipient_selector').on('click', 'ul li a', BRS.evSpanRecipientSelectorClickUlLiA)
+    $('span.recipient_selector').on('click', 'button', evSpanRecipientSelectorClickButton)
+    $('span.recipient_selector').on('click', 'ul li a', evSpanRecipientSelectorClickUlLiA)
 }
 
 export function evDocumentOnClickRemoveRecipient (e) {
@@ -59,9 +75,9 @@ export function evDocumentOnClickRemoveRecipient (e) {
     $(this).parent().parent('div').remove()
 
     if ($('#send_money_same_out_checkbox').is(':checked')) {
-        BRS.evMultiOutSameAmountChange()
+        evMultiOutSameAmountChange()
     } else {
-        BRS.evMultiOutAmountChange()
+        evMultiOutAmountChange()
     }
 }
 
@@ -78,11 +94,11 @@ export function evMultiOutAmountChange (e) {
         }
     })
     const current_fee = parseFloat($('#multi_out_fee').val(), 10)
-    const fee = BRS.checkMinimumFee(current_fee)
+    const fee = checkMinimumFee(current_fee)
     // $("#multi_out_fee").val(fee.toFixed(8));
     amount_total += fee
 
-    $('#total_amount_multi_out').html(BRS.formatAmount(BRS.convertToNQT(amount_total)) + ' ' + BRS.valueSuffix)
+    $('#total_amount_multi_out').html(formatAmount(convertToNQT(amount_total)) + ' ' + BRS.valueSuffix)
 }
 
 export function evMultiOutSameAmountChange () {
@@ -90,7 +106,7 @@ export function evMultiOutSameAmountChange () {
     const current_amount = parseFloat($('#multi_out_same_amount').val(), 10)
     const current_fee = parseFloat($('#multi_out_fee').val(), 10)
     const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount)
-    const fee = BRS.checkMinimumFee(current_fee)
+    const fee = checkMinimumFee(current_fee)
 
     $('#multi_out_same_recipients input[name=recipient_multi_out_same]').each(function () {
         if ($(this).val() !== '') {
@@ -99,7 +115,7 @@ export function evMultiOutSameAmountChange () {
     })
     amount_total += fee
 
-    $('#total_amount_multi_out').html(BRS.formatAmount(BRS.convertToNQT(amount_total)) + ' ' + BRS.valueSuffix)
+    $('#total_amount_multi_out').html(formatAmount(convertToNQT(amount_total)) + ' ' + BRS.valueSuffix)
 }
 
 export function evSameOutCheckboxChange (e) {
@@ -108,20 +124,20 @@ export function evSameOutCheckboxChange (e) {
         $('#multi_out_same_recipients').fadeIn()
         $('#row_multi_out_same_amount').fadeIn()
         $('#multi_out_recipients').hide()
-        BRS.evMultiOutSameAmountChange()
+        evMultiOutSameAmountChange()
     } else {
         $('#multi_out_same_recipients').hide()
         $('#row_multi_out_same_amount').hide()
         $('#multi_out_recipients').fadeIn()
-        BRS.evMultiOutAmountChange()
+        evMultiOutAmountChange()
     }
 }
 
 export function evMultiOutFeeChange (e) {
     if ($('#send_money_same_out_checkbox').is(':checked')) {
-        BRS.evMultiOutSameAmountChange()
+        evMultiOutSameAmountChange()
     } else {
-        BRS.evMultiOutAmountChange()
+        evMultiOutAmountChange()
     }
 }
 
@@ -131,7 +147,7 @@ export function evModalOnShowBsModal (e) {
     if ($visible_modal.length) {
         if ($visible_modal.hasClass('locked')) {
             const $btn = $visible_modal.find('button.btn-primary:not([data-dismiss=modal])')
-            BRS.unlockForm($visible_modal, $btn, true)
+            unlockForm($visible_modal, $btn, true)
         } else {
             $visible_modal.modal('hide')
         }
@@ -149,11 +165,11 @@ export function resetModalMultiOut () {
     $('#multi_out_recipients').append($('#additional_multi_out_recipient').html())
     $('#multi_out_same_recipients').append($('#additional_multi_out_same_recipient').html())
     $('#multi_out_same_recipients').append($('#additional_multi_out_same_recipient').html())
-    $('#multi_out_same_recipients input[name=recipient_multi_out_same]').off('blur').on('blur', BRS.evMultiOutSameAmountChange)
-    $('#multi_out_recipients input[name=recipient_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
-    $('#multi_out_recipients input[name=amount_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange)
-    $('span.recipient_selector').on('click', 'button', BRS.evSpanRecipientSelectorClickButton)
-    $('span.recipient_selector').on('click', 'ul li a', BRS.evSpanRecipientSelectorClickUlLiA)
+    $('#multi_out_same_recipients input[name=recipient_multi_out_same]').off('blur').on('blur', evMultiOutSameAmountChange)
+    $('#multi_out_recipients input[name=recipient_multi_out]').off('blur').on('blur', evMultiOutAmountChange)
+    $('#multi_out_recipients input[name=amount_multi_out]').off('blur').on('blur', evMultiOutAmountChange)
+    $('span.recipient_selector').on('click', 'button', evSpanRecipientSelectorClickButton)
+    $('span.recipient_selector').on('click', 'ul li a', evSpanRecipientSelectorClickUlLiA)
     $('#send_multi_out .remove_recipient').each(function () {
         $(this).remove()
     })
@@ -172,7 +188,7 @@ export function resetModalMultiOut () {
 
 // Reset form to initial state when modal is closed
 export function evModalOnHiddenBsModal (e) {
-    BRS.resetModalMultiOut()
+    resetModalMultiOut()
 
     // Multi-transfers
     $('.multi-transfer').hide()
@@ -250,7 +266,7 @@ export function evModalOnHiddenBsModal (e) {
             defaultFee = 1
         }
 
-        $(this).find('.advanced_fee').html(BRS.formatAmount(BRS.convertToNQT(defaultFee)) + ' ' + BRS.valueSuffix)
+        $(this).find('.advanced_fee').html(formatAmount(convertToNQT(defaultFee)) + ' ' + BRS.valueSuffix)
     }
 
     BRS.showedFormWarning = false

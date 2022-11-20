@@ -7,6 +7,24 @@ import converters from '../util/converters'
 import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
 
+import {
+    addToConsole
+} from './brs.console'
+
+import {
+    generatePublicKey,
+    getAccountId,
+    signBytes,
+    verifyBytes
+} from './brs.encryption'
+
+import {
+    convertToNQT,
+    translateServerError
+} from './brs.util'
+
+import { showRawTransactionModal } from './brs.modals.advanced'
+
 export function setServerPassword (password) {
     BRS._password = password
 }
@@ -61,7 +79,7 @@ function convertNxtToNqt (data) {
             const nxtField = nxtFields[i]
             field = nxtField.replace('NXT', '')
             if (nxtField in data) {
-                data[field + 'NQT'] = BRS.convertToNQT(data[nxtField])
+                data[field + 'NQT'] = convertToNQT(data[nxtField])
                 delete data[nxtField]
             }
         }
@@ -150,7 +168,7 @@ export function sendRequest (requestType, data, callback, async) {
 
     // check to see if secretPhrase supplied matches logged in account, if not - show error.
     if ('secretPhrase' in data) {
-        const accountId = BRS.getAccountId(BRS.rememberPassword ? BRS._password : data.secretPhrase)
+        const accountId = getAccountId(BRS.rememberPassword ? BRS._password : data.secretPhrase)
         if (accountId !== BRS.account) {
             if (callback) {
                 callback({
@@ -162,7 +180,7 @@ export function sendRequest (requestType, data, callback, async) {
         }
     }
 
-    BRS.processAjaxRequest(requestType, data, callback, async)
+    processAjaxRequest(requestType, data, callback, async)
 }
 
 export function processAjaxRequest (requestType, data, callback, async) {
@@ -240,7 +258,7 @@ export function processAjaxRequest (requestType, data, callback, async) {
         if (BRS.accountInfo && BRS.accountInfo.publicKey) {
             data.publicKey = BRS.accountInfo.publicKey
         } else {
-            data.publicKey = BRS.generatePublicKey(secretPhrase)
+            data.publicKey = generatePublicKey(secretPhrase)
             BRS.accountInfo.publicKey = data.publicKey
         }
     }
@@ -287,15 +305,15 @@ export function processAjaxRequest (requestType, data, callback, async) {
         data
     }).done(function (response, status, xhr) {
         if (BRS.console) {
-            BRS.addToConsole(this.url, this.type, this.data, response)
+            addToConsole(this.url, this.type, this.data, response)
         }
 
         response = addUnconfirmedProperty(response, requestType)
 
         if (secretPhrase && response.unsignedTransactionBytes && !response.errorCode && !response.error) {
-            const publicKey = BRS.generatePublicKey(secretPhrase)
-            const signature = BRS.signBytes(response.unsignedTransactionBytes, converters.stringToHexString(secretPhrase))
-            if (!BRS.verifyBytes(signature, response.unsignedTransactionBytes, publicKey)) {
+            const publicKey = generatePublicKey(secretPhrase)
+            const signature = signBytes(response.unsignedTransactionBytes, converters.stringToHexString(secretPhrase))
+            if (!verifyBytes(signature, response.unsignedTransactionBytes, publicKey)) {
                 const errorMessage = $.t('error_signature_verification_client')
                 if (callback) {
                     callback({
@@ -307,7 +325,7 @@ export function processAjaxRequest (requestType, data, callback, async) {
                 }
                 return
             }
-            const payload = BRS.verifyAndSignTransactionBytes(response.unsignedTransactionBytes, signature, requestType, data)
+            const payload = verifyAndSignTransactionBytes(response.unsignedTransactionBytes, signature, requestType, data)
             if (payload.length === 0) {
                 const errorMessage = $.t('error_signature_verification_server')
                 if (callback) {
@@ -322,29 +340,29 @@ export function processAjaxRequest (requestType, data, callback, async) {
             }
             if (data.broadcast == 'false') {
                 response.transactionBytes = payload
-                BRS.showRawTransactionModal(response)
+                showRawTransactionModal(response)
                 return
             }
             if (callback) {
                 if (extra) {
                     data._extra = extra
                 }
-                BRS.broadcastTransactionBytes(payload, callback, response, data)
+                broadcastTransactionBytes(payload, callback, response, data)
             } else {
-                BRS.broadcastTransactionBytes(payload, null, response, data)
+                broadcastTransactionBytes(payload, null, response, data)
             }
             return
         }
         // Request sucessfull but there was an error in response.
         if (response.errorCode || response.errorDescription || response.errorMessage || response.error) {
-            response.errorDescription = BRS.translateServerError(response)
+            response.errorDescription = translateServerError(response)
             delete response.fullHash
             if (!response.errorCode) {
                 response.errorCode = -1
             }
         }
         if (response.broadcasted === false) {
-            BRS.showRawTransactionModal(response)
+            showRawTransactionModal(response)
         } else {
             if (callback) {
                 if (extra) {
@@ -358,7 +376,7 @@ export function processAjaxRequest (requestType, data, callback, async) {
         }
     }).fail(function (xhr, textStatus, error) {
         if (BRS.console) {
-            BRS.addToConsole(this.url, this.type, this.data, error, true)
+            addToConsole(this.url, this.type, this.data, error, true)
         }
 
         if ((error == 'error' || textStatus == 'error') && (xhr.status == 404 || xhr.status === 0)) {
@@ -928,7 +946,7 @@ export function broadcastTransactionBytes (transactionData, callback, originalRe
         }
     }).done(function (response, status, xhr) {
         if (BRS.console) {
-            BRS.addToConsole(this.url, this.type, this.data, response)
+            addToConsole(this.url, this.type, this.data, response)
         }
 
         if (callback) {
@@ -956,7 +974,7 @@ export function broadcastTransactionBytes (transactionData, callback, originalRe
         }
     }).fail(function (xhr, textStatus, error) {
         if (BRS.console) {
-            BRS.addToConsole(this.url, this.type, this.data, error, true)
+            addToConsole(this.url, this.type, this.data, error, true)
         }
 
         if (callback) {

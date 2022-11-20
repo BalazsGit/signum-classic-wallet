@@ -7,8 +7,31 @@
 import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
 
+import {
+    loadPage,
+    getAccountInfo
+} from './brs'
+
+import { sendRequest } from './brs.server'
+
+import { getContactByName } from './brs.contacts'
+
+import {
+    formatQuantity,
+    formatAmount,
+    formatTimestamp,
+    convertRSAccountToNumeric,
+    getAccountLink,
+    getAccountTitle,
+    dataLoaded,
+    dataLoadFinished,
+    getUnconfirmedTransactionsFromCache
+} from './brs.util'
+
+import { getAssetDetails } from './brs.assetexchange'
+
 export function getInitialTransactions () {
-    BRS.sendRequest('getAccountTransactions', {
+    sendRequest('getAccountTransactions', {
         account: BRS.account,
         firstIndex: 0,
         lastIndex: 9,
@@ -26,11 +49,11 @@ export function getInitialTransactions () {
                 transactionIds.push(transaction.transaction)
             }
 
-            BRS.getUnconfirmedTransactions(function (unconfirmedTransactions) {
+            getUnconfirmedTransactions(function (unconfirmedTransactions) {
                 handleInitialTransactions(transactions.concat(unconfirmedTransactions), transactionIds)
             })
         } else {
-            BRS.getUnconfirmedTransactions(function (unconfirmedTransactions) {
+            getUnconfirmedTransactions(function (unconfirmedTransactions) {
                 handleInitialTransactions(unconfirmedTransactions, [])
             })
         }
@@ -51,12 +74,12 @@ function handleInitialTransactions (transactions, transactionIds) {
 
     $('#dashboard_transactions_table tbody').empty().append(rows)
 
-    BRS.dataLoadFinished($('#dashboard_transactions_table'))
+    dataLoadFinished($('#dashboard_transactions_table'))
 }
 
 export function getNewTransactions () {
     // check if there is a new transaction..
-    BRS.sendRequest('getAccountTransactionIds', {
+    sendRequest('getAccountTransactionIds', {
         account: BRS.account,
         timestamp: BRS.blocks[0].timestamp + 1,
         firstIndex: 0,
@@ -64,7 +87,7 @@ export function getNewTransactions () {
     }, function (response) {
         // if there is, get latest 10 transactions
         if (response.transactionIds && response.transactionIds.length) {
-            BRS.sendRequest('getAccountTransactions', {
+            sendRequest('getAccountTransactions', {
                 account: BRS.account,
                 firstIndex: 0,
                 lastIndex: 9,
@@ -73,25 +96,25 @@ export function getNewTransactions () {
                 if (response.transactions && response.transactions.length) {
                     const transactionIds = response.transactions.map(tr => tr.transaction)
 
-                    BRS.getUnconfirmedTransactions(function (unconfirmedTransactions) {
-                        BRS.handleIncomingTransactions(response.transactions.concat(unconfirmedTransactions), transactionIds)
+                    getUnconfirmedTransactions(function (unconfirmedTransactions) {
+                        handleIncomingTransactions(response.transactions.concat(unconfirmedTransactions), transactionIds)
                     })
                 } else {
-                    BRS.getUnconfirmedTransactions(function (unconfirmedTransactions) {
-                        BRS.handleIncomingTransactions(unconfirmedTransactions)
+                    getUnconfirmedTransactions(function (unconfirmedTransactions) {
+                        handleIncomingTransactions(unconfirmedTransactions)
                     })
                 }
             })
         } else {
-            BRS.getUnconfirmedTransactions(function (unconfirmedTransactions) {
-                BRS.handleIncomingTransactions(unconfirmedTransactions)
+            getUnconfirmedTransactions(function (unconfirmedTransactions) {
+                handleIncomingTransactions(unconfirmedTransactions)
             })
         }
     })
 }
 
 export function getUnconfirmedTransactions (callback) {
-    BRS.sendRequest('getUnconfirmedTransactions', {
+    sendRequest('getUnconfirmedTransactions', {
         account: BRS.account,
         includeIndirect: true
     }, function (response) {
@@ -223,7 +246,7 @@ export function incomingUpdateDashboardTransactions (newTransactions, unconfirme
 
 // todo: add to dashboard?
 export function addUnconfirmedTransaction (transactionId, callback) {
-    BRS.sendRequest('getTransaction', {
+    sendRequest('getTransaction', {
         transaction: transactionId
     }, function (response) {
         if (!response.errorCode) {
@@ -256,7 +279,7 @@ export function addUnconfirmedTransaction (transactionId, callback) {
 
             BRS.incoming.updateDashboardTransactions(BRS.unconfirmedTransactions, true)
 
-            BRS.getAccountInfo()
+            getAccountInfo()
         } else if (callback) {
             callback(false)
         }
@@ -274,7 +297,7 @@ export function pagesTransactions () {
         if (BRS.rsRegEx.test(fromWho) || BRS.idRegEx.test(fromWho)) {
             return fromWho
         }
-        const foundContact = BRS.getContactByName(fromWho)
+        const foundContact = getContactByName(fromWho)
         if (foundContact) {
             return foundContact.accountRS
         }
@@ -307,7 +330,7 @@ export function pagesTransactions () {
     if (BRS.transactionsPageType) {
         params.type = BRS.transactionsPageType.type
         params.subtype = BRS.transactionsPageType.subtype
-        unconfirmedTransactions = BRS.getUnconfirmedTransactionsFromCache(params.type, params.subtype)
+        unconfirmedTransactions = getUnconfirmedTransactionsFromCache(params.type, params.subtype)
     } else {
         unconfirmedTransactions = BRS.unconfirmedTransactions
     }
@@ -316,7 +339,7 @@ export function pagesTransactions () {
         rows = unconfirmedTransactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr, account), '')
     }
 
-    BRS.sendRequest('getAccountTransactions+', params, (response) => {
+    sendRequest('getAccountTransactions+', params, (response) => {
         if (response.transactions && response.transactions.length) {
             if (response.transactions.length > BRS.pageSize) {
                 BRS.hasMorePages = true
@@ -324,23 +347,23 @@ export function pagesTransactions () {
             }
             rows += response.transactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr, account), '')
         }
-        BRS.dataLoaded(rows)
+        dataLoaded(rows)
     })
 }
 
 export function incomingTransactions (transactions) {
-    BRS.loadPage('transactions')
+    loadPage('transactions')
 }
 
 function displayUnconfirmedTransactions (viewAccount) {
-    BRS.sendRequest('getUnconfirmedTransactions', function (response) {
+    sendRequest('getUnconfirmedTransactions', function (response) {
         let rows = ''
 
         if (response.unconfirmedTransactions && response.unconfirmedTransactions.length) {
             rows = response.unconfirmedTransactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr, viewAccount), '')
         }
 
-        BRS.dataLoaded(rows)
+        dataLoaded(rows)
     })
 }
 
@@ -355,7 +378,7 @@ export function getTransactionDetails (transaction, viewingAccount) {
         viewingAccount = BRS.account
     }
     if (BRS.rsRegEx.test(viewingAccount)) {
-        viewingAccount = BRS.convertRSAccountToNumeric(viewingAccount)
+        viewingAccount = convertRSAccountToNumeric(viewingAccount)
     }
 
     let nameOfTransaction = $.t('unknown')
@@ -365,12 +388,12 @@ export function getTransactionDetails (transaction, viewingAccount) {
         senderOrRecipientOrMultiple = 'recipient'
     }
     let amountToFromViewer = transaction.amountNQT
-    let amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
+    let amountToFromViewerHTML = formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
     let foundAsset, newAmountText
     let hasAssets = false
 
-    let recipientHTML = BRS.getAccountLink(transaction, 'recipient')
-    const senderHTML = BRS.getAccountLink(transaction, 'sender')
+    let recipientHTML = getAccountLink(transaction, 'recipient')
+    const senderHTML = getAccountLink(transaction, 'sender')
 
     let amountEach
     // process transactions exceptions and names
@@ -390,13 +413,13 @@ export function getTransactionDetails (transaction, viewingAccount) {
             for (const recipient of transaction.attachment.recipients) {
                 const nxtAddress = new NxtAddress(recipient[0])
                 const RSAddress = nxtAddress.getAccountRS(BRS.prefix)
-                const amountEach = BRS.formatAmount(recipient[1]) + ' ' + BRS.valueSuffix
+                const amountEach = formatAmount(recipient[1]) + ' ' + BRS.valueSuffix
                 if (recipient[0] === viewingAccount) {
                     recipientHTML += `<strong class="mono-font">${RSAddress}: ${amountEach}</strong>`
                     toFromViewer = true
                     senderOrRecipientOrMultiple = 'sender'
                     amountToFromViewer = recipient[1]
-                    amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
+                    amountToFromViewerHTML = formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
                 } else {
                     recipientHTML += `<span class="mono-font">${RSAddress}</span>: ${amountEach}`
                 }
@@ -420,7 +443,7 @@ export function getTransactionDetails (transaction, viewingAccount) {
                     toFromViewer = true
                     senderOrRecipientOrMultiple = 'sender'
                     amountToFromViewer = amountEach
-                    amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
+                    amountToFromViewerHTML = formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
                 } else {
                     recipientHTML += `<span class="mono-font">${address}</span>`
                 }
@@ -463,7 +486,7 @@ export function getTransactionDetails (transaction, viewingAccount) {
         case 0:
             nameOfTransaction = $.t('asset_issuance')
             senderOrRecipientOrMultiple = 'sender'
-            amountToFromViewerHTML = `${BRS.formatQuantity(transaction.attachment.quantityQNT, transaction.attachment.decimals)} ${transaction.attachment.name}`
+            amountToFromViewerHTML = `${formatQuantity(transaction.attachment.quantityQNT, transaction.attachment.decimals)} ${transaction.attachment.name}`
             if (transaction.attachment.quantityQNT !== '0') {
                 hasAssets = true
             }
@@ -476,10 +499,10 @@ export function getTransactionDetails (transaction, viewingAccount) {
                 nameOfTransaction = $.t('asset_mint')
                 senderOrRecipientOrMultiple = 'sender'
             }
-            foundAsset = BRS.getAssetDetails(transaction.attachment.asset)
+            foundAsset = getAssetDetails(transaction.attachment.asset)
             newAmountText = ''
             if (foundAsset) {
-                newAmountText = `${BRS.formatQuantity(transaction.attachment.quantityQNT, foundAsset.decimals)} ${foundAsset.name}`
+                newAmountText = `${formatQuantity(transaction.attachment.quantityQNT, foundAsset.decimals)} ${foundAsset.name}`
             } else {
                 newAmountText = `${transaction.attachment.quantityQNT} [QNT]`
             }
@@ -530,9 +553,9 @@ export function getTransactionDetails (transaction, viewingAccount) {
                 if (i !== 0) {
                     amountToFromViewerHTML += '<br>'
                 }
-                foundAsset = BRS.getAssetDetails(transaction.attachment.assetIds[i])
+                foundAsset = getAssetDetails(transaction.attachment.assetIds[i])
                 if (foundAsset) {
-                    amountToFromViewerHTML += `${BRS.formatQuantity(transaction.attachment.quantitiesQNT[i], foundAsset.decimals)} ${foundAsset.name}`
+                    amountToFromViewerHTML += `${formatQuantity(transaction.attachment.quantitiesQNT[i], foundAsset.decimals)} ${foundAsset.name}`
                 } else {
                     amountToFromViewerHTML += `${transaction.attachment.quantityQNT} [QNT]`
                 }
@@ -585,13 +608,13 @@ export function getTransactionDetails (transaction, viewingAccount) {
             nameOfTransaction = $.t('add_commitment')
             senderOrRecipientOrMultiple = 'recipient'
             amountToFromViewer = transaction.attachment.amountNQT.toString()
-            amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
+            amountToFromViewerHTML = formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
             break
         case 2: // "Remove Commitment"
             nameOfTransaction = $.t('remove_commitment')
             senderOrRecipientOrMultiple = 'sender'
             amountToFromViewer = transaction.attachment.amountNQT.toString()
-            amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
+            amountToFromViewerHTML = formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
             break
         }
         break
@@ -600,7 +623,7 @@ export function getTransactionDetails (transaction, viewingAccount) {
         case 0:
             nameOfTransaction = 'Escrow Creation'
             amountToFromViewer = transaction.attachment.amountNQT.toString()
-            amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
+            amountToFromViewerHTML = formatAmount(amountToFromViewer) + ' ' + BRS.valueSuffix
             break
         case 1:
             nameOfTransaction = 'Escrow Signing'
@@ -651,8 +674,8 @@ export function getTransactionDetails (transaction, viewingAccount) {
         }
     }
 
-    const accountLink = BRS.getAccountLink(transaction, senderOrRecipientOrMultiple)
-    const accountTitle = BRS.getAccountTitle(transaction, senderOrRecipientOrMultiple)
+    const accountLink = getAccountLink(transaction, senderOrRecipientOrMultiple)
+    const accountTitle = getAccountTitle(transaction, senderOrRecipientOrMultiple)
     return {
         nameOfTransaction,
         accountLink,
@@ -670,7 +693,7 @@ export function getTransactionDetails (transaction, viewingAccount) {
 }
 
 function getTransactionRowDashboardHTML (transaction) {
-    const details = BRS.getTransactionDetails(transaction)
+    const details = getTransactionDetails(transaction)
 
     let confirmationHTML = String(transaction.confirmations).escapeHTML()
     if (transaction.unconfirmed) {
@@ -681,7 +704,7 @@ function getTransactionRowDashboardHTML (transaction) {
 
     let rowStr = ''
     rowStr += "<tr class='" + (transaction.unconfirmed ? 'tentative' : 'confirmed') + "'>"
-    rowStr += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "' data-timestamp='" + String(transaction.timestamp).escapeHTML() + "'>" + BRS.formatTimestamp(transaction.timestamp) + '</a></td>'
+    rowStr += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "' data-timestamp='" + String(transaction.timestamp).escapeHTML() + "'>" + formatTimestamp(transaction.timestamp) + '</a></td>'
     rowStr += '<td>' + details.nameOfTransaction + (details.hasMessage ? " + <i class='far fa-envelope-open'></i>&nbsp;" : '') + '</td>'
     rowStr += '<td>' + details.circleText + '</td>'
     rowStr += `<td ${details.colorClass}>${details.amountToFromViewerHTML}</td>`
@@ -693,9 +716,9 @@ function getTransactionRowDashboardHTML (transaction) {
 }
 
 function getTransactionRowHTML (transaction, viewAccount) {
-    const details = BRS.getTransactionDetails(transaction, viewAccount)
+    const details = getTransactionDetails(transaction, viewAccount)
 
-    let confirmationHTML = BRS.formatAmount(transaction.confirmations)
+    let confirmationHTML = formatAmount(transaction.confirmations)
     if (transaction.unconfirmed) {
         confirmationHTML = BRS.pendingTransactionHTML
     }
@@ -703,11 +726,11 @@ function getTransactionRowHTML (transaction, viewAccount) {
     rowStr += '<tr ' + ((transaction.unconfirmed && details.toFromViewer) ? " class='tentative'" : '') + '>'
     rowStr += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "'>" + String(transaction.transaction).escapeHTML() + '</a></td>'
     rowStr += '<td>' + (details.hasMessage ? "<i class='far fa-envelope-open'></i>&nbsp;" : '') + '</td>'
-    rowStr += '<td>' + BRS.formatTimestamp(transaction.timestamp) + '</td>'
+    rowStr += '<td>' + formatTimestamp(transaction.timestamp) + '</td>'
     rowStr += '<td>' + details.nameOfTransaction + '</td>'
     rowStr += '<td>' + details.circleText + '</td>'
     rowStr += `<td ${details.colorClass}>${details.amountToFromViewerHTML}</td>`
-    rowStr += '<td>' + BRS.formatAmount(transaction.feeNQT) + '</td>'
+    rowStr += '<td>' + formatAmount(transaction.feeNQT) + '</td>'
     rowStr += `<td>${details.accountLink}</td>`
     rowStr += '<td>' + confirmationHTML + '</td>'
     rowStr += '</tr>'
@@ -739,5 +762,5 @@ export function evTransactionsPageTypeClick (e) {
 
     $('.popover').remove()
 
-    BRS.loadPage('transactions')
+    loadPage('transactions')
 }

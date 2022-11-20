@@ -7,6 +7,52 @@
 import { BRS } from '.'
 import converters from '../util/converters'
 
+import {
+    checkSelectedNode,
+    getAccountInfo,
+    checkLocationHash,
+    checkIfOnAFork
+} from './brs'
+
+import {
+    updateSettings
+} from './brs.settings'
+
+import {
+    setServerPassword,
+    sendRequest
+} from './brs.server'
+
+import {
+    checkBlockHeight
+} from './brs.blocks'
+
+import {
+    getContactByName
+} from './brs.contacts'
+
+import {
+    getPublicKey,
+    getAccountId,
+    setEncryptionPassword,
+    getEncryptionPassword,
+    setDecryptionPassword
+} from './brs.encryption'
+
+import {
+    convertNumericToRSAccountFormat,
+    setupClipboardFunctionality
+} from './brs.util'
+
+import {
+    loadCachedAssets,
+    cacheUserAssets
+} from './brs.assetexchange'
+
+import {
+    getInitialTransactions
+} from './brs.transactions'
+
 export function allowLoginViaEnter () {
     $('#login_password').keypress(function (e) {
         if (e.which === '13') {
@@ -19,7 +65,7 @@ export function allowLoginViaEnter () {
 
 export function showLoginOrWelcomeScreen () {
     if (BRS.hasLocalStorage && localStorage.getItem('logged_in')) {
-        BRS.showLoginScreen()
+        showLoginScreen()
     } else {
         showWelcomeScreen()
     }
@@ -124,7 +170,7 @@ export function evAccountPhraseCustomPanelSubmit (event) {
 
 export function loginCommon () {
     if (!BRS.settings.automatic_node_selection) {
-        BRS.updateSettings('prefered_node', BRS.server)
+        updateSettings('prefered_node', BRS.server)
     }
 
     const $valueSufix = document.querySelectorAll('[data-value-suffix]')
@@ -133,26 +179,26 @@ export function loginCommon () {
     }
 
     if (BRS.state) {
-        BRS.checkBlockHeight()
+        checkBlockHeight()
     }
 
-    BRS.getAccountInfo(true, BRS.cacheUserAssets)
+    getAccountInfo(true, cacheUserAssets)
 
     unlock()
 
     if (!BRS.downloadingBlockchain) {
-        BRS.checkIfOnAFork()
+        checkIfOnAFork()
     }
 
-    BRS.setupClipboardFunctionality()
+    setupClipboardFunctionality()
 
-    BRS.loadCachedAssets()
+    loadCachedAssets()
 
-    BRS.checkLocationHash(BRS.getEncryptionPassword())
+    checkLocationHash(getEncryptionPassword())
 
-    $(window).on('hashchange', BRS.checkLocationHash)
+    $(window).on('hashchange', checkLocationHash)
 
-    BRS.getInitialTransactions()
+    getInitialTransactions()
 }
 
 function loginWithAccount (account) {
@@ -162,9 +208,9 @@ function loginWithAccount (account) {
         return
     }
 
-    BRS.checkSelectedNode()
+    checkSelectedNode()
 
-    BRS.sendRequest('getBlockchainStatus', function (response) {
+    sendRequest('getBlockchainStatus', function (response) {
         if (response.errorCode) {
             $.notify($.t('error_server_connect'), { type: 'danger' })
             return
@@ -176,7 +222,7 @@ function loginWithAccount (account) {
         if (BRS.rsRegEx.test(account) || BRS.idRegEx.test(account)) {
             login = account
         } else {
-            const foundContact = BRS.getContactByName(account)
+            const foundContact = getContactByName(account)
             if (foundContact) login = foundContact.accountRS
         }
         if (!login) {
@@ -188,7 +234,7 @@ function loginWithAccount (account) {
         }
 
         // Get the account information for the given address
-        BRS.sendRequest('getAccount', {
+        sendRequest('getAccount', {
             account: login
         }, function (response) {
             if (response.errorCode) {
@@ -204,8 +250,8 @@ function loginWithAccount (account) {
                 return
             }
 
-            BRS.updateSettings('remember_account', $('#remember_account').is(':checked'))
-            BRS.updateSettings('remember_account_account', account)
+            updateSettings('remember_account', $('#remember_account').is(':checked'))
+            updateSettings('remember_account_account', account)
 
             BRS.account = response.account
             BRS.accountRS = response.accountRS
@@ -217,7 +263,7 @@ function loginWithAccount (account) {
             $.notify($.t('success_login_watch_only'), { type: 'success' })
             $('#account_id').html(String(BRS.accountRS).escapeHTML())
 
-            BRS.loginCommon()
+            loginCommon()
         })
     })
 }
@@ -228,7 +274,7 @@ function loginWithPassphrase (passphrase) {
         return
     }
 
-    BRS.checkSelectedNode()
+    checkSelectedNode()
 
     if (!BRS.isTestNet && passphrase.length < 12 && $('#login_check_password_length').val() == 1) {
         $('#login_check_password_length').val(0)
@@ -237,9 +283,9 @@ function loginWithPassphrase (passphrase) {
         return
     }
 
-    BRS.updateSettings('remember_passphrase', $('#remember_password').is(':checked'))
+    updateSettings('remember_passphrase', $('#remember_password').is(':checked'))
 
-    BRS.sendRequest('getBlockchainStatus', function (response) {
+    sendRequest('getBlockchainStatus', function (response) {
         if (response.errorCode) {
             $.notify($.t('error_server_connect'), { type: 'danger' })
             return
@@ -247,12 +293,12 @@ function loginWithPassphrase (passphrase) {
 
         BRS.state = response
 
-        BRS.account = BRS.getAccountId(passphrase)
-        BRS.accountRS = BRS.convertNumericToRSAccountFormat(BRS.account)
-        BRS.publicKey = BRS.getPublicKey(converters.stringToHexString(passphrase))
+        BRS.account = getAccountId(passphrase)
+        BRS.accountRS = convertNumericToRSAccountFormat(BRS.account)
+        BRS.publicKey = getPublicKey(converters.stringToHexString(passphrase))
         BRS.accountRSExtended = BRS.accountRS + '-' + new BigNumber(BRS.publicKey, 16).toString(36).toUpperCase()
 
-        BRS.sendRequest('getAccountPublicKey', {
+        sendRequest('getAccountPublicKey', {
             account: BRS.account
         }, function (response) {
             if (response && response.publicKey && response.publicKey !== BRS.publicKey) {
@@ -275,7 +321,7 @@ function loginWithPassphrase (passphrase) {
             if ($('#remember_password').is(':checked')) {
                 BRS.rememberPassword = true
                 $('#remember_password').prop('checked', false)
-                BRS.setServerPassword(passphrase)
+                setServerPassword(passphrase)
                 $('.secret_phrase, .show_secret_phrase').hide()
                 $('.hide_secret_phrase').show()
             }
@@ -284,7 +330,7 @@ function loginWithPassphrase (passphrase) {
             $('#login_check_password_length').val(1)
             $('#account_id').html(String(BRS.accountRS).escapeHTML())
 
-            BRS.loginCommon()
+            loginCommon()
         })
     })
 }
@@ -328,8 +374,8 @@ function unlock () {
 }
 
 export function logout () {
-    BRS.setDecryptionPassword('')
-    BRS.setEncryptionPassword('')
-    BRS.setServerPassword('')
+    setDecryptionPassword('')
+    setEncryptionPassword('')
+    setServerPassword('')
     window.location.reload()
 }

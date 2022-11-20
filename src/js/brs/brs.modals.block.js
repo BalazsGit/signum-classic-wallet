@@ -7,6 +7,15 @@
 
 import { BRS } from '.'
 
+import { sendRequest } from './brs.server'
+
+import {
+    formatAmount,
+    createInfoTable
+} from './brs.util'
+
+import { getTransactionDetails } from './brs.transactions'
+
 export function evBlocksTableClick (event) {
     event.preventDefault()
     if (BRS.fetchingModalData) {
@@ -14,11 +23,11 @@ export function evBlocksTableClick (event) {
     }
     BRS.fetchingModalData = true
     const blockHeight = $(this).data('block')
-    BRS.sendRequest('getBlock+', {
+    sendRequest('getBlock+', {
         height: blockHeight,
         includeTransactions: 'true'
     }, function (response) {
-        BRS.showBlockModal(response)
+        showBlockModal(response)
     })
 }
 
@@ -32,7 +41,7 @@ export function showBlockModal (block) {
     delete blockDetails.generationSignature
     delete blockDetails.payloadHash
     delete blockDetails.block
-    $('#block_info_details_table tbody').empty().append(BRS.createInfoTable(blockDetails))
+    $('#block_info_details_table tbody').empty().append(createInfoTable(blockDetails))
     $('#block_info_details_table').show()
     if (block.transactions.length === 0) {
         $('#block_info_transactions_none').show()
@@ -48,7 +57,7 @@ export function showBlockModal (block) {
     })
     let rows = ''
     for (const transaction of block.transactions) {
-        const details = BRS.getTransactionDetails(transaction)
+        const details = getTransactionDetails(transaction)
         rows += '<tr>'
 
         rows += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "'>" + String(transaction.transaction.slice(0, 7) + '…').escapeHTML() + '</a><br>'
@@ -56,7 +65,7 @@ export function showBlockModal (block) {
         rows += '<td>' + details.senderHTML + '</td>'
         rows += '<td>' + details.recipientHTML + '</td>'
         rows += `<td ${details.colorClass}>${details.amountToFromViewerHTML}</td>`
-        rows += '<td>' + BRS.formatAmount(transaction.feeNQT) + '</td>'
+        rows += '<td>' + formatAmount(transaction.feeNQT) + '</td>'
         rows += '</tr>'
     }
     $('#block_info_transactions_table tbody').empty().append(rows)

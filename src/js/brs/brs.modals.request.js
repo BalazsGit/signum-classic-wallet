@@ -6,6 +6,8 @@
 
 import { BRS } from '.'
 
+import { sendRequest } from './brs.server'
+
 export function evRequestBurstQrModalOnShowBsModal (e) {
     const radio = document.request_burst_form.request_burst_suggested_fee
     $('#new_qr_button').hide()
@@ -22,7 +24,7 @@ export function evRequestBurstQrModalOnShowBsModal (e) {
         }
     }
 
-    BRS.sendRequest('suggestFee', {
+    sendRequest('suggestFee', {
     }, function (response) {
         if (!response.errorCode) {
             $('#standard_fee_response').html("<span class='margin-left-5'>(<a href='#' class='btn-fee-response' name='fee_value' data-i18n='[title]click_to_apply'>" + (response.standard / 100000000).toFixed(8) + '</a>)</span>')

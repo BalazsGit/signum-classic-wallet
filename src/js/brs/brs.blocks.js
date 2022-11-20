@@ -6,12 +6,39 @@
 
 import { BRS } from '.'
 
+import {
+    setStateInterval,
+    loadPage,
+    updateBlockchainDownloadProgress,
+    checkIfOnAFork
+} from './brs'
+
+import {
+    sendRequest
+} from './brs.server'
+
+import {
+    formatVolume,
+    convertToNQT,
+    formatAmount,
+    formatTimestamp,
+    getAccountTitle,
+    getAccountFormatted,
+    dataLoaded,
+    dataLoadFinished,
+    formatStyledAmount
+} from './brs.util'
+
+import {
+    getTransactionDetails
+} from './brs.transactions'
+
 export function getBlock (blockID, callback, pageRequest) {
-    BRS.sendRequest('getBlock' + (pageRequest ? '+' : ''), {
+    sendRequest('getBlock' + (pageRequest ? '+' : ''), {
         block: blockID
     }, function (response) {
         if (response.errorCode && response.errorCode == -1) {
-            BRS.getBlock(blockID, callback, pageRequest)
+            getBlock(blockID, callback, pageRequest)
         } else {
             if (callback) {
                 response.block = blockID
@@ -23,43 +50,43 @@ export function getBlock (blockID, callback, pageRequest) {
 
 export function handleInitialBlocks (response) {
     if (response.errorCode) {
-        BRS.dataLoadFinished($('#dashboard_blocks_table'))
+        dataLoadFinished($('#dashboard_blocks_table'))
         return
     }
 
     BRS.blocks.push(response)
 
     if (BRS.blocks.length < 10 && response.previousBlock) {
-        BRS.getBlock(response.previousBlock, BRS.handleInitialBlocks)
+        getBlock(response.previousBlock, handleInitialBlocks)
     } else {
-        BRS.checkBlockHeight(BRS.blocks[0].height)
+        checkBlockHeight(BRS.blocks[0].height)
 
         if (BRS.state) {
             // if no new blocks in 6 hours, show blockchain download progress..
             const timeDiff = BRS.state.time - BRS.blocks[0].timestamp
             if (timeDiff > 60 * 60 * 18) {
                 if (timeDiff > 60 * 60 * 24 * 14) {
-                    BRS.setStateInterval(30)
+                    setStateInterval(30)
                 } else if (timeDiff > 60 * 60 * 24 * 7) {
                     // second to last week
-                    BRS.setStateInterval(15)
+                    setStateInterval(15)
                 } else {
                     // last week
-                    BRS.setStateInterval(10)
+                    setStateInterval(10)
                 }
                 BRS.downloadingBlockchain = true
                 $('#brs_update_explanation span').hide()
                 $('#brs_update_explanation_wait').attr('style', 'display: none !important')
                 $('#downloading_blockchain, #brs_update_explanation_blockchain_sync').show()
                 $('#show_console').hide()
-                BRS.updateBlockchainDownloadProgress()
+                updateBlockchainDownloadProgress()
             } else {
                 // continue with faster state intervals if we still haven't reached current block from within 1 hour
                 if (timeDiff < 60 * 60) {
-                    BRS.setStateInterval(30)
+                    setStateInterval(30)
                     BRS.trackBlockchain = false
                 } else {
-                    BRS.setStateInterval(10)
+                    setStateInterval(10)
                     BRS.trackBlockchain = true
                 }
             }
@@ -70,11 +97,11 @@ export function handleInitialBlocks (response) {
         for (let i = 0; i < BRS.blocks.length; i++) {
             const block = BRS.blocks[i]
 
-            rows += "<tr><td><a href='#' data-block='" + String(block.height).escapeHTML() + "' data-blockid='" + String(block.block).escapeHTML() + "' class='block'" + (block.numberOfTransactions > 0 ? " style='font-weight:bold'" : '') + '>' + String(block.height).escapeHTML() + "</a></td><td data-timestamp='" + String(block.timestamp).escapeHTML() + "'>" + BRS.formatTimestamp(block.timestamp) + '</td><td>' + BRS.formatAmount(block.totalAmountNQT) + ' + ' + BRS.formatAmount(block.totalFeeNQT) + '</td><td>' + BRS.formatAmount(block.numberOfTransactions) + '</td></tr>'
+            rows += "<tr><td><a href='#' data-block='" + String(block.height).escapeHTML() + "' data-blockid='" + String(block.block).escapeHTML() + "' class='block'" + (block.numberOfTransactions > 0 ? " style='font-weight:bold'" : '') + '>' + String(block.height).escapeHTML() + "</a></td><td data-timestamp='" + String(block.timestamp).escapeHTML() + "'>" + formatTimestamp(block.timestamp) + '</td><td>' + formatAmount(block.totalAmountNQT) + ' + ' + formatAmount(block.totalFeeNQT) + '</td><td>' + formatAmount(block.numberOfTransactions) + '</td></tr>'
         }
 
         $('#dashboard_blocks_table tbody').empty().append(rows)
-        BRS.dataLoadFinished($('#dashboard_blocks_table'))
+        dataLoadFinished($('#dashboard_blocks_table'))
     }
 }
 
@@ -107,12 +134,12 @@ export function handleNewBlocks (response) {
             BRS.blocks = BRS.blocks.slice(0, 100)
         }
 
-        BRS.checkBlockHeight(BRS.blocks[0].height)
+        checkBlockHeight(BRS.blocks[0].height)
 
         BRS.incoming.updateDashboardBlocks(newBlocks)
     } else {
         BRS.tempBlocks.push(response)
-        BRS.getBlock(response.previousBlock, BRS.handleNewBlocks)
+        getBlock(response.previousBlock, handleNewBlocks)
     }
 }
 
@@ -138,9 +165,9 @@ export function incomingUpdateDashboardBlocks (newBlocks) {
             timeDiff = BRS.state.time - BRS.blocks[0].timestamp
             if (timeDiff < 60 * 60 * 18) {
                 if (timeDiff < 60 * 60) {
-                    BRS.setStateInterval(30)
+                    setStateInterval(30)
                 } else {
-                    BRS.setStateInterval(10)
+                    setStateInterval(10)
                     BRS.trackBlockchain = true
                 }
                 BRS.downloadingBlockchain = false
@@ -151,19 +178,19 @@ export function incomingUpdateDashboardBlocks (newBlocks) {
                     $('#show_console').show()
                 }
                 $.notify($.t('success_blockchain_up_to_date'), { type: 'success' })
-                BRS.checkIfOnAFork()
+                checkIfOnAFork()
             } else {
                 if (timeDiff > 60 * 60 * 24 * 14) {
-                    BRS.setStateInterval(30)
+                    setStateInterval(30)
                 } else if (timeDiff > 60 * 60 * 24 * 7) {
                     // second to last week
-                    BRS.setStateInterval(15)
+                    setStateInterval(15)
                 } else {
                     // last week
-                    BRS.setStateInterval(10)
+                    setStateInterval(10)
                 }
 
-                BRS.updateBlockchainDownloadProgress()
+                updateBlockchainDownloadProgress()
             }
         }
     } else if (BRS.trackBlockchain) {
@@ -171,10 +198,10 @@ export function incomingUpdateDashboardBlocks (newBlocks) {
 
         // continue with faster state intervals if we still haven't reached current block from within 1 hour
         if (timeDiff < 60 * 60) {
-            BRS.setStateInterval(30)
+            setStateInterval(30)
             BRS.trackBlockchain = false
         } else {
-            BRS.setStateInterval(10)
+            setStateInterval(10)
         }
     }
 
@@ -183,7 +210,7 @@ export function incomingUpdateDashboardBlocks (newBlocks) {
     for (let i = 0; i < newBlockCount; i++) {
         const block = newBlocks[i]
 
-        rows += "<tr><td><a href='#' data-block='" + String(block.height).escapeHTML() + "' data-blockid='" + String(block.block).escapeHTML() + "' class='block'" + (block.numberOfTransactions > 0 ? " style='font-weight:bold'" : '') + '>' + String(block.height).escapeHTML() + "</a></td><td data-timestamp='" + String(block.timestamp).escapeHTML() + "'>" + BRS.formatTimestamp(block.timestamp) + '</td><td>' + BRS.formatAmount(block.totalAmountNQT) + ' + ' + BRS.formatAmount(block.totalFeeNQT) + '</td><td>' + BRS.formatAmount(block.numberOfTransactions) + '</td></tr>'
+        rows += "<tr><td><a href='#' data-block='" + String(block.height).escapeHTML() + "' data-blockid='" + String(block.block).escapeHTML() + "' class='block'" + (block.numberOfTransactions > 0 ? " style='font-weight:bold'" : '') + '>' + String(block.height).escapeHTML() + "</a></td><td data-timestamp='" + String(block.timestamp).escapeHTML() + "'>" + formatTimestamp(block.timestamp) + '</td><td>' + formatAmount(block.totalAmountNQT) + ' + ' + formatAmount(block.totalFeeNQT) + '</td><td>' + formatAmount(block.numberOfTransactions) + '</td></tr>'
     }
 
     if (newBlockCount == 1) {
@@ -210,7 +237,7 @@ export function incomingUpdateDashboardBlocks (newBlocks) {
         if (confirmations <= 10) {
             $(this).data('confirmations', nrConfirmations)
             $(this).attr('data-content', $.t('x_confirmations', {
-                x: BRS.formatAmount(nrConfirmations, false, true)
+                x: formatAmount(nrConfirmations, false, true)
             }))
 
             if (nrConfirmations > 10) {
@@ -219,19 +246,19 @@ export function incomingUpdateDashboardBlocks (newBlocks) {
             $(this).html(nrConfirmations)
         } else {
             $(this).attr('data-content', $.t('x_confirmations', {
-                x: BRS.formatAmount(nrConfirmations, false, true)
+                x: formatAmount(nrConfirmations, false, true)
             }))
         }
     })
 }
 
 export function pagesBlocksForged () {
-    BRS.sendRequest('getAccountBlockIds+', {
+    sendRequest('getAccountBlockIds+', {
         account: BRS.account,
         timestamp: 0
     }, function (response) {
         if (!response.blockIds || response.blockIds.length == 0) {
-            BRS.blocksPageLoaded([])
+            blocksPageLoaded([])
             return
         }
         // We have blocks!
@@ -245,7 +272,7 @@ export function pagesBlocksForged () {
         }
 
         for (let i = 0; i < blockIds.length; i++) {
-            BRS.sendRequest('getBlock+', {
+            sendRequest('getBlock+', {
                 block: blockIds[i],
                 _extra: {
                     nr: i
@@ -261,7 +288,7 @@ export function pagesBlocksForged () {
                 nrBlocks++
 
                 if (nrBlocks == blockIds.length) {
-                    BRS.blocksPageLoaded(blocks)
+                    blocksPageLoaded(blocks)
                 }
             })
         }
@@ -269,42 +296,42 @@ export function pagesBlocksForged () {
 }
 
 export function pagesBlockInfo () {
-    BRS.blocksInfoLoad('')
+    blocksInfoLoad('')
 }
 
 export function blocksInfoLoad (blockheight) {
     if (blockheight === '') {
         blockheight = BRS.blocks[0].height.toString()
     }
-    BRS.sendRequest('getBlock+', {
+    sendRequest('getBlock+', {
         height: blockheight,
         includeTransactions: true
     }, function (response) {
         if (response.errorCode) {
             $.notify($.t('invalid_blockheight'), { type: 'danger' })
-            BRS.dataLoaded('')
+            dataLoaded('')
             return
         }
         $('#block_info_input_block').val(blockheight)
         const rows = response.transactions.reduce((prev, currTr) => prev + getTransactionInBlocksRowHTML(currTr), '')
-        BRS.dataLoaded(rows)
+        dataLoaded(rows)
     })
 }
 
 function getTransactionInBlocksRowHTML (transaction) {
-    const details = BRS.getTransactionDetails(transaction)
+    const details = getTransactionDetails(transaction)
 
     let rowStr = ''
     rowStr += '<tr>'
     rowStr += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "'>" + String(transaction.transaction).escapeHTML() + '</a></td>'
     rowStr += '<td>' + (details.hasMessage ? "<i class='far fa-envelope-open'></i>&nbsp;" : '') + '</td>'
-    rowStr += '<td>' + BRS.formatTimestamp(transaction.timestamp) + '</td>'
+    rowStr += '<td>' + formatTimestamp(transaction.timestamp) + '</td>'
     rowStr += '<td>' + details.nameOfTransaction + '</td>'
     rowStr += '<td>' + details.senderHTML + '</td>'
     rowStr += '<td>' + details.recipientHTML + '</td>'
     rowStr += '<td>' + details.circleText + '</td>'
     rowStr += `<td ${details.colorClass}>${details.amountToFromViewerHTML}</td>`
-    rowStr += '<td>' + BRS.formatAmount(transaction.feeNQT) + '</td>'
+    rowStr += '<td>' + formatAmount(transaction.feeNQT) + '</td>'
     rowStr += '</tr>'
 
     return rowStr
@@ -313,33 +340,33 @@ function getTransactionInBlocksRowHTML (transaction) {
 export function pagesBlocks () {
     if (BRS.blocks.length >= 100 || BRS.downloadingBlockchain) {
         // Just show what we have
-        BRS.blocksPageLoaded(BRS.blocks)
+        blocksPageLoaded(BRS.blocks)
         return
     }
     if (BRS.blocks.length < 2) {
         // should never happens because dashboard already loaded 10 of them
         // buuut then show nothing
-        BRS.blocksPageLoaded([])
+        blocksPageLoaded([])
         return
     }
     // partial blocks only, fetch 100 of them
     const previousBlock = BRS.blocks[BRS.blocks.length - 1].previousBlock
     // if previous block is undefined, dont try add it
     if (typeof previousBlock !== 'undefined') {
-        BRS.getBlock(previousBlock, BRS.finish100Blocks, true)
+        getBlock(previousBlock, finish100Blocks, true)
     }
 }
 
 export function incomingBlocks () {
-    BRS.loadPage('blocks')
+    loadPage('blocks')
 }
 
 export function finish100Blocks (response) {
     BRS.blocks.push(response)
     if (BRS.blocks.length < 100 && typeof response.previousBlock !== 'undefined') {
-        BRS.getBlock(response.previousBlock, BRS.finish100Blocks, true)
+        getBlock(response.previousBlock, finish100Blocks, true)
     } else {
-        BRS.blocksPageLoaded(BRS.blocks)
+        blocksPageLoaded(BRS.blocks)
     }
 }
 
@@ -361,7 +388,7 @@ export function blocksPageLoaded (blocks) {
 
         totalTransactions += block.numberOfTransactions
 
-        rows += "<tr><td><a href='#' data-block='" + String(block.height).escapeHTML() + "' data-blockid='" + String(block.block).escapeHTML() + "' class='block'" + (block.numberOfTransactions > 0 ? " style='font-weight:bold'" : '') + '>' + String(block.height).escapeHTML() + '</a></td><td>' + BRS.formatTimestamp(block.timestamp) + '</td><td>' + BRS.formatAmount(block.totalAmountNQT) + '</td><td>' + BRS.formatAmount(block.totalFeeNQT) + '</td><td>' + BRS.formatAmount(block.numberOfTransactions) + '</td><td>' + (block.generator != BRS.genesis ? "<a href='#' data-user='" + BRS.getAccountFormatted(block, 'generator') + "' class='user_info'>" + BRS.getAccountTitle(block, 'generator') + '</a>' : $.t('genesis')) + '</td><td>' + BRS.formatVolume(block.payloadLength) + '</td><td>' + Math.round(block.baseTarget / 153722867 * 100).pad(4) + ' %</td></tr>'
+        rows += "<tr><td><a href='#' data-block='" + String(block.height).escapeHTML() + "' data-blockid='" + String(block.block).escapeHTML() + "' class='block'" + (block.numberOfTransactions > 0 ? " style='font-weight:bold'" : '') + '>' + String(block.height).escapeHTML() + '</a></td><td>' + formatTimestamp(block.timestamp) + '</td><td>' + formatAmount(block.totalAmountNQT) + '</td><td>' + formatAmount(block.totalFeeNQT) + '</td><td>' + formatAmount(block.numberOfTransactions) + '</td><td>' + (block.generator != BRS.genesis ? "<a href='#' data-user='" + getAccountFormatted(block, 'generator') + "' class='user_info'>" + getAccountTitle(block, 'generator') + '</a>' : $.t('genesis')) + '</td><td>' + formatVolume(block.payloadLength) + '</td><td>' + Math.round(block.baseTarget / 153722867 * 100).pad(4) + ' %</td></tr>'
     }
 
     if (blocks.length) {
@@ -382,8 +409,8 @@ export function blocksPageLoaded (blocks) {
         averageAmount = 0
     }
 
-    averageFee = BRS.convertToNQT(averageFee)
-    averageAmount = BRS.convertToNQT(averageAmount)
+    averageFee = convertToNQT(averageFee)
+    averageAmount = convertToNQT(averageAmount)
 
     if (BRS.currentPage == 'blocks_forged') {
         if (blocks.length == 100) {
@@ -391,20 +418,20 @@ export function blocksPageLoaded (blocks) {
         } else {
             blockCount = blocks.length
         }
-        $('#blocks_forged_average_fee').html(BRS.formatStyledAmount(averageFee)).removeClass('loading_dots')
-        $('#blocks_forged_average_amount').html(BRS.formatStyledAmount(averageAmount)).removeClass('loading_dots')
+        $('#blocks_forged_average_fee').html(formatStyledAmount(averageFee)).removeClass('loading_dots')
+        $('#blocks_forged_average_amount').html(formatStyledAmount(averageAmount)).removeClass('loading_dots')
         $('#forged_blocks_total').html(blockCount).removeClass('loading_dots')
-        $('#forged_fees_total').html(BRS.formatStyledAmount(BRS.accountInfo.forgedBalanceNQT)).removeClass('loading_dots')
+        $('#forged_fees_total').html(formatStyledAmount(BRS.accountInfo.forgedBalanceNQT)).removeClass('loading_dots')
     } else {
         if (time === 0) {
             $('#blocks_transactions_per_hour').html('0').removeClass('loading_dots')
         } else {
             $('#blocks_transactions_per_hour').html(Math.round(totalTransactions / (time / 60) * 60)).removeClass('loading_dots')
         }
-        $('#blocks_average_fee').html(BRS.formatStyledAmount(averageFee)).removeClass('loading_dots')
-        $('#blocks_average_amount').html(BRS.formatStyledAmount(averageAmount)).removeClass('loading_dots')
+        $('#blocks_average_fee').html(formatStyledAmount(averageFee)).removeClass('loading_dots')
+        $('#blocks_average_amount').html(formatStyledAmount(averageAmount)).removeClass('loading_dots')
         $('#blocks_average_generation_time').html(Math.round(time / 100) + 's').removeClass('loading_dots')
     }
 
-    BRS.dataLoaded(rows)
+    dataLoaded(rows)
 }

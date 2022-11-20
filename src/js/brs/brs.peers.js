@@ -6,8 +6,17 @@
 
 import { BRS } from '.'
 
+import { loadPage } from './brs'
+
+import { sendRequest } from './brs.server'
+
+import {
+    formatVolume,
+    dataLoaded
+} from './brs.util'
+
 export function pagesPeers () {
-    BRS.sendRequest('getPeers+', {
+    sendRequest('getPeers+', {
         active: 'true'
     }, function (response) {
         if (response.peers && response.peers.length) {
@@ -15,7 +24,7 @@ export function pagesPeers () {
             let nrPeers = 0
 
             for (let i = 0; i < response.peers.length; i++) {
-                BRS.sendRequest('getPeer+', {
+                sendRequest('getPeer+', {
                     peer: response.peers[i]
                 }, function (peer, input) {
                     if (BRS.currentPage !== 'peers') {
@@ -62,9 +71,9 @@ export function pagesPeers () {
                                     '&nbsp;&nbsp;' +
                                     (peer.announcedAddress ? String(peer.announcedAddress).escapeHTML() : 'No name') +
                                     '</td><td>' +
-                                    BRS.formatVolume(peer.downloadedVolume) +
+                                    formatVolume(peer.downloadedVolume) +
                                     '</td><td>' +
-                                    BRS.formatVolume(peer.uploadedVolume) +
+                                    formatVolume(peer.uploadedVolume) +
                                     "</td><td><span class='label label-" +
                                     (versionCompare(peer.version, versionToCompare) ? 'success' : 'danger') +
                                     "'>" +
@@ -74,24 +83,24 @@ export function pagesPeers () {
                                     '</td></tr>'
                         }
 
-                        $('#peers_uploaded_volume').html(BRS.formatVolume(uploaded)).removeClass('loading_dots')
-                        $('#peers_downloaded_volume').html(BRS.formatVolume(downloaded)).removeClass('loading_dots')
+                        $('#peers_uploaded_volume').html(formatVolume(uploaded)).removeClass('loading_dots')
+                        $('#peers_downloaded_volume').html(formatVolume(downloaded)).removeClass('loading_dots')
                         $('#peers_connected').html(connected).removeClass('loading_dots')
                         $('#peers_up_to_date').html(upToDate + '/' + activePeers).removeClass('loading_dots')
 
-                        BRS.dataLoaded(rows)
+                        dataLoaded(rows)
                     }
                 })
             }
         } else {
             $('#peers_uploaded_volume, #peers_downloaded_volume, #peers_connected, #peers_up_to_date').html('0').removeClass('loading_dots')
-            BRS.dataLoaded()
+            dataLoaded()
         }
     })
 }
 
 export function incomingPeers () {
-    BRS.loadPage('peers')
+    loadPage('peers')
 }
 
 class PreleaseTag {

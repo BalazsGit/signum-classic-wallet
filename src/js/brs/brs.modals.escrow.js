@@ -7,6 +7,10 @@
 
 import { BRS } from '.'
 
+import { sendRequest } from './brs.server'
+
+import { formatTimestamp } from './brs.util'
+
 export function showEscrowDecisionModal (escrow) {
     if (BRS.fetchingModalData) {
         return
@@ -15,13 +19,13 @@ export function showEscrowDecisionModal (escrow) {
     BRS.fetchingModalData = true
 
     if (typeof escrow !== 'object') {
-        BRS.sendRequest('getEscrowTransaction', {
+        sendRequest('getEscrowTransaction', {
             escrow
         }, function (response, input) {
-            BRS.processEscrowDecisionModalData(response)
+            processEscrowDecisionModalData(response)
         })
     } else {
-        BRS.processEscrowDecisionModalData(escrow)
+        processEscrowDecisionModalData(escrow)
     }
 }
 
@@ -33,7 +37,7 @@ export function processEscrowDecisionModalData (escrow) {
     }
     $('#escrow_decision_decisions').html(decisions)
     $('#escrow_decision_required').html(escrow.requiredSigners + ' signers required')
-    $('#escrow_decision_deadline').html('Defaults to ' + escrow.deadlineAction + ' at ' + BRS.formatTimestamp(escrow.deadline))
+    $('#escrow_decision_deadline').html('Defaults to ' + escrow.deadlineAction + ' at ' + formatTimestamp(escrow.deadline))
 
     $('#escrow_decision_modal').modal('show')
     BRS.fetchingModalData = false

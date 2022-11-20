@@ -11,6 +11,14 @@ import * as curve25519 from '../crypto/curve25519'
 import * as jssha from '../crypto/3rdparty/jssha256'
 import converters from '../util/converters'
 
+import {
+    sendRequest
+} from './brs.server'
+
+import {
+    getTranslatedFieldName
+} from './brs.util'
+
 export function generatePublicKey (secretPhrase) {
     if (!secretPhrase) {
         if (BRS.rememberPassword) {
@@ -20,13 +28,13 @@ export function generatePublicKey (secretPhrase) {
         }
     }
 
-    return BRS.getPublicKey(converters.stringToHexString(secretPhrase))
+    return getPublicKey(converters.stringToHexString(secretPhrase))
 }
 
 export function getAccountPublicKey (account) {
     let publicKey = ''
     // synchronous!
-    BRS.sendRequest('getAccountPublicKey', {
+    sendRequest('getAccountPublicKey', {
         account
     }, function (response) {
         if (!response.publicKey) {
@@ -54,7 +62,7 @@ function getPrivateKey (secretPhrase) {
 }
 
 export function getAccountId (secretPhrase) {
-    return BRS.getAccountIdFromPublicKey(BRS.getPublicKey(converters.stringToHexString(secretPhrase)))
+    return getAccountIdFromPublicKey(getPublicKey(converters.stringToHexString(secretPhrase)))
 }
 
 export function getAccountIdFromPublicKey (publicKey, RSFormat) {
@@ -147,7 +155,7 @@ export function encryptNote (message, options, secretPhrase) {
 //             return false
 //         } else {
 //             if (options.title) {
-//                 let translatedTitle = BRS.getTranslatedFieldName(options.title).toLowerCase()
+//                 let translatedTitle = getTranslatedFieldName(options.title).toLowerCase()
 //                 if (!translatedTitle) {
 //                     translatedTitle = String(options.title).escapeHTML().toLowerCase()
 //                 }
@@ -229,7 +237,7 @@ function decryptNote (message, options, secretPhrase) {
 
 //     const privateKey = converters.hexStringToByteArray(getPrivateKey(secretPhrase))
 
-//     const publicKey = converters.hexStringToByteArray(BRS.getPublicKey(account, true))
+//     const publicKey = converters.hexStringToByteArray(getPublicKey(account, true))
 
 //     const sharedKey = curve25519.sharedKeyGen(privateKey, publicKey)
 
@@ -390,7 +398,7 @@ export function tryToDecrypt (transaction, fields, account, options) {
                         return false
                     } else {
                         if (title) {
-                            let translatedTitle = BRS.getTranslatedFieldName(title).toLowerCase()
+                            let translatedTitle = getTranslatedFieldName(title).toLowerCase()
                             if (!translatedTitle) {
                                 translatedTitle = String(title).escapeHTML().toLowerCase()
                             }
@@ -422,7 +430,7 @@ export function tryToDecrypt (transaction, fields, account, options) {
 
         $('#decrypt_note_form_container, ' + formEl).show()
     } else {
-        BRS.removeDecryptionForm()
+        removeDecryptionForm()
         $(outputEl).append(output).show()
     }
 }
@@ -456,7 +464,7 @@ export function decryptNoteFormSubmit () {
         }
     }
 
-    const accountId = BRS.getAccountId(password)
+    const accountId = getAccountId(password)
     if (accountId != BRS.account) {
         $form.find('.callout').html($.t('error_incorrect_passphrase')).show()
         return
@@ -538,7 +546,7 @@ export function decryptNoteFormSubmit () {
         delete BRS._decryptedTransactions[decryptionKeys[0]]
     }
 
-    BRS.removeDecryptionForm()
+    removeDecryptionForm()
 
     const outputEl = (BRS._encryptedNote.options.outputEl ? String(BRS._encryptedNote.options.outputEl).escapeHTML() : '#transaction_info_output_bottom')
 
@@ -558,7 +566,7 @@ export function decryptAllMessages (messages, password) {
             errorCode: 1
         }
     } else {
-        const accountId = BRS.getAccountId(password)
+        const accountId = getAccountId(password)
         if (accountId != BRS.account) {
             throw {
                 message: $.t('error_incorrect_passphrase'),

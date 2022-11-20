@@ -7,6 +7,10 @@
 
 import { BRS } from '.'
 
+import {
+    formatAmount
+} from './brs.util'
+
 export function evAccountDetailsModalOnShowBsModal (e) {
     $('#account_details_modal_qr_code').empty().qrcode({
         text: BRS.accountRS,
@@ -29,10 +33,10 @@ export function evAccountDetailsModalOnShowBsModal (e) {
             $('#account_balance_account_rs').html(String(BRS.accountRS).escapeHTML())
             $('#account_balance_account').html(String(BRS.account).escapeHTML())
         } else {
-            $('#account_balance_balance').html(BRS.formatAmount(new BigInteger(BRS.accountInfo.balanceNQT)) + ' ' + BRS.valueSuffix)
-            $('#account_balance_unconfirmed_balance').html(BRS.formatAmount(new BigInteger(BRS.accountInfo.unconfirmedBalanceNQT)) + ' ' + BRS.valueSuffix)
-            $('#account_locked_balance').html(BRS.formatAmount((new BigInteger(BRS.accountInfo.balanceNQT) - new BigInteger(BRS.accountInfo.unconfirmedBalanceNQT)).toLocaleString()) + ' ' + BRS.valueSuffix)
-            $('#account_committed_balance').html(BRS.formatAmount(new BigInteger(BRS.accountInfo.committedBalanceNQT)) + ' ' + BRS.valueSuffix)
+            $('#account_balance_balance').html(formatAmount(new BigInteger(BRS.accountInfo.balanceNQT)) + ' ' + BRS.valueSuffix)
+            $('#account_balance_unconfirmed_balance').html(formatAmount(new BigInteger(BRS.accountInfo.unconfirmedBalanceNQT)) + ' ' + BRS.valueSuffix)
+            $('#account_locked_balance').html(formatAmount((new BigInteger(BRS.accountInfo.balanceNQT) - new BigInteger(BRS.accountInfo.unconfirmedBalanceNQT)).toLocaleString()) + ' ' + BRS.valueSuffix)
+            $('#account_committed_balance').html(formatAmount(new BigInteger(BRS.accountInfo.committedBalanceNQT)) + ' ' + BRS.valueSuffix)
 
             $('#account_balance_public_key').html(String(BRS.accountInfo.publicKey).escapeHTML())
             $('#account_balance_account_rs').html(String(BRS.accountInfo.accountRS).escapeHTML())

@@ -7,6 +7,16 @@
 import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
 
+import {
+    loadPage,
+    pageLoaded
+} from './brs'
+
+import {
+    getAccountFormatted,
+    dataLoaded
+} from './brs.util'
+
 export function getContactByName (nameToFind) {
     for (const accountId in BRS.contacts) {
         if (BRS.contacts[accountId].name === nameToFind) {
@@ -20,7 +30,7 @@ export function pagesContacts () {
         $('#contact_page_database_error').show()
         $('#contacts_table_container').hide()
         $('#add_contact_button').hide()
-        BRS.pageLoaded()
+        pageLoaded()
         return
     }
 
@@ -30,7 +40,7 @@ export function pagesContacts () {
     BRS.database.select('contacts', null, function (error, contacts) {
         let rows = ''
         if (error || !contacts) {
-            BRS.dataLoaded(rows)
+            dataLoaded(rows)
             return
         }
         contacts.sort(function (a, b) {
@@ -52,10 +62,10 @@ export function pagesContacts () {
                 contactDescription = '-'
             }
 
-            rows += "<tr><td><a href='#' data-toggle='modal' data-target='#update_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>" + contact.name.escapeHTML() + "</a></td><td><a href='#' data-user='" + BRS.getAccountFormatted(contact, 'account') + "' class='user_info'>" + BRS.getAccountFormatted(contact, 'account') + '</a></td><td>' + (contact.email ? contact.email.escapeHTML() : '-') + '</td><td>' + contactDescription.escapeHTML() + "</td><td style='white-space:nowrap'><a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_money_modal' data-contact='" + String(contact.name).escapeHTML() + "'>" + $.t('send_burst') + "</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_message_modal' data-contact='" + String(contact.name).escapeHTML() + "'>" + $.t('message') + "</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#delete_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>" + $.t('delete') + '</a></td></tr>'
+            rows += "<tr><td><a href='#' data-toggle='modal' data-target='#update_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>" + contact.name.escapeHTML() + "</a></td><td><a href='#' data-user='" + getAccountFormatted(contact, 'account') + "' class='user_info'>" + getAccountFormatted(contact, 'account') + '</a></td><td>' + (contact.email ? contact.email.escapeHTML() : '-') + '</td><td>' + contactDescription.escapeHTML() + "</td><td style='white-space:nowrap'><a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_money_modal' data-contact='" + String(contact.name).escapeHTML() + "'>" + $.t('send_burst') + "</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_message_modal' data-contact='" + String(contact.name).escapeHTML() + "'>" + $.t('message') + "</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#delete_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>" + $.t('delete') + '</a></td></tr>'
         }
 
-        BRS.dataLoaded(rows)
+        dataLoaded(rows)
     })
 }
 
@@ -78,7 +88,7 @@ function validateContactData (data) {
 function notifyContactOperationSuccess (message) {
     $.notify(message, { type: 'success' })
     if (BRS.currentPage === 'contacts') {
-        BRS.loadPage('contacts')
+        loadPage('contacts')
         return
     }
     if (BRS.currentPage === 'messages' && BRS.selectedContext) {
@@ -357,7 +367,7 @@ export function importContacts (imported_contacts) {
                         $.notify($.t('success_contact_add'), { type: 'success' })
 
                         if (BRS.currentPage === 'contacts') {
-                            BRS.loadPage('contacts')
+                            loadPage('contacts')
                         } else if (BRS.currentPage === 'messages' && BRS.selectedContext) {
                             const heading = BRS.selectedContext.find('h4.list-group-item-heading')
                             if (heading.length) {

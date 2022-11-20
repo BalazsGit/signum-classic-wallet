@@ -7,6 +7,25 @@
 
 import { BRS } from '.'
 
+import {
+    sendRequest
+} from './brs.server'
+
+import {
+    calculatePercentage,
+    formatQuantity,
+    formatAmount,
+    formatTimestamp,
+    convertRSAccountToNumeric,
+    getAccountTitle,
+    getAccountFormatted,
+    dataLoadFinished
+} from './brs.util'
+
+import {
+    getTransactionDetails
+} from './brs.transactions'
+
 export function showAccountModal (account) {
     if (BRS.fetchingModalData) {
         return
@@ -19,7 +38,7 @@ export function showAccountModal (account) {
         BRS.fetchingModalData = true
     }
 
-    $('#user_info_modal_account').html(BRS.getAccountFormatted(BRS.userInfoModal.user))
+    $('#user_info_modal_account').html(getAccountFormatted(BRS.userInfoModal.user))
 
     let accountButton
     if (BRS.userInfoModal.user in BRS.contacts) {
@@ -33,7 +52,7 @@ export function showAccountModal (account) {
     $('#user_info_modal_actions button').data('account', accountButton)
 
     if (BRS.fetchingModalData) {
-        BRS.sendRequest('getAccount', {
+        sendRequest('getAccount', {
             account: BRS.userInfoModal.user
         }, function (response) {
             processAccountModalData(response)
@@ -52,7 +71,7 @@ function processAccountModalData (account) {
     if (account.unconfirmedBalanceNQT === '0') {
         $('#user_info_modal_account_balance').html('0')
     } else {
-        $('#user_info_modal_account_balance').html(BRS.formatAmount(account.unconfirmedBalanceNQT) + ' ' + BRS.valueSuffix)
+        $('#user_info_modal_account_balance').html(formatAmount(account.unconfirmedBalanceNQT) + ' ' + BRS.valueSuffix)
     }
 
     if (account.name) {
@@ -90,7 +109,7 @@ export function loadUserInfoModal (tabName, param) {
 }
 
 function userInfoModalTransactions (type) {
-    BRS.sendRequest('getAccountTransactions', {
+    sendRequest('getAccountTransactions', {
         account: BRS.userInfoModal.user,
         firstIndex: 0,
         lastIndex: BRS.pageSize,
@@ -99,25 +118,25 @@ function userInfoModalTransactions (type) {
         let rows = ''
         if (response.transactions && response.transactions.length) {
             for (const transaction of response.transactions) {
-                const details = BRS.getTransactionDetails(transaction, BRS.userInfoModal.user)
+                const details = getTransactionDetails(transaction, BRS.userInfoModal.user)
 
                 rows += '<tr>'
-                rows += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "' data-timestamp='" + String(transaction.timestamp).escapeHTML() + "'>" + BRS.formatTimestamp(transaction.timestamp) + '</a></td>'
+                rows += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "' data-timestamp='" + String(transaction.timestamp).escapeHTML() + "'>" + formatTimestamp(transaction.timestamp) + '</a></td>'
                 rows += '<td>' + details.nameOfTransaction + '</td>'
                 rows += '<td>' + details.circleText + '</td>'
                 rows += `<td ${details.colorClass}>${details.amountToFromViewerHTML}</td>`
-                rows += '<td>' + BRS.formatAmount(transaction.feeNQT) + '</td>'
+                rows += '<td>' + formatAmount(transaction.feeNQT) + '</td>'
                 rows += `<td>${details.accountTitle}</td>`
                 rows += '</tr>'
             }
         }
         $('#user_info_modal_transactions_table tbody').empty().append(rows)
-        BRS.dataLoadFinished($('#user_info_modal_transactions_table'))
+        dataLoadFinished($('#user_info_modal_transactions_table'))
     })
 }
 
 function userInfoModalAliases () {
-    BRS.sendRequest('getAliases', {
+    sendRequest('getAliases', {
         account: BRS.userInfoModal.user,
         timestamp: 0
     }, function (response) {
@@ -156,18 +175,18 @@ function userInfoModalAliases () {
         }
 
         $('#user_info_modal_aliases_table tbody').empty().append(rows)
-        BRS.dataLoadFinished($('#user_info_modal_aliases_table'))
+        dataLoadFinished($('#user_info_modal_aliases_table'))
     })
 }
 
 function userInfoModalSmartcontract () {
-    BRS.sendRequest('getAT', {
-        at: BRS.convertRSAccountToNumeric(BRS.userInfoModal.user)
+    sendRequest('getAT', {
+        at: convertRSAccountToNumeric(BRS.userInfoModal.user)
     }, function (response) {
         let rows = ''
         if (response.errorCode) {
             $('#user_info_modal_smartcontract_table tbody').empty()
-            BRS.dataLoadFinished($('#user_info_modal_smartcontract_table'))
+            dataLoadFinished($('#user_info_modal_smartcontract_table'))
             return
         }
         const props = [
@@ -191,10 +210,10 @@ function userInfoModalSmartcontract () {
             let codeHTML = ''
             switch (row) {
             case 'minActivation':
-                codeHTML = BRS.formatAmount(response[row]) + ' ' + BRS.valueSuffix
+                codeHTML = formatAmount(response[row]) + ' ' + BRS.valueSuffix
                 break
             case 'creatorRS':
-                codeHTML = BRS.getAccountTitle(response[row])
+                codeHTML = getAccountTitle(response[row])
                 break
             case 'machineCode':
                 codeHTML = response[row].replace(/0+$/, '')
@@ -213,12 +232,12 @@ function userInfoModalSmartcontract () {
             rows += '</tr>'
         }
         $('#user_info_modal_smartcontract_table tbody').html(rows)
-        BRS.dataLoadFinished($('#user_info_modal_smartcontract_table'))
+        dataLoadFinished($('#user_info_modal_smartcontract_table'))
     })
 }
 
 function userInfoModalAssets () {
-    BRS.sendRequest('getAccount', {
+    sendRequest('getAccount', {
         account: BRS.userInfoModal.user
     }, function (response) {
         if (response.assetBalances && response.assetBalances.length) {
@@ -236,7 +255,7 @@ function userInfoModalAssets () {
                     continue
                 }
 
-                BRS.sendRequest('getAsset', {
+                sendRequest('getAsset', {
                     asset: response.assetBalances[i].asset,
                     _extra: {
                         balanceQNT: response.assetBalances[i].balanceQNT
@@ -260,7 +279,7 @@ function userInfoModalAssets () {
 }
 
 function userInfoModalAddIssuedAssets (assets) {
-    BRS.sendRequest('getAssetsByIssuer', {
+    sendRequest('getAssetsByIssuer', {
         account: BRS.userInfoModal.user
     }, function (response) {
         if (response.assets && response.assets.length) {
@@ -279,7 +298,7 @@ function userInfoModalAddIssuedAssets (assets) {
             userInfoModalAssetsLoaded(assets)
         } else {
             $('#user_info_modal_assets_table tbody').empty()
-            BRS.dataLoadFinished($('#user_info_modal_assets_table'))
+            dataLoadFinished($('#user_info_modal_assets_table'))
         }
     })
 }
@@ -319,12 +338,12 @@ function userInfoModalAssetsLoaded (assets) {
     for (let i = 0; i < assetArray.length; i++) {
         const asset = assetArray[i]
 
-        const percentageAsset = BRS.calculatePercentage(asset.balanceQNT, asset.quantityCirculatingQNT)
+        const percentageAsset = calculatePercentage(asset.balanceQNT, asset.quantityCirculatingQNT)
 
-        rows += '<tr' + (asset.issued ? " class='asset_owner'" : '') + "><td><a href='#' data-goto-asset='" + String(asset.asset).escapeHTML() + "'" + (asset.issued ? " style='font-weight:bold'" : '') + '>' + String(asset.name).escapeHTML() + "</a></td><td class='quantity'>" + BRS.formatQuantity(asset.balanceQNT, asset.decimals) + '</td><td>' + BRS.formatQuantity(asset.quantityCirculatingQNT, asset.decimals) + '</td><td>' + percentageAsset + '%</td></tr>'
+        rows += '<tr' + (asset.issued ? " class='asset_owner'" : '') + "><td><a href='#' data-goto-asset='" + String(asset.asset).escapeHTML() + "'" + (asset.issued ? " style='font-weight:bold'" : '') + '>' + String(asset.name).escapeHTML() + "</a></td><td class='quantity'>" + formatQuantity(asset.balanceQNT, asset.decimals) + '</td><td>' + formatQuantity(asset.quantityCirculatingQNT, asset.decimals) + '</td><td>' + percentageAsset + '%</td></tr>'
     }
 
     $('#user_info_modal_assets_table tbody').empty().append(rows)
 
-    BRS.dataLoadFinished($('#user_info_modal_assets_table'))
+    dataLoadFinished($('#user_info_modal_assets_table'))
 }
