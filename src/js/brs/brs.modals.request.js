@@ -57,7 +57,7 @@ export function evGenerateQrButtonClick (e) {
     const fee = Number($('#request_burst_fee').val())
     let suggested_fee
     for (let i = 0; i < radio.length; i++) {
-        if (radio[i].checked == true) {
+        if (radio[i].checked === true) {
             suggested_fee = radio[i].value
         }
     }

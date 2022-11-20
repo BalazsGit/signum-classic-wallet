@@ -155,22 +155,22 @@ function userInfoModalAliases () {
                 }
             })
 
-            let alias_account_count = 0
-            let alias_uri_count = 0
-            let empty_alias_count = 0
+            // let alias_account_count = 0
+            // let alias_uri_count = 0
+            // let empty_alias_count = 0
             const alias_count = aliases.length
 
             for (let i = 0; i < alias_count; i++) {
                 const alias = aliases[i]
 
                 rows += "<tr data-alias='" + String(alias.aliasName).toLowerCase().escapeHTML() + "'><td class='alias'>" + String(alias.aliasName).escapeHTML() + "</td><td class='uri'>" + (alias.aliasURI.indexOf('http') === 0 ? "<a href='" + String(alias.aliasURI).escapeHTML() + "' target='_blank'>" + String(alias.aliasURI).escapeHTML() + '</a>' : String(alias.aliasURI).escapeHTML()) + '</td></tr>'
-                if (!alias.uri) {
-                    empty_alias_count++
-                } else if (alias.aliasURI.indexOf('http') === 0) {
-                    alias_uri_count++
-                } else if (alias.aliasURI.indexOf('acct:') === 0 || alias.aliasURI.indexOf('nacc:') === 0) {
-                    alias_account_count++
-                }
+                // if (!alias.uri) {
+                //     empty_alias_count++
+                // } else if (alias.aliasURI.indexOf('http') === 0) {
+                //     alias_uri_count++
+                // } else if (alias.aliasURI.indexOf('acct:') === 0 || alias.aliasURI.indexOf('nacc:') === 0) {
+                //     alias_account_count++
+                // }
             }
         }
 

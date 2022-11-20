@@ -37,7 +37,7 @@ export function getBlock (blockID, callback, pageRequest) {
     sendRequest('getBlock' + (pageRequest ? '+' : ''), {
         block: blockID
     }, function (response) {
-        if (response.errorCode && response.errorCode == -1) {
+        if (response.errorCode && response.errorCode === -1) {
             getBlock(blockID, callback, pageRequest)
         } else {
             if (callback) {
@@ -108,13 +108,13 @@ export function handleInitialBlocks (response) {
 export function handleNewBlocks (response) {
     if (BRS.downloadingBlockchain) {
         // new round started...
-        if (BRS.tempBlocks.length === 0 && BRS.state.lastBlock != response.block) {
+        if (BRS.tempBlocks.length === 0 && BRS.state.lastBlock !== response.block) {
             return
         }
     }
 
     // we have all blocks
-    if (response.height - 1 == BRS.lastBlockHeight || BRS.tempBlocks.length == 99) {
+    if (response.height - 1 === BRS.lastBlockHeight || BRS.tempBlocks.length === 99) {
         let newBlocks = []
 
         // there was only 1 new block (response)
@@ -213,9 +213,9 @@ export function incomingUpdateDashboardBlocks (newBlocks) {
         rows += "<tr><td><a href='#' data-block='" + String(block.height).escapeHTML() + "' data-blockid='" + String(block.block).escapeHTML() + "' class='block'" + (block.numberOfTransactions > 0 ? " style='font-weight:bold'" : '') + '>' + String(block.height).escapeHTML() + "</a></td><td data-timestamp='" + String(block.timestamp).escapeHTML() + "'>" + formatTimestamp(block.timestamp) + '</td><td>' + formatAmount(block.totalAmountNQT) + ' + ' + formatAmount(block.totalFeeNQT) + '</td><td>' + formatAmount(block.numberOfTransactions) + '</td></tr>'
     }
 
-    if (newBlockCount == 1) {
+    if (newBlockCount === 1) {
         $('#dashboard_blocks_table tbody tr:last').remove()
-    } else if (newBlockCount == 10) {
+    } else if (newBlockCount === 10) {
         $('#dashboard_blocks_table tbody').empty()
     } else {
         $('#dashboard_blocks_table tbody tr').slice(10 - newBlockCount).remove()
@@ -257,7 +257,7 @@ export function pagesBlocksForged () {
         account: BRS.account,
         timestamp: 0
     }, function (response) {
-        if (!response.blockIds || response.blockIds.length == 0) {
+        if (!response.blockIds || response.blockIds.length === 0) {
             blocksPageLoaded([])
             return
         }
@@ -278,7 +278,7 @@ export function pagesBlocksForged () {
                     nr: i
                 }
             }, function (block, input) {
-                if (BRS.currentPage != 'blocks_forged') {
+                if (BRS.currentPage !== 'blocks_forged') {
                     blocks = {}
                     return
                 }
@@ -287,7 +287,7 @@ export function pagesBlocksForged () {
                 blocks[input._extra.nr] = block
                 nrBlocks++
 
-                if (nrBlocks == blockIds.length) {
+                if (nrBlocks === blockIds.length) {
                     blocksPageLoaded(blocks)
                 }
             })
@@ -388,7 +388,7 @@ export function blocksPageLoaded (blocks) {
 
         totalTransactions += block.numberOfTransactions
 
-        rows += "<tr><td><a href='#' data-block='" + String(block.height).escapeHTML() + "' data-blockid='" + String(block.block).escapeHTML() + "' class='block'" + (block.numberOfTransactions > 0 ? " style='font-weight:bold'" : '') + '>' + String(block.height).escapeHTML() + '</a></td><td>' + formatTimestamp(block.timestamp) + '</td><td>' + formatAmount(block.totalAmountNQT) + '</td><td>' + formatAmount(block.totalFeeNQT) + '</td><td>' + formatAmount(block.numberOfTransactions) + '</td><td>' + (block.generator != BRS.genesis ? "<a href='#' data-user='" + getAccountFormatted(block, 'generator') + "' class='user_info'>" + getAccountTitle(block, 'generator') + '</a>' : $.t('genesis')) + '</td><td>' + formatVolume(block.payloadLength) + '</td><td>' + Math.round(block.baseTarget / 153722867 * 100).pad(4) + ' %</td></tr>'
+        rows += "<tr><td><a href='#' data-block='" + String(block.height).escapeHTML() + "' data-blockid='" + String(block.block).escapeHTML() + "' class='block'" + (block.numberOfTransactions > 0 ? " style='font-weight:bold'" : '') + '>' + String(block.height).escapeHTML() + '</a></td><td>' + formatTimestamp(block.timestamp) + '</td><td>' + formatAmount(block.totalAmountNQT) + '</td><td>' + formatAmount(block.totalFeeNQT) + '</td><td>' + formatAmount(block.numberOfTransactions) + '</td><td>' + (block.generator !== BRS.genesis ? "<a href='#' data-user='" + getAccountFormatted(block, 'generator') + "' class='user_info'>" + getAccountTitle(block, 'generator') + '</a>' : $.t('genesis')) + '</td><td>' + formatVolume(block.payloadLength) + '</td><td>' + Math.round(block.baseTarget / 153722867 * 100).pad(4) + ' %</td></tr>'
     }
 
     if (blocks.length) {
@@ -412,8 +412,8 @@ export function blocksPageLoaded (blocks) {
     averageFee = convertToNQT(averageFee)
     averageAmount = convertToNQT(averageAmount)
 
-    if (BRS.currentPage == 'blocks_forged') {
-        if (blocks.length == 100) {
+    if (BRS.currentPage === 'blocks_forged') {
+        if (blocks.length === 100) {
             blockCount = blocks.length + '+'
         } else {
             blockCount = blocks.length

@@ -296,7 +296,7 @@ export function getState (callback) {
 
     sendRequest('getBlockchainStatus', function (response) {
         if (response.errorCode) {
-            if (response.errorCode == -1) {
+            if (response.errorCode === -1) {
                 if (BRS.settings.automatic_node_selection) {
                     autoSelectServer()
                     return
@@ -403,7 +403,7 @@ export function logoSidebarClick (e, data) {
             currentActive.removeClass('active')
         }
 
-        if ($(this).attr('id') && $(this).attr('id') == 'logo') {
+        if ($(this).attr('id') && $(this).attr('id') === 'logo') {
             $('#dashboard_link').addClass('active')
         } else {
             $(this).parent().addClass('active')
@@ -636,7 +636,6 @@ export function clearData () {
         }
     }
 
-    let anwser
     if (BRS.databaseSupport) {
         if (window.confirm($.t('remove_contacts_bookmark_q'))) {
             BRS.database.drop('contacts', onDropped)
@@ -761,7 +760,7 @@ export function getAccountInfo (firstRun, callback) {
 
             if (response.assetBalances) {
                 for (let i = 0; i < response.assetBalances.length; i++) {
-                    if (response.assetBalances[i].balanceQNT != '0') {
+                    if (response.assetBalances[i].balanceQNT !== '0') {
                         nr_assets++
                     }
                 }
@@ -837,10 +836,10 @@ function checkAssetDifferences (current_balances, previous_balances) {
                 asset.difference = input._extra.difference
                 asset.asset = input._extra.asset
                 let quantity
-                if (asset.difference.charAt(0) != '-') {
+                if (asset.difference.charAt(0) !== '-') {
                     quantity = formatQuantity(asset.difference, asset.decimals)
 
-                    if (quantity != '0') {
+                    if (quantity !== '0') {
                         $.notify($.t('you_received_assets', {
                             asset: String(asset.asset).escapeHTML(),
                             name: String(asset.name).escapeHTML(),
@@ -926,7 +925,7 @@ export function checkIfOnAFork () {
 
         if (BRS.blocks && BRS.blocks.length >= 10) {
             for (let i = 0; i < 10; i++) {
-                if (BRS.blocks[i].generator != BRS.account) {
+                if (BRS.blocks[i].generator !== BRS.account) {
                     onAFork = false
                     break
                 }
@@ -960,11 +959,12 @@ export function showFeeSuggestions (input_fee_field_id, response_span_id, fee_id
                 e.preventDefault()
                 $(input_fee_field_id).val($(this).text())
                 if (fee_id === undefined) {
+                    // for modals with Total field trigger sendMoneyCalculateTotal
                     $(input_fee_field_id).trigger('change')
-                } /// / --> for modals with Total field trigger sendMoneyCalculateTotal
-                else {
+                } else {
+                    // for modals without Total field set Fee field
                     $(fee_id).html($(this).text() + ' ' + BRS.valueSuffix)
-                } /// --> for modals without Total field set Fee field
+                }
             })
         } else {
             $('#suggested_fee_response').html(response.errorDescription)

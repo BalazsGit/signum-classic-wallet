@@ -276,7 +276,7 @@ function loginWithPassphrase (passphrase) {
 
     checkSelectedNode()
 
-    if (!BRS.isTestNet && passphrase.length < 12 && $('#login_check_password_length').val() == 1) {
+    if (!BRS.isTestNet && passphrase.length < 12 && $('#login_check_password_length').val() === '1') {
         $('#login_check_password_length').val(0)
         $('#login_error .callout').html($.t('error_passphrase_login_length'))
         $('#login_error').show()

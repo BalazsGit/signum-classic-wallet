@@ -20,14 +20,14 @@ export function evAccountDetailsModalOnShowBsModal (e) {
 
     $('#account_details_modal_balance').show()
 
-    if (BRS.accountInfo.errorCode && BRS.accountInfo.errorCode != 5) {
+    if (BRS.accountInfo.errorCode && BRS.accountInfo.errorCode !== 5) {
         $('#account_balance_table').hide()
         // todo
         $('#account_balance_warning').html(String(BRS.accountInfo.errorDescription).escapeHTML()).show()
     } else {
         $('#account_balance_warning').hide()
 
-        if (BRS.accountInfo.errorCode && BRS.accountInfo.errorCode == 5) {
+        if (BRS.accountInfo.errorCode && BRS.accountInfo.errorCode === 5) {
             $('#account_balance_balance, #account_balance_unconfirmed_balance, #account_balance_effective_balance, #account_balance_guaranteed_balance').html('0 Signa')
             $('#account_balance_public_key').html(String(BRS.publicKey).escapeHTML())
             $('#account_balance_account_rs').html(String(BRS.accountRS).escapeHTML())

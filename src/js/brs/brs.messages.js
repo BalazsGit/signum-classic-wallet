@@ -68,7 +68,7 @@ export function pagesMessages (callback) {
     }, function (response) {
         if (response.transactions && response.transactions.length) {
             for (let i = 0; i < response.transactions.length; i++) {
-                const otherUser = (response.transactions[i].recipient == BRS.account ? response.transactions[i].sender : response.transactions[i].recipient)
+                const otherUser = (response.transactions[i].recipient === BRS.account ? response.transactions[i].sender : response.transactions[i].recipient)
 
                 if (!(otherUser in BRS._messages)) {
                     BRS._messages[otherUser] = []
@@ -97,7 +97,6 @@ function displayMessageSidebar (callback) {
     }
 
     let rows = ''
-    const menu = ''
 
     const sortedMessages = []
 
@@ -112,7 +111,7 @@ function displayMessageSidebar (callback) {
             }
         })
 
-        const otherUserRS = (otherUser == BRS._messages[otherUser][0].sender ? BRS._messages[otherUser][0].senderRS : BRS._messages[otherUser][0].recipientRS)
+        const otherUserRS = (otherUser === BRS._messages[otherUser][0].sender ? BRS._messages[otherUser][0].senderRS : BRS._messages[otherUser][0].recipientRS)
 
         sortedMessages.push({
             timestamp: BRS._messages[otherUser][BRS._messages[otherUser].length - 1].timestamp,
@@ -165,7 +164,7 @@ export function incomingMessages (transactions) {
         if (transactions.length) {
             for (let i = 0; i < transactions.length; i++) {
                 const trans = transactions[i]
-                if (!trans.unconfirmed && trans.type == 1 && trans.subtype == 0 && trans.senderRS != BRS.accountRS) {
+                if (!trans.unconfirmed && trans.type === 1 && trans.subtype === 0 && trans.senderRS !== BRS.accountRS) {
                     if (trans.height >= BRS.lastBlockHeight - 3 && !BRS._latestMessages[trans.transaction]) {
                         BRS._latestMessages[trans.transaction] = trans
                         $.notify($.t('you_received_message', {
@@ -177,7 +176,7 @@ export function incomingMessages (transactions) {
             }
         }
 
-        if (BRS.currentPage == 'messages') {
+        if (BRS.currentPage === 'messages') {
             loadPage('messages')
         }
     }
@@ -202,8 +201,6 @@ export function evMessagesSidebarClick (e) {
 
     const messages = BRS._messages[otherUser]
 
-    const sharedKey = null
-
     if (messages) {
         for (let i = 0; i < messages.length; i++) {
             let decoded = false
@@ -217,7 +214,7 @@ export function evMessagesSidebarClick (e) {
                     decoded = tryToDecryptMessage(messages[i])
                     extra = 'decrypted'
                 } catch (err) {
-                    if (err.errorCode && err.errorCode == 1) {
+                    if (err.errorCode && err.errorCode === 1) {
                         decoded = $.t('error_decryption_passphrase_required')
                         extra = 'to_decrypt'
                     } else {
@@ -247,10 +244,10 @@ export function evMessagesSidebarClick (e) {
                 }
                 decoded = String(decoded).escapeHTML().nl2br()
 
-                if (extra == 'to_decrypt') {
+                if (extra === 'to_decrypt') {
                     decoded = "<i class='fas fa-exclamation-triangle'></i> " + decoded
-                } else if (extra == 'decrypted') {
-                    if (type == 'payment') {
+                } else if (extra === 'decrypted') {
+                    if (type === 'payment') {
                         decoded = '<strong>+' + formatAmount(messages[i].amountNQT) + ' ' + BRS.valueSuffix + '</strong><br />' + decoded
                     }
 
@@ -263,12 +260,12 @@ export function evMessagesSidebarClick (e) {
 
             const day = formatTimestamp(messages[i].timestamp, true)
 
-            if (day != last_day) {
+            if (day !== last_day) {
                 output += '<dt><strong>' + day + '</strong></dt>'
                 last_day = day
             }
 
-            output += "<dd class='" + (messages[i].recipient == BRS.account ? 'from' : 'to') + (extra ? ' ' + extra : '') + "'><p>" + decoded + '</p></dd>'
+            output += "<dd class='" + (messages[i].recipient === BRS.account ? 'from' : 'to') + (extra ? ' ' + extra : '') + "'><p>" + decoded + '</p></dd>'
         }
     }
 
@@ -295,7 +292,7 @@ export function evMessagesSidebarClick (e) {
                 decoded = tryToDecryptMessage(unconfirmedTransaction)
                 extra = 'decrypted'
             } catch (err) {
-                if (err.errorCode && err.errorCode == 1) {
+                if (err.errorCode && err.errorCode === 1) {
                     decoded = $.t('error_decryption_passphrase_required')
                     extra = 'to_decrypt'
                 } else {
@@ -326,7 +323,7 @@ export function evMessagesSidebarClick (e) {
             decoded = $.t('message_empty')
         }
 
-        output += "<dd class='to tentative" + (extra ? ' ' + extra : '') + "'><p>" + (extra == 'to_decrypt' ? "<i class='fas fa-exclamation-triangle'></i> " : (extra == 'decrypted' ? "<i class='fas fa-lock'></i> " : '')) + String(decoded).escapeHTML().nl2br() + '</p></dd>'
+        output += "<dd class='to tentative" + (extra ? ' ' + extra : '') + "'><p>" + (extra === 'to_decrypt' ? "<i class='fas fa-exclamation-triangle'></i> " : (extra === 'decrypted' ? "<i class='fas fa-lock'></i> " : '')) + String(decoded).escapeHTML().nl2br() + '</p></dd>'
     }
 
     output += '</dl>'
@@ -343,13 +340,13 @@ export function evMessagesSidebarContextClick (e) {
 
     closeContextMenu()
 
-    if (option == 'add_contact') {
+    if (option === 'add_contact') {
         $('#add_contact_account_id').val(account).trigger('blur')
         $('#add_contact_modal').modal('show')
-    } else if (option == 'send_burst') {
+    } else if (option === 'send_burst') {
         $('#send_money_recipient').val(account).trigger('blur')
         $('#send_money_modal').modal('show')
-    } else if (option == 'account_info') {
+    } else if (option === 'account_info') {
         showAccountModal(account)
     }
 }
@@ -365,14 +362,14 @@ export function evInlineMessageFormSubmit (e) {
     }
 
     if (!BRS.rememberPassword) {
-        if ($('#inline_message_password').val() == '') {
+        if ($('#inline_message_password').val() === '') {
             $.notify($.t('error_passphrase_required'), { type: 'danger' })
             return
         }
 
         const accountId = getAccountId(data.secretPhrase)
 
-        if (accountId != BRS.account) {
+        if (accountId !== BRS.account) {
             $.notify($.t('error_passphrase_incorrect'), { type: 'danger' })
             return
         }
@@ -448,7 +445,7 @@ export function formsSendMessageComplete (response, data) {
         })
     }
 
-    if (BRS.currentPage == 'messages') {
+    if (BRS.currentPage === 'messages') {
         const date = new Date(Date.UTC(2013, 10, 24, 12, 0, 0, 0)).getTime()
 
         const now = parseInt(((new Date().getTime()) - date) / 1000, 10)
@@ -474,7 +471,7 @@ export function formsSendMessageComplete (response, data) {
 
             let extra = ''
 
-            if (accountTitle != data.recipient) {
+            if (accountTitle !== data.recipient) {
                 extra = " data-context='messages_sidebar_update_context'"
             }
 

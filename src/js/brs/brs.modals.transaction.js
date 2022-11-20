@@ -78,7 +78,7 @@ function processTransactionModalData (transaction) {
     function processInfoDetails () {
         const transactionDetails = $.extend({}, transaction)
         delete transactionDetails.attachment
-        if (transactionDetails.referencedTransaction == '0') {
+        if (/^0+$/.test(transactionDetails.referencedTransaction)) {
             delete transactionDetails.referencedTransaction
         }
         delete transactionDetails.transaction
@@ -258,7 +258,7 @@ function processTransactionModalData (transaction) {
                         burst: formatAmount(transaction.attachment.priceNQT)
                     }) + " <a href='#' data-alias='" + String(transaction.attachment.alias).escapeHTML() + "' data-toggle='modal' data-target='#buy_alias_modal'>" + $.t('buy_it_q') + '</a>'
                 } else if (transaction.senderRS === BRS.accountRS) {
-                    if (transaction.attachment.priceNQT != '0') {
+                    if (transaction.attachment.priceNQT !== '0') {
                         message = $.t('your_alias_sale_offer') + " <a href='#' data-alias='" + String(transaction.attachment.alias).escapeHTML() + "' data-toggle='modal' data-target='#cancel_alias_sale_modal'>" + $.t('cancel_sale_q') + '</a>'
                     }
                 } else {
@@ -409,11 +409,11 @@ function processTransactionModalData (transaction) {
                 if (foundAsset2) {
                     data.distributingAsset_formatted_html = getAssetLink(foundAsset2)
                     data.distributingQuantity = convertToQNTf(data.distributingQuantity, foundAsset2.decimals) + ' ' + foundAsset2.name
-                    if (userQuantity != 0) {
+                    if (userQuantity !== '0') {
                         data.quantityToYou = convertToQNTf(userQuantity, foundAsset2.decimals) + ' ' + foundAsset2.name
                     }
                 } else {
-                    if (userQuantity != 0) {
+                    if (userQuantity !== '0') {
                         data.quantityToYou = convertToQNTf(userQuantity, '0') + ' [QNT]'
                     }
                 }
@@ -521,7 +521,7 @@ function processTransactionModalData (transaction) {
             }, function (purchase) {
                 let callout = ''
                 if (purchase.errorCode) {
-                    if (purchase.errorCode == 4) {
+                    if (purchase.errorCode === 4) {
                         callout = $.t('incorrect_purchase')
                     } else {
                         callout = String(purchase.errorDescription).escapeHTML()
@@ -609,7 +609,7 @@ function processTransactionModalData (transaction) {
                 data.item_name = goods.name
                 data.price = purchase.priceNQT
                 data.quantity_formatted_html = format(purchase.quantity)
-                if (purchase.quantity != '1') {
+                if (purchase.quantity !== 1) {
                     const orderTotal = formatAmount(new BigInteger(String(purchase.quantity)).multiply(new BigInteger(String(purchase.priceNQT))))
                     data.total_formatted_html = orderTotal + ' ' + BRS.valueSuffix
                 }

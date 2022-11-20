@@ -211,7 +211,7 @@ export function processAjaxRequest (requestType, data, callback, async) {
     let type = (('secretPhrase' in data) || (data.broadcast === 'false')) ? 'POST' : 'GET'
     const url = BRS.server + '/burst?requestType=' + requestType
 
-    if (type == 'GET') {
+    if (type === 'GET') {
         // It’s challenging to manage caching in XMLHttpRequest.
         // Appending a random query string value to bypass the browser cache.
         data._ = $.now()
@@ -220,7 +220,7 @@ export function processAjaxRequest (requestType, data, callback, async) {
     let secretPhrase = ''
 
     // unknown account..
-    if (type == 'POST' && (BRS.accountInfo.errorCode && BRS.accountInfo.errorCode == 5)) {
+    if (type === 'POST' && (BRS.accountInfo.errorCode && BRS.accountInfo.errorCode === 5)) {
         if (callback) {
             callback({
                 errorCode: 2,
@@ -247,7 +247,7 @@ export function processAjaxRequest (requestType, data, callback, async) {
         }
     }
 
-    if (type == 'POST') {
+    if (type === 'POST') {
         if (BRS.rememberPassword) {
             secretPhrase = BRS._password
         } else {
@@ -272,16 +272,16 @@ export function processAjaxRequest (requestType, data, callback, async) {
     $.support.cors = true
 
     let ajaxCall = $.ajax
-    if (type == 'GET') {
+    if (type === 'GET') {
         ajaxCall = BRS.multiQueue.queue
     }
 
-    if (requestType == 'broadcastTransaction') {
+    if (requestType === 'broadcastTransaction') {
         type = 'POST'
     }
 
     async = (async === undefined ? true : async)
-    if (async === false && type == 'GET') {
+    if (async === false && type === 'GET') {
         const client = new XMLHttpRequest()
         client.open('GET', url + '&' + $.param(data), false)
         client.setRequestHeader('Content-Type', 'text/plain;charset=UTF-8')
@@ -301,7 +301,7 @@ export function processAjaxRequest (requestType, data, callback, async) {
         async: true,
         currentPage,
         currentSubPage,
-        shouldRetry: (type == 'GET' ? 2 : undefined),
+        shouldRetry: (type === 'GET' ? 2 : undefined),
         data
     }).done(function (response, status, xhr) {
         if (BRS.console) {
@@ -338,7 +338,7 @@ export function processAjaxRequest (requestType, data, callback, async) {
                 }
                 return
             }
-            if (data.broadcast == 'false') {
+            if (data.broadcast === 'false') {
                 response.transactionBytes = payload
                 showRawTransactionModal(response)
                 return
@@ -379,17 +379,17 @@ export function processAjaxRequest (requestType, data, callback, async) {
             addToConsole(this.url, this.type, this.data, error, true)
         }
 
-        if ((error == 'error' || textStatus == 'error') && (xhr.status == 404 || xhr.status === 0)) {
-            if (type == 'POST') {
+        if ((error === 'error' || textStatus === 'error') && (xhr.status === 404 || xhr.status === 0)) {
+            if (type === 'POST') {
                 $.notify($.t('error_server_connect'), { type: 'danger' })
             }
         }
 
-        if (error == 'abort') {
+        if (error === 'abort') {
             return
         }
         if (callback) {
-            if (error == 'timeout') {
+            if (error === 'timeout') {
                 error = $.t('error_request_timeout')
             }
             callback({
@@ -435,7 +435,7 @@ export function verifyAndSignTransactionBytes (transactionBytes, signature, requ
         transaction.amountNQT = String(converters.byteArrayToBigInteger(byteArray, 48))
         transaction.feeNQT = String(converters.byteArrayToBigInteger(byteArray, 56))
         transaction.referencedTransactionFullHash = converters.byteArrayToHexString(byteArray.slice(64, 96))
-        if (transaction.referencedTransactionFullHash == '0000000000000000000000000000000000000000000000000000000000000000') {
+        if (/^0+$/.test(transaction.referencedTransactionFullHash)) {
             transaction.referencedTransactionFullHash = ''
         }
         transaction.flags = 0
@@ -464,7 +464,7 @@ export function verifyAndSignTransactionBytes (transactionBytes, signature, requ
     }
 
     function checkBaseTransaction () {
-        if (transaction.publicKey != BRS.accountInfo.publicKey ||
+        if (transaction.publicKey !== BRS.accountInfo.publicKey ||
                 transaction.deadline !== data.deadline ||
                 transaction.feeNQT !== data.feeNQT ||
                 transaction.version === 0 ||
@@ -474,7 +474,7 @@ export function verifyAndSignTransactionBytes (transactionBytes, signature, requ
         }
         if (transaction.recipient !== data.recipient) {
             const requestTypeWithoutRecipientInData = ['buyAlias']
-            if (requestTypeWithoutRecipientInData.indexOf(requestType) == -1) {
+            if (requestTypeWithoutRecipientInData.indexOf(requestType) === -1) {
                 return ERROR
             }
         }
@@ -837,7 +837,7 @@ export function verifyAndSignTransactionBytes (transactionBytes, signature, requ
         }
         pos += messageLength
         const messageIsText = (transaction.messageIsText ? 'true' : 'false')
-        if (messageIsText != data.messageIsText) {
+        if (messageIsText !== data.messageIsText) {
             return ERROR
         }
         if (transaction.message !== data.message) {
@@ -869,7 +869,7 @@ export function verifyAndSignTransactionBytes (transactionBytes, signature, requ
         transaction.encryptedMessageNonce = converters.byteArrayToHexString(byteArray.slice(pos, pos + 32))
         pos += 32
         const messageToEncryptIsText = (transaction.messageToEncryptIsText ? 'true' : 'false')
-        if (messageToEncryptIsText != data.messageToEncryptIsText) {
+        if (messageToEncryptIsText !== data.messageToEncryptIsText) {
             return ERROR
         }
         if (transaction.encryptedMessageData !== data.encryptedMessageData ||
@@ -892,7 +892,7 @@ export function verifyAndSignTransactionBytes (transactionBytes, signature, requ
         }
         const recipientPublicKey = converters.byteArrayToHexString(byteArray.slice(pos, pos + 32))
         pos += 32
-        if (recipientPublicKey != data.recipientPublicKey) {
+        if (recipientPublicKey !== data.recipientPublicKey) {
             return ERROR
         }
         return SUCCESS
@@ -920,7 +920,7 @@ export function verifyAndSignTransactionBytes (transactionBytes, signature, requ
         transaction.encryptToSelfMessageNonce = converters.byteArrayToHexString(byteArray.slice(pos, pos + 32))
         pos += 32
         const messageToEncryptToSelfIsText = (transaction.messageToEncryptToSelfIsText ? 'true' : 'false')
-        if (messageToEncryptToSelfIsText != data.messageToEncryptToSelfIsText) {
+        if (messageToEncryptToSelfIsText !== data.messageToEncryptToSelfIsText) {
             return ERROR
         }
         if (transaction.encryptToSelfMessageData !== data.encryptToSelfMessageData ||
@@ -978,7 +978,7 @@ export function broadcastTransactionBytes (transactionData, callback, originalRe
         }
 
         if (callback) {
-            if (error == 'timeout') {
+            if (error === 'timeout') {
                 error = $.t('error_request_timeout')
             }
             callback({

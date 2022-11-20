@@ -188,16 +188,16 @@ export function handleIncomingTransactions (transactions, confirmedTransactionId
     if (confirmedTransactionIds.length || BRS.unconfirmedTransactionsChange) {
         transactions.sort(sortArray)
 
-        BRS.incoming.updateDashboardTransactions(transactions, confirmedTransactionIds.length == 0)
+        BRS.incoming.updateDashboardTransactions(transactions, confirmedTransactionIds.length === 0)
     }
 
     // always refresh peers and unconfirmed transactions..
-    if (BRS.currentPage == 'peers') {
+    if (BRS.currentPage === 'peers') {
         BRS.incoming.peers()
-    } else if (BRS.currentPage == 'transactions' && BRS.transactionsPageType == 'unconfirmed') {
+    } else if (BRS.currentPage === 'transactions' && BRS.transactionsPageType === 'unconfirmed') {
         BRS.incoming.transactions()
     } else {
-        if (BRS.currentPage != 'messages' && (!oldBlock || BRS.unconfirmedTransactionsChange)) {
+        if (BRS.currentPage !== 'messages' && (!oldBlock || BRS.unconfirmedTransactionsChange)) {
             if (BRS.incoming[BRS.currentPage]) {
                 BRS.incoming[BRS.currentPage](transactions)
             }
@@ -261,7 +261,7 @@ export function addUnconfirmedTransaction (transactionId, callback) {
                     alreadyProcessed = true
                 } else {
                     $.each(BRS.unconfirmedTransactions, function (key, unconfirmedTransaction) {
-                        if (unconfirmedTransaction.transaction == transactionId) {
+                        if (unconfirmedTransaction.transaction === transactionId) {
                             alreadyProcessed = true
                             return false
                         }
@@ -313,7 +313,7 @@ export function pagesTransactions () {
         return
     }
 
-    if (BRS.transactionsPageType == 'unconfirmed') {
+    if (BRS.transactionsPageType === 'unconfirmed') {
         displayUnconfirmedTransactions(account)
         return
     }
@@ -335,7 +335,7 @@ export function pagesTransactions () {
         unconfirmedTransactions = BRS.unconfirmedTransactions
     }
 
-    if (unconfirmedTransactions && BRS.pageNumber == 1) {
+    if (unconfirmedTransactions && BRS.pageNumber === 1) {
         rows = unconfirmedTransactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr, account), '')
     }
 
@@ -382,9 +382,9 @@ export function getTransactionDetails (transaction, viewingAccount) {
     }
 
     let nameOfTransaction = $.t('unknown')
-    let toFromViewer = (transaction.sender == viewingAccount || transaction.recipient == viewingAccount)
+    let toFromViewer = (transaction.sender === viewingAccount || transaction.recipient === viewingAccount)
     let senderOrRecipientOrMultiple = 'sender'
-    if (toFromViewer && transaction.sender == viewingAccount) {
+    if (toFromViewer && transaction.sender === viewingAccount) {
         senderOrRecipientOrMultiple = 'recipient'
     }
     let amountToFromViewer = transaction.amountNQT
@@ -405,7 +405,7 @@ export function getTransactionDetails (transaction, viewingAccount) {
             break
         case 1:
             nameOfTransaction = $.t('multi_out_payment')
-            if (transaction.sender == viewingAccount) {
+            if (transaction.sender === viewingAccount) {
                 senderOrRecipientOrMultiple = 'multiple'
                 break
             }
@@ -428,7 +428,7 @@ export function getTransactionDetails (transaction, viewingAccount) {
             break
         case 2:
             nameOfTransaction = $.t('multi_out_same_payment')
-            if (transaction.sender == viewingAccount) {
+            if (transaction.sender === viewingAccount) {
                 senderOrRecipientOrMultiple = 'multiple'
             }
 
@@ -465,7 +465,7 @@ export function getTransactionDetails (transaction, viewingAccount) {
             senderOrRecipientOrMultiple = 'sender'
             break
         case 6:
-            if (transaction.attachment.priceNQT == '0') {
+            if (transaction.attachment.priceNQT === '0') {
                 if (transaction.sender === transaction.recipient) {
                     nameOfTransaction = $.t('alias_sale_cancellation')
                 } else {
@@ -535,7 +535,7 @@ export function getTransactionDetails (transaction, viewingAccount) {
             // Assuming yes, because it will be wrong only in unconfirmed transaction.
             toFromViewer = true
             senderOrRecipientOrMultiple = 'sender'
-            if (transaction.sender != viewingAccount) {
+            if (transaction.sender !== viewingAccount) {
                 // amount is unknow only if current user is in recipient list
                 amountToFromViewerHTML = '(' + amountToFromViewerHTML + ')'
             } else {
@@ -658,7 +658,7 @@ export function getTransactionDetails (transaction, viewingAccount) {
     if (transaction.attachment) {
         if (transaction.attachment.encryptedMessage || transaction.attachment.message) {
             hasMessage = true
-        } else if (transaction.sender == viewingAccount && transaction.attachment.encryptToSelfMessage) {
+        } else if (transaction.sender === viewingAccount && transaction.attachment.encryptToSelfMessage) {
             hasMessage = true
         }
     }
@@ -745,7 +745,7 @@ export function evTransactionsPageTypeClick (e) {
 
     if (!type) {
         BRS.transactionsPageType = null
-    } else if (type == 'unconfirmed') {
+    } else if (type === 'unconfirmed') {
         BRS.transactionsPageType = 'unconfirmed'
     } else {
         type = type.split(':')

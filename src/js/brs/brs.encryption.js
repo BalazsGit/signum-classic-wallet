@@ -313,7 +313,7 @@ export function tryToDecryptMessage (message) {
     }
     return decryptNote(message.attachment.encryptedMessage.data, {
         nonce: message.attachment.encryptedMessage.nonce,
-        account: (message.recipient == BRS.account ? message.sender : message.recipient)
+        account: (message.recipient === BRS.account ? message.sender : message.recipient)
     })
 }
 
@@ -361,7 +361,7 @@ export function tryToDecrypt (transaction, fields, account, options) {
             let nonce = ''
             const nonceField = (typeof title !== 'string' ? title.nonce : key + 'Nonce')
 
-            if (key == 'encryptedMessage' || key == 'encryptToSelfMessage') {
+            if (key === 'encryptedMessage' || key === 'encryptToSelfMessage') {
                 encrypted = transaction.attachment[key].data
                 nonce = transaction.attachment[key].nonce
             } else if (transaction.attachment && transaction.attachment[key]) {
@@ -392,8 +392,7 @@ export function tryToDecrypt (transaction, fields, account, options) {
                         account: destinationAccount
                     })
                 } catch (err) {
-                    const mesage = String(err.message ? err.message : err)
-                    if (err.errorCode && err.errorCode == 1) {
+                    if (err.errorCode && err.errorCode === 1) {
                         showDecryptionForm = true
                         return false
                     } else {
@@ -465,7 +464,7 @@ export function decryptNoteFormSubmit () {
     }
 
     const accountId = getAccountId(password)
-    if (accountId != BRS.account) {
+    if (accountId !== BRS.account) {
         $form.find('.callout').html($.t('error_incorrect_passphrase')).show()
         return
     }
@@ -478,8 +477,6 @@ export function decryptNoteFormSubmit () {
     let decryptionError = false
     const decryptedFields = {}
 
-    const inAttachment = ('attachment' in BRS._encryptedNote.transaction)
-
     const nrFields = Object.keys(BRS._encryptedNote.fields).length
 
     $.each(BRS._encryptedNote.fields, function (key, title) {
@@ -489,7 +486,7 @@ export function decryptNoteFormSubmit () {
         let nonce = ''
         const nonceField = (typeof title !== 'string' ? title.nonce : key + 'Nonce')
 
-        if (key == 'encryptedMessage' || key == 'encryptToSelfMessage') {
+        if (key === 'encryptedMessage' || key === 'encryptToSelfMessage') {
             encrypted = BRS._encryptedNote.transaction.attachment[key].data
             nonce = BRS._encryptedNote.transaction.attachment[key].nonce
         } else if (BRS._encryptedNote.transaction.attachment && BRS._encryptedNote.transaction.attachment[key]) {
@@ -567,7 +564,7 @@ export function decryptAllMessages (messages, password) {
         }
     } else {
         const accountId = getAccountId(password)
-        if (accountId != BRS.account) {
+        if (accountId !== BRS.account) {
             throw {
                 message: $.t('error_incorrect_passphrase'),
                 errorCode: 2
@@ -583,7 +580,7 @@ export function decryptAllMessages (messages, password) {
 
         if (message.attachment.encryptedMessage && !BRS._decryptedTransactions[message.transaction]) {
             try {
-                const otherUser = (message.sender == BRS.account ? message.recipient : message.sender)
+                const otherUser = (message.sender === BRS.account ? message.recipient : message.sender)
 
                 const decoded = decryptNote(message.attachment.encryptedMessage.data, {
                     nonce: message.attachment.encryptedMessage.nonce,
@@ -681,7 +678,7 @@ function aesEncrypt (plaintext, options) {
 }
 
 function aesDecrypt (ivCiphertext, options) {
-    if (ivCiphertext.length < 16 || ivCiphertext.length % 16 != 0) {
+    if (ivCiphertext.length < 16 || ivCiphertext.length % 16 !== 0) {
         throw {
             name: 'invalid ciphertext'
         }

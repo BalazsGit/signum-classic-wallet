@@ -69,7 +69,6 @@ import {
 import {
     convertToNQT,
     formatAmount,
-    getAccountFormatted,
     FnTree
 } from './brs.util'
 
@@ -368,7 +367,7 @@ export function addEventListeners () {
         e.preventDefault()
         const groupName = BRS.selectedContext.data('groupname')
         const option = $(this).data('option')
-        if (option == 'change_group_name') {
+        if (option === 'change_group_name') {
             $('#asset_exchange_change_group_name_old_display').html(groupName.escapeHTML())
             $('#asset_exchange_change_group_name_old').val(groupName)
             $('#asset_exchange_change_group_name_new').val('')
@@ -378,7 +377,7 @@ export function addEventListeners () {
     $('#asset_exchange_sidebar_context').on('click', 'a', evAssetExchangeSidebarContextClick)
     $('#asset_exchange_group_group').on('change', function () {
         const value = $(this).val()
-        if (value == -1) {
+        if (value === '-1') {
             $('#asset_exchange_group_new_group_div').show()
         } else {
             $('#asset_exchange_group_new_group_div').hide()
@@ -400,7 +399,7 @@ export function addEventListeners () {
         const $invoker = $(e.relatedTarget)
         const orderType = $invoker.data('type')
         const orderId = $invoker.data('order')
-        if (orderType == 'bid') {
+        if (orderType === 'bid') {
             $('#cancel_order_type').val('cancelBidOrder')
         } else {
             $('#cancel_order_type').val('cancelAskOrder')
@@ -424,12 +423,11 @@ export function addEventListeners () {
     $('#messages_sidebar_context').on('click', 'a', evMessagesSidebarContextClick)
     $('#messages_sidebar_update_context').on('click', 'a', function (e) {
         e.preventDefault()
-        const account = getAccountFormatted(BRS.selectedContext.data('account'))
         const option = $(this).data('option')
         closeContextMenu()
-        if (option == 'update_contact') {
+        if (option === 'update_contact') {
             $('#update_contact_modal').modal('show')
-        } else if (option == 'send_burst') {
+        } else if (option === 'send_burst') {
             $('#send_money_recipient').val(BRS.selectedContext.data('contact')).trigger('blur')
             $('#send_money_modal').modal('show')
         }
@@ -726,7 +724,7 @@ export function addEventListeners () {
     $('#request_burst_amount').change(function () {
         const amount = Number($('#request_burst_amount').val())
         $('#request_burst_amount').val(amount)
-        if (amount >= 0.00000001 || (!$('#request_burst_immutable').is(':checked') && (!amount || amount == 0))) {
+        if (amount >= 0.00000001 || (!$('#request_burst_immutable').is(':checked') && (!amount || amount === 0))) {
             $('#request_burst_amount_div').toggleClass('has-error', false)
             $('#request_burst_amount_div').toggleClass('has-success', true)
         } else {
@@ -760,7 +758,7 @@ export function addEventListeners () {
                 $('#request_burst_amount_div').toggleClass('has-error', true)
             }
         } else {
-            if (amount >= 0.00000001 || (!amount || amount == 0)) {
+            if (amount >= 0.00000001 || (!amount || amount === 0)) {
                 $('#request_burst_amount_div').toggleClass('has-error', false)
                 $('#request_burst_amount_div').toggleClass('has-success', true)
             } else {

@@ -17,7 +17,7 @@ import {
 
 export function pagesSettings () {
     for (const key in BRS.settings) {
-        if (/_warning/i.test(key) && key != 'asset_transfer_warning') {
+        if (/_warning/i.test(key) && key !== 'asset_transfer_warning') {
             if ($('#settings_' + key).length) {
                 $('#settings_' + key).val(convertToNXT(BRS.settings[key]))
             }
@@ -58,7 +58,7 @@ export function getSettings () {
 }
 
 function applySettings (key) {
-    if (!key || key == 'language') {
+    if (!key || key === 'language') {
         $.i18n.setLng(BRS.settings.language, null, function () {
             $('[data-i18n]').i18n()
         })
@@ -70,7 +70,7 @@ function applySettings (key) {
         }
     }
 
-    if (!key || key == 'submit_on_enter') {
+    if (!key || key === 'submit_on_enter') {
         if (BRS.settings.submit_on_enter) {
             $(".modal form:not('#decrypt_note_form_container')").on('submit.onEnter', function (e) {
                 e.preventDefault()
@@ -83,7 +83,7 @@ function applySettings (key) {
         }
     }
 
-    if (!key || key == 'console_log') {
+    if (!key || key === 'console_log') {
         if (BRS.inApp) {
             $('#show_console').hide()
         } else {
@@ -95,7 +95,7 @@ function applySettings (key) {
         }
     }
 
-    if (!key || key == 'automatic_node_selection') {
+    if (!key || key === 'automatic_node_selection') {
         if (BRS.settings.automatic_node_selection) {
             $('#automatic_node_selection').prop('checked', true)
             $('#prefered_node').val(BRS.server)
@@ -107,18 +107,18 @@ function applySettings (key) {
         }
     }
 
-    if (!key || key == 'page_size') {
+    if (!key || key === 'page_size') {
         BRS.pageSize = Number(BRS.settings.page_size)
     }
 
-    if (key == '24_hour_format') {
+    if (key === '24_hour_format') {
         const $dashboard_dates = $('#dashboard_transactions_table a[data-timestamp], #dashboard_blocks_table td[data-timestamp]')
         $.each($dashboard_dates, function (key, value) {
             $(this).html(formatTimestamp($(this).data('timestamp')))
         })
     }
 
-    if (!key || key == 'remember_passphrase') {
+    if (!key || key === 'remember_passphrase') {
         if (BRS.settings.remember_passphrase) {
             $('#remember_password').prop('checked', true)
         } else {
@@ -126,7 +126,7 @@ function applySettings (key) {
         }
     }
 
-    if (!key || key == 'remember_account') {
+    if (!key || key === 'remember_account') {
         if (BRS.settings.remember_account) {
             $('#remember_account').prop('checked', true)
             $('#login_account').val(BRS.settings.remember_account_account)

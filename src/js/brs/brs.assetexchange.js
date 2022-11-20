@@ -407,21 +407,21 @@ function loadAssetExchangeSidebar (callback) {
     let isClosedGroup = false
 
     const isSearch = BRS.assetSearch !== false
-    let searchResults = 0
+    // let searchResults = 0
 
     for (const asset of bookmarkedAssets) {
         if (isSearch) {
-            if (BRS.assetSearch.indexOf(asset.asset) == -1) {
+            if (BRS.assetSearch.indexOf(asset.asset) === -1) {
                 continue
-            } else {
-                searchResults++
+            // } else {
+            //     searchResults++
             }
         }
 
-        if (asset.groupName != lastGroup) {
+        if (asset.groupName !== lastGroup) {
             const to_check = (asset.groupName ? asset.groupName : 'undefined')
 
-            if (BRS.closedGroups.indexOf(to_check) != -1) {
+            if (BRS.closedGroups.indexOf(to_check) !== -1) {
                 isClosedGroup = true
             } else {
                 isClosedGroup = false
@@ -429,7 +429,7 @@ function loadAssetExchangeSidebar (callback) {
 
             if (asset.groupName) {
                 ungrouped = false
-                rows += "<a href='#' class='list-group-item list-group-item-header" + (asset.groupName == 'Ignore List' ? ' no-context' : '') + "'" + (asset.groupName != 'Ignore List' ? " data-context='asset_exchange_sidebar_group_context' " : "data-context=''") + " data-groupname='" + asset.groupName.escapeHTML() + "' data-closed='" + isClosedGroup + "'><h4 class='list-group-item-heading'>" + asset.groupName.escapeHTML() + "<i class='fas pull-right fa-angle-" + (isClosedGroup ? 'right' : 'down') + "'></i></h4></a>"
+                rows += "<a href='#' class='list-group-item list-group-item-header" + (asset.groupName === 'Ignore List' ? ' no-context' : '') + "'" + (asset.groupName !== 'Ignore List' ? " data-context='asset_exchange_sidebar_group_context' " : "data-context=''") + " data-groupname='" + asset.groupName.escapeHTML() + "' data-closed='" + isClosedGroup + "'><h4 class='list-group-item-heading'>" + asset.groupName.escapeHTML() + "<i class='fas pull-right fa-angle-" + (isClosedGroup ? 'right' : 'down') + "'></i></h4></a>"
             } else {
                 ungrouped = true
                 rows += "<a href='#' class='list-group-item list-group-item-header no-context' data-closed='" + isClosedGroup + "'><h4 class='list-group-item-heading'>UNGROUPED <i class='fa pull-right fa-angle-" + (isClosedGroup ? 'right' : 'down') + "'></i></h4></a>"
@@ -464,10 +464,10 @@ function loadAssetExchangeSidebar (callback) {
     $('#asset_exchange_sidebar_search').show()
 
     if (isSearch) {
-        if (active && BRS.assetSearch.indexOf(active) != -1) {
+        if (active && BRS.assetSearch.indexOf(active) !== -1) {
             // check if currently selected asset is in search results, if so keep it at that
             $('#asset_exchange_sidebar a[data-asset=' + active + ']').addClass('active')
-        } else if (BRS.assetSearch.length == 1) {
+        } else if (BRS.assetSearch.length === 1) {
             // if there is only 1 search result, click it
             $('#asset_exchange_sidebar a[data-asset=' + BRS.assetSearch[0] + ']').addClass('active').trigger('click')
         }
@@ -561,7 +561,7 @@ export function evAssetExchangeSidebarClick (e, data) {
         sendRequest('getAsset+', {
             asset: BRS.currentAssetID
         }, function (response) {
-            if (!response.errorCode && response.asset == BRS.currentAssetID) {
+            if (!response.errorCode && response.asset === BRS.currentAssetID) {
                 loadAsset(response, true, false)
             }
         })
@@ -622,7 +622,7 @@ function loadAsset (asset, refreshHTML, refreshAsset) {
         let nrDuplicates = 0
 
         $.each(BRS.assets, function (key, singleAsset) {
-            if (String(singleAsset.name) == String(asset.name) && singleAsset.asset != assetId) {
+            if (String(singleAsset.name) === String(asset.name) && singleAsset.asset !== assetId) {
                 nrDuplicates++
             }
         })
@@ -656,7 +656,7 @@ function loadAsset (asset, refreshHTML, refreshAsset) {
         })
     }
 
-    if (BRS.accountInfo.unconfirmedBalanceNQT == '0') {
+    if (BRS.accountInfo.unconfirmedBalanceNQT === '0') {
         $('#your_burst_balance').html('0')
         $('#buy_automatic_price').addClass('zero').removeClass('nonzero')
     } else {
@@ -668,10 +668,10 @@ function loadAsset (asset, refreshHTML, refreshAsset) {
         for (let i = 0; i < BRS.accountInfo.unconfirmedAssetBalances.length; i++) {
             const balance = BRS.accountInfo.unconfirmedAssetBalances[i]
 
-            if (balance.asset == assetId) {
+            if (balance.asset === assetId) {
                 BRS.currentAsset.yourBalanceNQT = balance.unconfirmedBalanceQNT
                 $('#your_asset_balance').html(formatQuantity(balance.unconfirmedBalanceQNT, BRS.currentAsset.decimals))
-                if (balance.unconfirmedBalanceQNT == '0') {
+                if (balance.unconfirmedBalanceQNT === '0') {
                     $('#sell_automatic_price').addClass('zero').removeClass('nonzero')
                 } else {
                     $('#sell_automatic_price').addClass('nonzero').removeClass('zero')
@@ -761,7 +761,7 @@ function loadAssetOrders (type, assetId, refresh) {
                 const unconfirmedTransaction = BRS.unconfirmedTransactions[i]
                 unconfirmedTransaction.order = unconfirmedTransaction.transaction
 
-                if (unconfirmedTransaction.type == 2 && (type == 'ask' ? unconfirmedTransaction.subtype == 2 : unconfirmedTransaction.subtype == 3) && unconfirmedTransaction.asset == assetId) {
+                if (unconfirmedTransaction.type === 2 && (type === 'ask' ? unconfirmedTransaction.subtype === 2 : unconfirmedTransaction.subtype === 3) && unconfirmedTransaction.asset === assetId) {
                     orders.push($.extend(true, {}, unconfirmedTransaction)) // make sure it's a deep copy
                     added = true
                 }
@@ -769,7 +769,7 @@ function loadAssetOrders (type, assetId, refresh) {
 
             if (added) {
                 orders.sort(function (a, b) {
-                    if (type == 'ask') {
+                    if (type === 'ask') {
                         // lowest price at the top
                         return new BigInteger(a.priceNQT).compareTo(new BigInteger(b.priceNQT))
                     } else {
@@ -789,7 +789,7 @@ function loadAssetOrders (type, assetId, refresh) {
             dataLoadFinished($(`#asset_exchange_${type}_orders_table`), !refresh)
             return
         }
-        $(`#${typeAction}_orders_count`).html('(' + orders.length + (orders.length == 50 ? '+' : '') + ')')
+        $(`#${typeAction}_orders_count`).html('(' + orders.length + (orders.length === 50 ? '+' : '') + ')')
 
         let rows = ''
         let first = true
@@ -802,7 +802,7 @@ function loadAssetOrders (type, assetId, refresh) {
                 $(`#${typeAction}_asset_price`).val(calculateOrderPricePerWholeQNT(order.priceNQT, BRS.currentAsset.decimals))
             }
 
-            const className = (order.account == BRS.account ? 'your-order' : '') + (order.unconfirmed ? ' tentative' : (isUserCancelledOrder(order) ? ' tentative tentative-crossed' : ''))
+            const className = (order.account === BRS.account ? 'your-order' : '') + (order.unconfirmed ? ' tentative' : (isUserCancelledOrder(order) ? ' tentative tentative-crossed' : ''))
 
             let accountHTML = ''
             if (order.unconfirmed) {
@@ -811,7 +811,7 @@ function loadAssetOrders (type, assetId, refresh) {
                 accountHTML = `<strong>${$.t('you')}</strong>`
             } else {
                 accountHTML = "<a href='#' data-user='" + getAccountFormatted(order, 'account') + "' class='user_info'>"
-                if (order.account == BRS.currentAsset.account) {
+                if (order.account === BRS.currentAsset.account) {
                     accountHTML += $.t('asset_issuer')
                 } else {
                     accountHTML += getAccountTitle(order, 'account')
@@ -846,7 +846,7 @@ function isUserCancelledOrder (order) {
         for (let i = 0; i < BRS.unconfirmedTransactions.length; i++) {
             const unconfirmedTransaction = BRS.unconfirmedTransactions[i]
 
-            if (unconfirmedTransaction.type == 2 && (order.type == 'ask' ? unconfirmedTransaction.subtype == 4 : unconfirmedTransaction.subtype == 5) && unconfirmedTransaction.attachment.order == order.order) {
+            if (unconfirmedTransaction.type === 2 && (order.type === 'ask' ? unconfirmedTransaction.subtype === 4 : unconfirmedTransaction.subtype === 5) && unconfirmedTransaction.attachment.order === order.order) {
                 return true
             }
         }
@@ -867,7 +867,7 @@ export function evAssetExchangeSearchInput (e) {
 
         for (const asset of BRS.assets) {
             if (asset.bookmarked === true &&
-                    (asset.account == input || asset.asset == input || asset.name.toUpperCase().includes(input) || asset.accountRS.includes(input))) {
+                    (asset.account === input || asset.asset === input || asset.name.toUpperCase().includes(input) || asset.accountRS.includes(input))) {
                 BRS.assetSearch.push(asset.asset)
             }
         };
@@ -880,11 +880,11 @@ export function evAssetExchangeSearchInput (e) {
 export function evAssetExchangeOrdersTableClick (e) {
     const $target = $(e.target)
     let totalNQT
-    if ($target.prop('tagName').toLowerCase() == 'a') {
+    if ($target.prop('tagName').toLowerCase() === 'a') {
         return
     }
 
-    const type = ($target.closest('table').attr('id') == 'asset_exchange_bid_orders_table' ? 'sell' : 'buy')
+    const type = ($target.closest('table').attr('id') === 'asset_exchange_bid_orders_table' ? 'sell' : 'buy')
 
     const $tr = $target.closest('tr')
 
@@ -900,7 +900,7 @@ export function evAssetExchangeOrdersTableClick (e) {
         return
     }
     let balanceNQT
-    if (type == 'sell') {
+    if (type === 'sell') {
         try {
             balanceNQT = new BigInteger(BRS.accountInfo.unconfirmedBalanceNQT)
         } catch (err) {
@@ -930,10 +930,10 @@ export function evAssetExchangeOrdersTableClick (e) {
 
 export function evSellBuyAutomaticPriceClick (e) {
     try {
-        const type = ($(this).attr('id') == 'sell_automatic_price' ? 'sell' : 'buy')
+        const type = ($(this).attr('id') === 'sell_automatic_price' ? 'sell' : 'buy')
 
         let price = new Big(convertToNQT(String($('#' + type + '_asset_price').val())))
-        const balance = new Big(type == 'buy' ? BRS.accountInfo.unconfirmedBalanceNQT : BRS.currentAsset.yourBalanceNQT)
+        const balance = new Big(type === 'buy' ? BRS.accountInfo.unconfirmedBalanceNQT : BRS.currentAsset.yourBalanceNQT)
         const balanceNQT = new Big(BRS.accountInfo.unconfirmedBalanceNQT)
         const maxQuantity = new Big(convertToQNTf(BRS.currentAsset.quantityCirculatingQNT, BRS.currentAsset.decimals))
 
@@ -947,7 +947,7 @@ export function evSellBuyAutomaticPriceClick (e) {
             $('#' + type + '_asset_price').val(convertToNXT(price.toString()))
         }
 
-        let quantity = new Big(amountToPrecision((type == 'sell' ? balanceNQT : balance).div(price).toString(), BRS.currentAsset.decimals))
+        let quantity = new Big(amountToPrecision((type === 'sell' ? balanceNQT : balance).div(price).toString(), BRS.currentAsset.decimals))
 
         let total = quantity.times(price)
 
@@ -957,7 +957,7 @@ export function evSellBuyAutomaticPriceClick (e) {
             total = quantity.times(price)
         }
 
-        if (type == 'sell') {
+        if (type === 'sell') {
             const maxUserQuantity = new Big(convertToQNTf(balance, BRS.currentAsset.decimals))
             if (quantity.cmp(maxUserQuantity) == 1) {
                 quantity = maxUserQuantity
@@ -979,10 +979,10 @@ function isControlKey (charCode) {
     if (charCode >= 32) {
         return false
     }
-    if (charCode == 10) {
+    if (charCode === 10) {
         return false
     }
-    if (charCode == 13) {
+    if (charCode === 13) {
         return false
     }
 
@@ -1002,8 +1002,8 @@ export function evAssetExchangeQuantityPriceKeydown (e) {
 
     if (maxFractionLength) {
         // allow 1 single period character
-        if (charCode == 110 || charCode == 190) {
-            if ($(this).val().indexOf('.') != -1) {
+        if (charCode === 110 || charCode === 190) {
+            if ($(this).val().indexOf('.') !== -1) {
                 e.preventDefault()
                 return false
             } else {
@@ -1012,7 +1012,7 @@ export function evAssetExchangeQuantityPriceKeydown (e) {
         }
     } else {
         // do not allow period
-        if (charCode == 110 || charCode == 190 || charCode == 188) {
+        if (charCode === 110 || charCode === 190 || charCode === 188) {
             $.notify($.t('error_fractions'), { type: 'danger' })
             e.preventDefault()
             return false
@@ -1027,7 +1027,7 @@ export function evAssetExchangeQuantityPriceKeydown (e) {
     if (afterComma && afterComma[1].length > maxFractionLength) {
         const selectedText = getSelectedText()
 
-        if (selectedText != $(this).val()) {
+        if (selectedText !== $(this).val()) {
             let errorMessage
 
             if (isQuantityField) {
@@ -1048,12 +1048,12 @@ export function evAssetExchangeQuantityPriceKeydown (e) {
     }
 
     // numeric characters, left/right key, backspace, delete
-    if (charCode == 8 || charCode == 37 || charCode == 39 || charCode == 46 ||
+    if (charCode === 8 || charCode === 37 || charCode === 39 || charCode === 46 ||
         (charCode >= 48 && charCode <= 57 && !isNaN(String.fromCharCode(charCode))) || (charCode >= 96 && charCode <= 105)) {
         return
     }
     // comma
-    if (charCode == 188) {
+    if (charCode === 188) {
         $.notify($.t('error_comma_not_allowed'), { type: 'danger' })
     }
     e.preventDefault()
@@ -1068,7 +1068,7 @@ export function evCalculatePricePreviewKeyup (e) {
         const quantityQNT = new BigInteger(convertToQNT(String($('#' + orderType + '_asset_quantity').val()), BRS.currentAsset.decimals))
         const priceNQT = new BigInteger(calculatePricePerWholeQNT(convertToNQT(String($('#' + orderType + '_asset_price').val())), BRS.currentAsset.decimals))
 
-        if (priceNQT.toString() == '0' || quantityQNT.toString() == '0') {
+        if (priceNQT.toString() === '0' || quantityQNT.toString() === '0') {
             $('#' + orderType + '_asset_total').val('0')
         } else {
             const total = calculateOrderTotal(quantityQNT, priceNQT, BRS.currentAsset.decimals)
@@ -1103,7 +1103,7 @@ export function evAssetOrderModalOnShowBsModal (e) {
         return e.preventDefault()
     }
 
-    if (priceNQT.toString() == '0' || quantityQNT.toString() == '0') {
+    if (priceNQT.toString() === '0' || quantityQNT.toString() === '0') {
         $.notify($.t('error_amount_price_required'), { type: 'danger' })
         return e.preventDefault()
     }
@@ -1111,7 +1111,7 @@ export function evAssetOrderModalOnShowBsModal (e) {
     const priceNQTPerWholeQNT = priceNQT.multiply(new BigInteger('' + Math.pow(10, BRS.currentAsset.decimals)))
     let description
     let tooltipTitle
-    if (orderType == 'buy') {
+    if (orderType === 'buy') {
         description = $.t('buy_order_description', {
             quantity: formatQuantity(quantityQNT, BRS.currentAsset.decimals, true),
             asset_name: $('#asset_name').html().escapeHTML(),
@@ -1140,7 +1140,7 @@ export function evAssetOrderModalOnShowBsModal (e) {
     $('#asset_order_description').html(description)
     $('#asset_order_total').html(totalNXT + ' ' + BRS.valueSuffix)
 
-    if (quantity != '1') {
+    if (quantity !== '1') {
         $('#asset_order_total_tooltip').show()
         $('#asset_order_total_tooltip').popover('destroy')
         $('#asset_order_total_tooltip').data('content', tooltipTitle)
@@ -1152,7 +1152,7 @@ export function evAssetOrderModalOnShowBsModal (e) {
         $('#asset_order_total_tooltip').hide()
     }
 
-    $('#asset_order_type').val((orderType == 'buy' ? 'placeBidOrder' : 'placeAskOrder'))
+    $('#asset_order_type').val((orderType === 'buy' ? 'placeBidOrder' : 'placeAskOrder'))
     $('#asset_order_asset').val(assetId)
     $('#asset_order_quantity').val(quantityQNT.toString())
     $('#asset_order_price').val(priceNQT.toString())
@@ -1163,7 +1163,7 @@ export function formsOrderAsset (data) {
     delete data.asset_order_type
     return {
         requestType,
-        successMessage: (requestType == 'placeBidOrder' ? $.t('success_buy_order_asset') : $.t('success_sell_order_asset')),
+        successMessage: (requestType === 'placeBidOrder' ? $.t('success_buy_order_asset') : $.t('success_sell_order_asset')),
         errorMessage: $.t('error_order_asset')
     }
 }
@@ -1173,7 +1173,7 @@ export function formsOrderAssetComplete (response, data) {
         return
     }
     let $table
-    if (data.requestType == 'placeBidOrder') {
+    if (data.requestType === 'placeBidOrder') {
         $table = $('#asset_exchange_bid_orders_table tbody')
     } else {
         $table = $('#asset_exchange_ask_orders_table tbody')
@@ -1190,7 +1190,7 @@ export function formsOrderAssetComplete (response, data) {
     data.totalNQT = new BigInteger(calculateOrderTotalNQT(data.quantityQNT, data.priceNQT))
 
     let rowToAdd = `<tr class='tentative' data-transaction='${response.transaction}' data-quantity='${data.quantityQNT.toString()}' data-price='${data.priceNQT.toString()}'>`
-    if (data.requestType == 'placeBidOrder') {
+    if (data.requestType === 'placeBidOrder') {
         rowToAdd += `<td>${BRS.pendingTransactionHTML} <strong>${$.t('you')}</strong></td>`
         rowToAdd += '<td>' + formatAmount(data.totalNQT) + '</td>'
         rowToAdd += '<td>' + formatQuantity(data.quantityQNT, BRS.currentAsset.decimals) + '</td>'
@@ -1209,11 +1209,11 @@ export function formsOrderAssetComplete (response, data) {
         $rows.each(function () {
             const rowPrice = new BigInteger(String($(this).data('price')))
 
-            if (data.requestType == 'placeBidOrder' && data.priceNQT.compareTo(rowPrice) > 0) {
+            if (data.requestType === 'placeBidOrder' && data.priceNQT.compareTo(rowPrice) > 0) {
                 $(this).before(rowToAdd)
                 rowAdded = true
                 return false
-            } else if (data.requestType == 'placeAskOrder' && data.priceNQT.compareTo(rowPrice) < 0) {
+            } else if (data.requestType === 'placeAskOrder' && data.priceNQT.compareTo(rowPrice) < 0) {
                 $(this).before(rowToAdd)
                 rowAdded = true
                 return false
@@ -1293,7 +1293,7 @@ export function evAssetExchangeSidebarContextClick (e) {
 
     closeContextMenu()
 
-    if (option == 'add_to_group') {
+    if (option === 'add_to_group') {
         $('#asset_exchange_group_asset').val(assetId)
 
         BRS.database.select('assets', [{
@@ -1314,7 +1314,7 @@ export function evAssetExchangeSidebarContextClick (e) {
                 const groupNames = []
 
                 $.each(assets, function (index, asset) {
-                    if (asset.groupName && $.inArray(asset.groupName, groupNames) == -1) {
+                    if (asset.groupName && $.inArray(asset.groupName, groupNames) === -1) {
                         groupNames.push(asset.groupName)
                     }
                 })
@@ -1334,7 +1334,7 @@ export function evAssetExchangeSidebarContextClick (e) {
                 groupSelect.empty()
 
                 $.each(groupNames, function (index, groupName) {
-                    groupSelect.append("<option value='" + groupName.escapeHTML() + "'" + (asset.groupName && asset.groupName == groupName ? " selected='selected'" : '') + '>' + groupName.escapeHTML() + '</option>')
+                    groupSelect.append("<option value='" + groupName.escapeHTML() + "'" + (asset.groupName && asset.groupName === groupName ? " selected='selected'" : '') + '>' + groupName.escapeHTML() + '</option>')
                 })
 
                 groupSelect.append("<option value='0'" + (!asset.groupName ? " selected='selected'" : '') + '></option>')
@@ -1343,7 +1343,7 @@ export function evAssetExchangeSidebarContextClick (e) {
                 $('#asset_exchange_group_modal').modal('show')
             })
         })
-    } else if (option == 'remove_from_group') {
+    } else if (option === 'remove_from_group') {
         const foundAsset = BRS.assets.find((tkn) => tkn.asset === assetId)
         if (foundAsset) {
             foundAsset.groupName = ''
@@ -1358,7 +1358,7 @@ export function evAssetExchangeSidebarContextClick (e) {
                 $.notify($.t('success_asset_group_removal'), { type: 'success' })
             }, 50)
         })
-    } else if (option == 'remove_from_bookmarks') {
+    } else if (option === 'remove_from_bookmarks') {
         const foundAsset = BRS.assets.find((tkn) => tkn.asset === assetId)
         if (foundAsset) {
             foundAsset.bookmarked = false
@@ -1434,9 +1434,9 @@ export function pagesTransferHistory () {
             for (let i = 0; i < transfers.length; i++) {
                 transfers[i].quantityQNT = new BigInteger(transfers[i].quantityQNT)
 
-                const type = (transfers[i].recipientRS == BRS.accountRS ? 'receive' : 'send')
+                const type = (transfers[i].recipientRS === BRS.accountRS ? 'receive' : 'send')
 
-                rows += "<tr><td><a href='#' data-transaction='" + String(transfers[i].assetTransfer).escapeHTML() + "'>" + String(transfers[i].assetTransfer).escapeHTML() + "</a></td><td><a href='#' data-goto-asset='" + String(transfers[i].asset).escapeHTML() + "'>" + String(transfers[i].name).escapeHTML() + '</a></td><td>' + formatTimestamp(transfers[i].timestamp) + "</td><td style='color:" + (type == 'receive' ? 'green' : 'red') + "'>" + formatQuantity(transfers[i].quantityQNT, transfers[i].decimals) + '</td>' +
+                rows += "<tr><td><a href='#' data-transaction='" + String(transfers[i].assetTransfer).escapeHTML() + "'>" + String(transfers[i].assetTransfer).escapeHTML() + "</a></td><td><a href='#' data-goto-asset='" + String(transfers[i].asset).escapeHTML() + "'>" + String(transfers[i].name).escapeHTML() + '</a></td><td>' + formatTimestamp(transfers[i].timestamp) + "</td><td style='color:" + (type === 'receive' ? 'green' : 'red') + "'>" + formatQuantity(transfers[i].quantityQNT, transfers[i].decimals) + '</td>' +
                         "<td><a href='#' data-user='" + getAccountFormatted(transfers[i], 'recipient') + "' class='user_info'>" + getAccountTitle(transfers[i], 'recipient') + '</a></td>' +
                         "<td><a href='#' data-user='" + getAccountFormatted(transfers[i], 'sender') + "' class='user_info'>" + getAccountTitle(transfers[i], 'sender') + '</a></td>' +
                         '</tr>'
@@ -1466,7 +1466,7 @@ export function pagesMyAssets () {
         }
 
         for (let i = 0; i < BRS.accountInfo.assetBalances.length; i++) {
-            if (BRS.accountInfo.assetBalances[i].balanceQNT == '0') {
+            if (BRS.accountInfo.assetBalances[i].balanceQNT === '0') {
                 count.ignored_assets++
                 if (checkMyAssetsPageLoaded(count)) {
                     myAssetsPageLoaded(result)
@@ -1479,7 +1479,7 @@ export function pagesMyAssets () {
                 firstIndex: 0,
                 lastIndex: 0
             }, function (response, input) {
-                if (BRS.currentPage != 'my_assets') {
+                if (BRS.currentPage !== 'my_assets') {
                     return
                 }
 
@@ -1490,7 +1490,7 @@ export function pagesMyAssets () {
                             asset: input.asset
                         }
                     }, function (response, input) {
-                        if (BRS.currentPage != 'my_assets') {
+                        if (BRS.currentPage !== 'my_assets') {
                             return
                         }
 
@@ -1516,7 +1516,7 @@ export function pagesMyAssets () {
                 firstIndex: 0,
                 lastIndex: 0
             }, function (response, input) {
-                if (BRS.currentPage != 'my_assets') {
+                if (BRS.currentPage !== 'my_assets') {
                     return
                 }
 
@@ -1527,7 +1527,7 @@ export function pagesMyAssets () {
                             asset: input.asset
                         }
                     }, function (response, input) {
-                        if (BRS.currentPage != 'my_assets') {
+                        if (BRS.currentPage !== 'my_assets') {
                             return
                         }
 
@@ -1554,7 +1554,7 @@ export function pagesMyAssets () {
                     balanceQNT: BRS.accountInfo.assetBalances[i].balanceQNT
                 }
             }, function (asset, input) {
-                if (BRS.currentPage != 'my_assets') {
+                if (BRS.currentPage !== 'my_assets') {
                     return
                 }
 
@@ -1585,7 +1585,7 @@ function checkMyAssetsPageLoaded (count) {
 
 function myAssetsPageLoaded (result) {
     let rows = ''
-    let total
+    // let total
     result.assets.sort(function (a, b) {
         if (a.name.toLowerCase() > b.name.toLowerCase()) {
             return 1
@@ -1602,11 +1602,11 @@ function myAssetsPageLoaded (result) {
         const lowestAskOrder = result.ask_orders[asset.asset]
         const highestBidOrder = result.bid_orders[asset.asset]
 
-        if (highestBidOrder != -1) {
-            total = new BigInteger(calculateOrderTotalNQT(asset.balanceQNT, highestBidOrder, asset.decimals))
-        } else {
-            total = 0
-        }
+        // if (highestBidOrder != -1) {
+        //     total = new BigInteger(calculateOrderTotalNQT(asset.balanceQNT, highestBidOrder, asset.decimals))
+        // } else {
+        //     total = 0
+        // }
 
         let tentative = -1
         let totalNQT
@@ -1614,15 +1614,15 @@ function myAssetsPageLoaded (result) {
             for (let j = 0; j < BRS.unconfirmedTransactions.length; j++) {
                 const unconfirmedTransaction = BRS.unconfirmedTransactions[j]
 
-                if (unconfirmedTransaction.type == 2 && unconfirmedTransaction.subtype == 1 && unconfirmedTransaction.attachment.asset == asset.asset) {
+                if (unconfirmedTransaction.type === 2 && unconfirmedTransaction.subtype === 1 && unconfirmedTransaction.attachment.asset === asset.asset) {
                     if (tentative == -1) {
-                        if (unconfirmedTransaction.recipient == BRS.account) {
+                        if (unconfirmedTransaction.recipient === BRS.account) {
                             tentative = new BigInteger(unconfirmedTransaction.attachment.quantityQNT)
                         } else {
                             tentative = new BigInteger('-' + unconfirmedTransaction.attachment.quantityQNT)
                         }
                     } else {
-                        if (unconfirmedTransaction.recipient == BRS.account) {
+                        if (unconfirmedTransaction.recipient === BRS.account) {
                             tentative = tentative.add(new BigInteger(unconfirmedTransaction.attachment.quantityQNT))
                         } else {
                             tentative = tentative.add(new BigInteger('-' + unconfirmedTransaction.attachment.quantityQNT))
@@ -1848,7 +1848,7 @@ export function pagesOpenOrders () {
     let loaded = 0
     function allLoaded () {
         loaded++
-        if (loaded == 2) {
+        if (loaded === 2) {
             pageLoaded()
         }
     }
@@ -1897,7 +1897,7 @@ function getOpenOrders (type, callback) {
                     }
                 })
             })
-            if (BRS.currentPage != 'open_orders') {
+            if (BRS.currentPage !== 'open_orders') {
                 return
             }
         }
@@ -1907,7 +1907,7 @@ function getOpenOrders (type, callback) {
 function getUnconfirmedOrders (type) {
     const unconfirmedOrders = []
     for (const unconfirmedTransaction of BRS.unconfirmedTransactions) {
-        if (unconfirmedTransaction.type == 2 && unconfirmedTransaction.subtype == (type == 'ask' ? 2 : 3)) {
+        if (unconfirmedTransaction.type === 2 && unconfirmedTransaction.subtype === (type === 'ask' ? 2 : 3)) {
             unconfirmedOrders.push({
                 account: unconfirmedTransaction.sender,
                 asset: unconfirmedTransaction.attachment.asset,
@@ -1966,9 +1966,9 @@ function openOrdersLoaded (orders, type, callback) {
     for (const completeOrder of orders) {
         let cancelled = false
         for (const unconfirmedTransaction of BRS.unconfirmedTransactions) {
-            if (unconfirmedTransaction.type == 2 &&
-                    unconfirmedTransaction.subtype == (type == 'ask' ? 4 : 5) &&
-                    unconfirmedTransaction.attachment.order == completeOrder.order) {
+            if (unconfirmedTransaction.type === 2 &&
+                    unconfirmedTransaction.subtype === (type === 'ask' ? 4 : 5) &&
+                    unconfirmedTransaction.attachment.order === completeOrder.order) {
                 cancelled = true
                 break
             }
@@ -2027,7 +2027,7 @@ export function formsCancelOrder (data) {
 }
 
 export function formsCancelOrderComplete (response, data) {
-    if (data.requestType == 'cancelAskOrder') {
+    if (data.requestType === 'cancelAskOrder') {
         $.notify($.t('success_cancel_sell_order'), { type: 'success' })
     } else {
         $.notify($.t('success_cancel_buy_order'), { type: 'success' })
