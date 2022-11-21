@@ -9,6 +9,7 @@
     "lint": "npx eslint './src/js/brs/*'",
     "build": "node esbuild.config.js",
     "lang": "pushd ./src/locales && ./updateFiles.sh && popd",
+    "dev": "npm run build && cp src/index.html src/index.dev.html && sed -i 's/index.min.js/index.dev.js/g' src/index.dev.html",
     "build-all": "npm run lang && npm run build"
   },
   "repository": {
