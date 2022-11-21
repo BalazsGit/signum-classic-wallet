@@ -1,4 +1,7 @@
 {
+    "account_extended": "Account extended address",
+    "details": "Details",
+    "user_no_details": "This account has no incoming or outgoing transactions.",
     "confirm_send_passphrase": "You are about to send your passphrase over the internet. It is not recommend to proceed.\n\nDo you still want to send your passphrase?",
     "filled": "Filled",
     "asset_issuer": "Asset issuer",

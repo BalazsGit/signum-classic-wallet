@@ -124,10 +124,6 @@ import {
 } from './brs.modals'
 
 import {
-    evAccountDetailsModalOnShowBsModal
-} from './brs.modals.accountdetails'
-
-import {
     showAccountModal,
     loadUserInfoModal
 } from './brs.modals.account'
@@ -642,24 +638,6 @@ export function addEventListeners () {
         if (content.hasClass('data-loading')) {
             loadUserInfoModal(tab)
         }
-    })
-
-    // from brs.modals.accountdetails.js
-    $('#account_details_modal').on('show.bs.modal', evAccountDetailsModalOnShowBsModal)
-    $('#account_details_modal ul.nav li').click(function (e) {
-        e.preventDefault()
-        const tab = $(this).data('tab')
-        $(this).siblings().removeClass('active')
-        $(this).addClass('active')
-        $('.account_details_modal_content').hide()
-        const content = $('#account_details_modal_' + tab)
-        content.show()
-    })
-    $('#account_details_modal').on('hidden.bs.modal', function (e) {
-        $(this).find('.account_details_modal_content').hide()
-        $(this).find('ul.nav li.active').removeClass('active')
-        $('#account_details_balance_nav').addClass('active')
-        $('#account_details_modal_qr_code').empty()
     })
 
     // from brs.modals.accountinfo.js

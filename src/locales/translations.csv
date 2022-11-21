@@ -1,4 +1,7 @@
 "Property","en","pt-br","pt","pl","nl","lt","ja","it","id","hr","hi","gl","fr","fi","es-es","el","de-de","cs","ca","bg","sk","sh","ru","sr","sr-cs","ro","uk","tr","zh-tw","zh-cn"
+"account_extended","Account extended address","Endereço estendido",,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"details","Details","Detalhes","Detalhes",,,,,,,,,,,,,,,,,,,,,,,,,,,
+"user_no_details","This account has no incoming or outgoing transactions.","Esta conta não recebeu e nem enviou transações.",,,,,,,,,,,,,,,,,,,,,,,,,,,,
 "confirm_send_passphrase","You are about to send your passphrase over the internet. It is not recommend to proceed.\\n\\nDo you still want to send your passphrase?","Você está prestes a mandar sua frase secreta pela internet. Isso NÃO é recomendado.\\n\\nVocê ainda deseja enviar sua frase secreta?",,,,,,,,,,,,,,,,,,,,,,,,,,,,
 "filled","Filled","Executada",,,,,,,,,,,,,,,,,,,,,,,,,,,,
 "asset_issuer","Asset issuer","Emissor do ativo",,,,,,,,,,,,,,,,,,,,,,,,,,,,

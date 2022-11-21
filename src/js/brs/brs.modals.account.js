@@ -95,6 +95,8 @@ export function loadUserInfoModal (tabName, param) {
     switch (tabName) {
     case 'transactions':
         return userInfoModalTransactions(param)
+    case 'details':
+        return userInfoModalDetails()
     case 'aliases':
         return userInfoModalAliases()
     case 'smartcontract':
@@ -176,6 +178,50 @@ function userInfoModalAliases () {
 
         $('#user_info_modal_aliases_table tbody').empty().append(rows)
         dataLoadFinished($('#user_info_modal_aliases_table'))
+    })
+}
+
+function userInfoModalDetails () {
+    sendRequest('getAccount', {
+        account: BRS.userInfoModal.user,
+        getCommittedAmount: 'true'
+    }, function (response) {
+        if (response.errorCode) {
+            $('#user_info_modal_details_table tbody').empty()
+            dataLoadFinished($('#user_info_modal_details_table'))
+            return
+        }
+        if (!response.publicKey || /^0+$/.test(response.publicKey)) {
+            response.publicKey = ''
+        }
+        let rows = ''
+        rows += '<tr>'
+        rows += `<td>${$.t('account_id')}</td><td>${response.account}</td>`
+        rows += '</tr><tr>'
+        if (response.name) {
+            rows += `<td>${$.t('name')}</td><td>${response.name}</td>`
+            rows += '</tr><tr>'
+        }
+        if (response.description) {
+            rows += `<td>${$.t('description')}</td><td style="word-break:break-all;word-wrap: break-word;">${response.description.escapeHTML()}</td>`
+            rows += '</tr><tr>'
+        }
+        rows += `<td>${$.t('total_balance')}</td><td>${formatAmount(response.balanceNQT)} ${BRS.valueSuffix}</td>`
+        rows += '</tr><tr>'
+        rows += `<td>${$.t('available_balance')}</td><td>${formatAmount(response.unconfirmedBalanceNQT)} ${BRS.valueSuffix}</td>`
+        rows += '</tr><tr>'
+        rows += `<td>${$.t('committed_balance')}</td><td>${formatAmount(response.committedBalanceNQT)} ${BRS.valueSuffix}</td>`
+        rows += '</tr><tr>'
+        if (response.accountRSExtended) {
+            rows += `<td>${$.t('account_extended')}</td><td style="word-break:break-all;word-wrap: break-word;">${response.accountRSExtended}</td>`
+            rows += '</tr><tr>'
+        }
+        rows += `<td>${$.t('public_key')}</td><td style="word-break:break-all;word-wrap: break-word;">${response.publicKey}</td>`
+        rows += '</tr><tr>'
+
+        rows += '</tr>'
+        $('#user_info_modal_details_table tbody').html(rows)
+        dataLoadFinished($('#user_info_modal_details_table'))
     })
 }
 
