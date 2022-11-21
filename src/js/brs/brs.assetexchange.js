@@ -2,7 +2,7 @@
  * @depends {brs.js}
  */
 
-/* global $ BigInteger Big */
+/* global $ BigInteger */
 
 import { BRS } from '.'
 
@@ -23,7 +23,6 @@ import {
     calculateOrderTotalNQT,
     calculateOrderTotal,
     convertToNXT,
-    amountToPrecision,
     convertToNQT,
     convertToQNTf,
     convertToQNT,
@@ -931,43 +930,32 @@ export function evAssetExchangeOrdersTableClick (e) {
 export function evSellBuyAutomaticPriceClick (e) {
     try {
         const type = ($(this).attr('id') === 'sell_automatic_price' ? 'sell' : 'buy')
+        const assetMult = BigInt('1'.padEnd(BRS.currentAsset.decimals + 1, '0'))
+        const userInputPrice = $('#' + type + '_asset_price').val()
+        let priceNQT = BigInt(convertToNQT(userInputPrice === '' ? '0' : userInputPrice)) / assetMult
+        const balance = BigInt(type === 'buy' ? BRS.accountInfo.unconfirmedBalanceNQT : BRS.currentAsset.yourBalanceNQT)
+        const balanceNQT = BigInt(BRS.accountInfo.unconfirmedBalanceNQT)
+        const maxQuantity = BigInt(BRS.currentAsset.quantityCirculatingQNT)
 
-        let price = new Big(convertToNQT(String($('#' + type + '_asset_price').val())))
-        const balance = new Big(type === 'buy' ? BRS.accountInfo.unconfirmedBalanceNQT : BRS.currentAsset.yourBalanceNQT)
-        const balanceNQT = new Big(BRS.accountInfo.unconfirmedBalanceNQT)
-        const maxQuantity = new Big(convertToQNTf(BRS.currentAsset.quantityCirculatingQNT, BRS.currentAsset.decimals))
-
-        if (balance.cmp(new Big('0')) <= 0) {
-            return
-        }
-
-        if (price.cmp(new Big('0')) <= 0) {
+        if (priceNQT === 0n) {
             // get minimum price if no offers exist, based on asset decimals..
-            price = new Big('' + Math.pow(10, BRS.currentAsset.decimals))
-            $('#' + type + '_asset_price').val(convertToNXT(price.toString()))
+            priceNQT = assetMult
+            $('#' + type + '_asset_price').val(convertToNXT(priceNQT))
         }
-
-        let quantity = new Big(amountToPrecision((type === 'sell' ? balanceNQT : balance).div(price).toString(), BRS.currentAsset.decimals))
-
-        let total = quantity.times(price)
-
-        // proposed quantity is bigger than available quantity
-        if (quantity.cmp(maxQuantity) === 1) {
-            quantity = maxQuantity
-            total = quantity.times(price)
+        let quantityQNT = (type === 'buy' ? balanceNQT / priceNQT : balance)
+        if (quantityQNT > maxQuantity) {
+            quantityQNT = maxQuantity
         }
-
         if (type === 'sell') {
-            const maxUserQuantity = new Big(convertToQNTf(balance, BRS.currentAsset.decimals))
-            if (quantity.cmp(maxUserQuantity) === 1) {
-                quantity = maxUserQuantity
-                total = quantity.times(price)
+            const maxUserQuantity = balance
+            if (maxUserQuantity > quantityQNT) {
+                quantityQNT = maxQuantity
             }
         }
+        const total = quantityQNT * priceNQT
 
-        $('#' + type + '_asset_quantity').val(quantity.toString())
+        $('#' + type + '_asset_quantity').val(convertToQNTf(quantityQNT, BRS.currentAsset.decimals))
         $('#' + type + '_asset_total').val(convertToNXT(total.toString()))
-
         $('#' + type + '_asset_total').css({
             background: '',
             color: ''
@@ -1773,7 +1761,7 @@ export function formsTransferAsset (data) {
 
     if (!BRS.showedFormWarning) {
         if (BRS.settings.asset_transfer_warning && BRS.settings.asset_transfer_warning !== 0) {
-            if (new Big(data.quantity).cmp(new Big(BRS.settings.asset_transfer_warning)) > 0) {
+            if (Number(data.quantity) > Number(BRS.settings.asset_transfer_warning)) {
                 BRS.showedFormWarning = true
                 return {
                     error: $.t('error_max_asset_transfer_warning', {

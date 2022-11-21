@@ -34,7 +34,6 @@ seedrandom.js - MIT - https://github.com/davidbau/seedrandom
 signing/crypto.js - MIT - https://github.com/Jaguar0625/JavaScriptNrs
 signing/curve25519.js - MIT - https://github.com/Jaguar0625/JavaScriptNrs
 xoreddata.js - MIT - BloodyRookie
-big.js - MIT - https://github.com/MikeMcl/big.js
 ajaxretry.js - MIT - https://github.com/dcherman/jQuery.ajaxRetry
 ajaxmultiqueue.js - MIT - https://github.com/GeReV/jQuery.ajaxMultiQueue
 autolink.js - MIT - https://github.com/bryanwoods/autolink-js

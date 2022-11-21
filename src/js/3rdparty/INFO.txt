@@ -7,7 +7,6 @@ File               Date   SHA384
 ------------------------------------------------------------------------------------------
 ajaxmultiqueue.js  180225 z4oBihrMyAEYUPZWuSscFRjhJsg8Xh5BjNf6W5eq34YtZ9yFeGLXABTJR7VabVTG
 ajaxretry.js       180203 ia90j7KZ3lHwnJ/jSofQNFuwwtGrcTHwjd9+SY8Ls7EFiyx+vFfXvURO9fW0odQj
-big.min.js         180225 BWcgDmoCXi+1663OmG90jk7M9rKeNHdZNVGSkq7LStLwsG62LF3MwBzzR4PhecM0
 bootstrap.min.js   180219 Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa
 clipboard.js       180203 E8q4FF0C3cBKqHxayVjOHWaPICaSEqWybiuRAkkxVrUO21syLamc+aHtgFVYTbe2
 notify.min.js      180219 Qnyy4lkYCL9J8NhIWAT7bMPccirUwfiBj7PLqr1ZBlSSJ0+A2XDB0UlqZcg+0VGS
@@ -20,15 +19,6 @@ webdb.js           180203 ls39os/gcYY5lIz4PNhfyBDtVesdw3WwwM02lTi8/ycTpginDkszyQ
 
 
 File Genesis:
-
-big.min.js
-
-src:      https://raw.githubusercontent.com/MikeMcl/big.js/master/big.min.js
-version:  5.0.3
-date:     2018-02-03
-license:  MIT
-
----
 
 jquery.min.js
 

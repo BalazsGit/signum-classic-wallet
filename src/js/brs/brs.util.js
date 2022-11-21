@@ -2,7 +2,7 @@
  * @depends {brs.js}
  */
 
-/* global $ BigInteger Big Clipboard */
+/* global $ BigInteger Clipboard */
 
 import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
@@ -93,10 +93,10 @@ export function calculateOrderTotal (quantityQNT, priceNQT) {
 
 export function calculatePercentage (a, b) {
     try {
-        a = new Big(String(a))
-        b = new Big(String(b))
-        const result = a.div(b).times(new Big('100')).toFixed(2)
-        return result.toString()
+        a = Number(a) * 100
+        b = Number(b)
+        const result = a / b
+        return result.toFixed(2)
     } catch (e) {
         return e.message.escapeHTML()
     }

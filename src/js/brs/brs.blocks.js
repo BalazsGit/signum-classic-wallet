@@ -2,7 +2,7 @@
  * @depends {brs.js}
  */
 
-/* global $ BigInteger Big */
+/* global $ BigInteger */
 
 import { BRS } from '.'
 
@@ -402,8 +402,8 @@ export function blocksPageLoaded (blocks) {
     let averageAmount
     let blockCount
     if (blocks.length) {
-        averageFee = new Big(totalFees.toString()).div(new Big('100000000')).div(new Big(String(blocks.length))).toFixed(2)
-        averageAmount = new Big(totalAmount.toString()).div(new Big('100000000')).div(new Big(String(blocks.length))).toFixed(2)
+        averageFee = formatAmount(totalFees.divide(new BigInteger((String(blocks.length)))))
+        averageAmount = formatAmount(totalAmount.divide(new BigInteger((String(blocks.length)))))
     } else {
         averageFee = 0
         averageAmount = 0
