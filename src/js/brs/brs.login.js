@@ -2,7 +2,7 @@
  * @depends {brs.js}
  */
 
-/* global $ PassPhraseGenerator BigNumber */
+/* global $ PassPhraseGenerator */
 
 import { BRS } from '.'
 import converters from '../util/converters'
@@ -296,7 +296,7 @@ function loginWithPassphrase (passphrase) {
         BRS.account = getAccountId(passphrase)
         BRS.accountRS = convertNumericToRSAccountFormat(BRS.account)
         BRS.publicKey = getPublicKey(converters.stringToHexString(passphrase))
-        BRS.accountRSExtended = BRS.accountRS + '-' + new BigNumber(BRS.publicKey, 16).toString(36).toUpperCase()
+        BRS.accountRSExtended = BRS.accountRS + '-' + BigInt(`0x${BRS.publicKey}`).toString(36).toUpperCase()
 
         sendRequest('getAccountPublicKey', {
             account: BRS.account
