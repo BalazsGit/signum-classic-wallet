@@ -952,14 +952,14 @@ export function evSellBuyAutomaticPriceClick (e) {
         let total = quantity.times(price)
 
         // proposed quantity is bigger than available quantity
-        if (quantity.cmp(maxQuantity) == 1) {
+        if (quantity.cmp(maxQuantity) === 1) {
             quantity = maxQuantity
             total = quantity.times(price)
         }
 
         if (type === 'sell') {
             const maxUserQuantity = new Big(convertToQNTf(balance, BRS.currentAsset.decimals))
-            if (quantity.cmp(maxUserQuantity) == 1) {
+            if (quantity.cmp(maxUserQuantity) === 1) {
                 quantity = maxUserQuantity
                 total = quantity.times(price)
             }
@@ -1576,7 +1576,7 @@ export function pagesMyAssets () {
 }
 
 function checkMyAssetsPageLoaded (count) {
-    if ((count.assets + count.ignored_assets == count.total_assets) && (count.assets == count.ask_orders) && (count.assets == count.bid_orders)) {
+    if ((count.assets + count.ignored_assets === count.total_assets) && (count.assets === count.ask_orders) && (count.assets === count.bid_orders)) {
         return true
     } else {
         return false
@@ -1615,7 +1615,7 @@ function myAssetsPageLoaded (result) {
                 const unconfirmedTransaction = BRS.unconfirmedTransactions[j]
 
                 if (unconfirmedTransaction.type === 2 && unconfirmedTransaction.subtype === 1 && unconfirmedTransaction.attachment.asset === asset.asset) {
-                    if (tentative == -1) {
+                    if (tentative === -1) {
                         if (unconfirmedTransaction.recipient === BRS.account) {
                             tentative = new BigInteger(unconfirmedTransaction.attachment.quantityQNT)
                         } else {
@@ -1632,18 +1632,18 @@ function myAssetsPageLoaded (result) {
             }
         }
 
-        if (highestBidOrder != -1) {
+        if (highestBidOrder !== -1) {
             totalNQT = new BigInteger(calculateOrderTotalNQT(asset.balanceQNT, highestBidOrder))
         }
 
         let sign = '+'
 
-        if (tentative != -1 && tentative.compareTo(BigInteger.ZERO) < 0) {
+        if (tentative !== -1 && tentative.compareTo(BigInteger.ZERO) < 0) {
             tentative = tentative.abs()
             sign = '-'
         }
 
-        rows += '<tr' + (tentative != -1 ? " class='tentative tentative-allow-links'" : '') + " data-asset='" + String(asset.asset).escapeHTML() + "'><td><a href='#' data-goto-asset='" + String(asset.asset).escapeHTML() + "'>" + String(asset.name).escapeHTML() + "</a></td><td class='quantity'>" + formatQuantity(asset.balanceQNT, asset.decimals) + (tentative != -1 ? ' ' + sign + " <span class='added_quantity'>" + formatQuantity(tentative, asset.decimals) + '</span>' : '') + '</td><td>' + formatQuantity(asset.quantityCirculatingQNT, asset.decimals) + '</td><td>' + (lowestAskOrder != -1 ? formatOrderPricePerWholeQNT(lowestAskOrder, asset.decimals) : '/') + '</td><td>' + (highestBidOrder != -1 ? formatOrderPricePerWholeQNT(highestBidOrder, asset.decimals) : '/') + '</td><td>' + (highestBidOrder != -1 ? formatAmount(totalNQT) : '/') + "</td><td><a href='#' data-toggle='modal' data-target='#transfer_asset_modal' data-asset='" + String(asset.asset).escapeHTML() + "' data-name='" + String(asset.name).escapeHTML() + "' data-decimals='" + String(asset.decimals).escapeHTML() + "'>" + $.t('transfer') + '</a></td></tr>'
+        rows += '<tr' + (tentative !== -1 ? " class='tentative tentative-allow-links'" : '') + " data-asset='" + String(asset.asset).escapeHTML() + "'><td><a href='#' data-goto-asset='" + String(asset.asset).escapeHTML() + "'>" + String(asset.name).escapeHTML() + "</a></td><td class='quantity'>" + formatQuantity(asset.balanceQNT, asset.decimals) + (tentative !== -1 ? ' ' + sign + " <span class='added_quantity'>" + formatQuantity(tentative, asset.decimals) + '</span>' : '') + '</td><td>' + formatQuantity(asset.quantityCirculatingQNT, asset.decimals) + '</td><td>' + (lowestAskOrder !== -1 ? formatOrderPricePerWholeQNT(lowestAskOrder, asset.decimals) : '/') + '</td><td>' + (highestBidOrder !== -1 ? formatOrderPricePerWholeQNT(highestBidOrder, asset.decimals) : '/') + '</td><td>' + (highestBidOrder !== -1 ? formatAmount(totalNQT) : '/') + "</td><td><a href='#' data-toggle='modal' data-target='#transfer_asset_modal' data-asset='" + String(asset.asset).escapeHTML() + "' data-name='" + String(asset.name).escapeHTML() + "' data-decimals='" + String(asset.decimals).escapeHTML() + "'>" + $.t('transfer') + '</a></td></tr>'
     }
 
     dataLoaded(rows)

@@ -16,7 +16,7 @@ module.exports = {
         eqeqeq: 'warn',
         'handle-callback-err': 'warn',
         'n/no-callback-literal': 'off',
-        'no-throw-literal': 'warn',
+        'no-throw-literal': 'off',
         'no-unused-vars': 'warn',
         'brace-style': ['warn', '1tbs', { allowSingleLine: false }]
     }

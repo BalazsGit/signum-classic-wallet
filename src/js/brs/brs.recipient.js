@@ -303,7 +303,6 @@ export function checkRecipient (account, modal) {
     const callout = modal.find('.account_info').first()
     const accountInputField = modal.find('input[name=converted_account_id]')
     const merchantInfoField = modal.find('input[name=merchant_info]')
-    const recipientPublicKeyField = modal.find('input[name=recipientPublicKey]')
 
     accountInputField.val('')
     merchantInfoField.val('')
