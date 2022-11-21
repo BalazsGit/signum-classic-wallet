@@ -12,11 +12,11 @@ import {
 } from './brs.util'
 
 export function evAccountDetailsModalOnShowBsModal (e) {
-    $('#account_details_modal_qr_code').empty().qrcode({
-        text: BRS.accountRS,
-        width: 128,
-        height: 128
-    })
+    // $('#account_details_modal_qr_code').empty().qrcode({
+    //     text: BRS.accountRS,
+    //     width: 128,
+    //     height: 128
+    // })
 
     $('#account_details_modal_balance').show()
 
