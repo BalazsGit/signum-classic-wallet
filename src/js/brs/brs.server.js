@@ -18,6 +18,7 @@ import {
 } from './brs.encryption'
 
 import {
+    convertPublicKeyFromBase36ToBase16,
     convertToNQT,
     translateServerError
 } from './brs.util'
@@ -459,6 +460,9 @@ export function verifyAndSignTransactionBytes (transactionBytes, signature, requ
             const address = new NxtAddress(parts[1] + parts[2])
             data.recipient = address.getAccountId()
             data.recipientRS = address.getAccountRS(BRS.prefix)
+            if (parts[3]) {
+                data.recipientPublicKey = convertPublicKeyFromBase36ToBase16(parts[3])
+            }
         }
     }
 

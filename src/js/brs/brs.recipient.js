@@ -17,7 +17,8 @@ import {
     formatAmount,
     formatTimestamp,
     convertRSAccountToNumeric,
-    getAccountFormatted
+    getAccountFormatted,
+    convertPublicKeyFromBase36ToBase16
 } from './brs.util'
 
 export function automaticallyCheckRecipient () {
@@ -296,14 +297,6 @@ export function correctAddressMistake (el) {
     $(el.target).closest('form').find('input[name=recipient],input[name=account_id]').val($(el.target).data('address')).trigger('blur')
 }
 
-function base36ToBase16 (inVal) {
-    function convert (value) {
-        return [...value.toString()]
-            .reduce((r, v) => r * 36n + BigInt(parseInt(v, 36)), 0n)
-    }
-    return convert(inVal).toString(16)
-}
-
 export function checkRecipient (account, modal) {
     const classes = 'callout-info callout-danger callout-warning'
 
@@ -324,7 +317,7 @@ export function checkRecipient (account, modal) {
             // Account is RS Address
             if (accountParts[3] !== undefined) {
                 // Account is extended RS Address. Verify the public key
-                const publicKey = base36ToBase16(accountParts[3])
+                const publicKey = convertPublicKeyFromBase36ToBase16(accountParts[3])
                 const checkRS = getAccountIdFromPublicKey(publicKey, true)
 
                 if (!checkRS.includes(accountParts[2])) {

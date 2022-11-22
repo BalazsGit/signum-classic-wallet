@@ -443,6 +443,18 @@ export function convertRSAccountToNumeric (account) {
     return address.getAccountId()
 }
 
+/**
+ * @param {String} inVal base36 string
+ * @returns same value but as hexString (64 chars)
+ */
+export function convertPublicKeyFromBase36ToBase16 (inVal) {
+    function convert (value) {
+        return [...value.toString()]
+            .reduce((r, v) => r * 36n + BigInt(parseInt(v, 36)), 0n)
+    }
+    return convert(inVal).toString(16).padStart(64, '0')
+}
+
 export function getAccountLink (object, acc) {
     if (acc === 'multiple') {
         return $.t('multiple')
