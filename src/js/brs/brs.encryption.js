@@ -2,7 +2,7 @@
  * @depends {brs.js}
  */
 
-/* global $ BigInteger CryptoJS pako */
+/* global BigInteger CryptoJS pako */
 
 import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'

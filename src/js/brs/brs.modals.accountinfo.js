@@ -3,8 +3,6 @@
  * @depends {brs.modals.js}
  */
 
-/* global $ */
-
 import { BRS } from '.'
 
 export function formsSetAccountInfoComplete (response, data) {

@@ -3,9 +3,8 @@
  * @depends {brs.modals.js}
  */
 
-/* global $ */
-
 import converters from '../util/converters'
+
 import { BRS } from '.'
 
 import { sendRequest } from './brs.server'

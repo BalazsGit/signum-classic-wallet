@@ -3,8 +3,6 @@
  * @depends {brs.modals.js}
  */
 
-/* global $ */
-
 import { createInfoTable } from './brs.util'
 
 export function showRawTransactionModal (transaction) {

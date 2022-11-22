@@ -1,5 +1,3 @@
-/* global $ */
-
 export function theme () {
     const mythemes = [
         'theme-dark',

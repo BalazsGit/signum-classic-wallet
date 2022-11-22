@@ -2,8 +2,6 @@
  * @depends {brs.js}
  */
 
-/* global $ */
-
 import { BRS } from '.'
 
 import { loadPage } from './brs'

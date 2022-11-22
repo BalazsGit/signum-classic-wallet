@@ -1,7 +1,6 @@
 /**
  * @depends {brs.js}
  */
-/* global $ */
 
 import { BRS } from '.'
 

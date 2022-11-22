@@ -2,7 +2,7 @@
  * @depends {brs.js}
  */
 
-/* global $ BigInteger */
+/* global BigInteger */
 
 import { BRS } from '.'
 

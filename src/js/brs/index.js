@@ -2,7 +2,7 @@
  * @module BRS
 */
 
-/* global $ */
+import $ from 'jquery'
 
 import {
     pagesSettings
@@ -316,7 +316,7 @@ export const BRS = {
     }
 }
 
-// window.BRS = BRS
+window.jQuery = window.$ = $
 
 $(document).ready(function () {
     let done = 0

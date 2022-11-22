@@ -2,9 +2,8 @@
  * @depends {brs.js}
  */
 
-/* global $ */
-
 import { BRS } from '.'
+
 import { fnAjaxMultiQueue } from './brs.ajaxmultiqueue'
 
 import {

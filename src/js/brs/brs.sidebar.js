@@ -3,8 +3,6 @@
  * Reverted from BRS version 2.0.4
  */
 
-/* global $ */
-
 import { BRS } from '.'
 
 export function evSidebarContextOnContextmenu (e) {

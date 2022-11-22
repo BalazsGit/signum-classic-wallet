@@ -1,7 +1,6 @@
 /**
  * @depends {brs.js}
  */
-/* global $ */
 
 import converters from '../util/converters'
 import { BRS } from '.'

@@ -24,7 +24,7 @@ import {
     addUnconfirmedTransaction
 } from './brs.transactions'
 
-/* global $ BigInteger */
+/* global BigInteger */
 
 function getSuccessMessage (requestType) {
     const ignore = ['asset_exchange_change_group_name', 'asset_exchange_group', 'add_contact', 'update_contact', 'delete_contact',

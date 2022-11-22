@@ -2,7 +2,7 @@
  * @depends {brs.js}
  */
 
-/* global $ BigInteger Clipboard */
+/* global BigInteger Clipboard */
 
 import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'

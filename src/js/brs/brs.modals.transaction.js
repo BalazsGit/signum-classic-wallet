@@ -3,7 +3,7 @@
  * @depends {brs.modals.js}
  */
 
-/* global $ BigInteger */
+/* global BigInteger */
 
 import converters from '../util/converters'
 import { BRS } from '.'

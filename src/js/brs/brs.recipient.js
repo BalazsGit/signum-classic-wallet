@@ -2,9 +2,8 @@
  * @depends {brs.js}
  */
 
-/* global $ */
-
 import { BRS } from '.'
+
 import { NxtAddress } from '../util/nxtaddress'
 
 import { sendRequest } from './brs.server'

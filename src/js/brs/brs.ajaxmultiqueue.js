@@ -9,8 +9,6 @@
  * Requires jQuery 1.5+
  */
 
-/* global $ */
-
 import { BRS } from '.'
 
 export function fnAjaxMultiQueue (n) {

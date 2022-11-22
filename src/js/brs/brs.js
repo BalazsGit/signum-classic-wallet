@@ -14,7 +14,7 @@
  * @depends {util/extensions.js}
  */
 
-/* global $ WebDB BigInteger */
+/* global WebDB BigInteger */
 
 import {
     getSettings
