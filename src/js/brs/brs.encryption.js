@@ -2,10 +2,11 @@
  * @depends {brs.js}
  */
 
-/* global BigInteger CryptoJS pako */
+/* global BigInteger CryptoJS */
 
 import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
+import pako from 'pako'
 
 import * as curve25519 from '../crypto/curve25519'
 import * as jssha from '../crypto/3rdparty/jssha256'
@@ -717,7 +718,6 @@ function aesDecrypt (ivCiphertext, options) {
 
 function encryptData (plaintext, options) {
     if (!window.crypto && !window.msCrypto) {
-        // eslint-disable-next-line no-throw-literal
         throw {
             errorCode: -1,
             message: $.t('error_encryption_browser_support')
