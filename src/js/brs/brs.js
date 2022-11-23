@@ -1,10 +1,8 @@
 /**
- * @depends {3rdparty/jquery.min.js}
  * @depends {3rdparty/bootstrap.min.js}
  * @depends {3rdparty/jsbn.js}
  * @depends {3rdparty/jsbn2.js}
  * @depends {3rdparty/webdb.js}
- * @depends {3rdparty/ajaxmultiqueue.js}
  * @depends {3rdparty/notify.min.js}
  * @depends {3rdparty/clipboard.js}
  * @depends {crypto/passphrasegenerator.js}
