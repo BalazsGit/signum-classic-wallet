@@ -1,4 +1,10 @@
-<section class="sidebar">
+<aside class="main-sidebar sidebar sidebar-dark-primary">
+
+  <!-- Logo -->
+  <a href="index3.html" class="brand-link">
+    <img src="img/signum_logo_collapsed.png" alt="Signum" class="brand-image img-circle elevation-3" style="opacity: .8">
+    <span class="brand-text font-weight-light">Signum</span>
+  </a>
   <div class="user-panel">
     <div class="pull-left info">
       <div class="pull-left info">
@@ -14,19 +20,14 @@
       </div>
     </div>
   </div>
-  <form action="#" method="get" class="sidebar-form" id="id_search" autocomplete="off">
-    <div class="input-group" title="search_help" data-i18n="[title]search_help">
-      <input type="text" name="q" class="form-control" placeholder="search" data-i18n="[placeholder]search">
-      <span class="input-group-btn">
-      <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fas fa-search"></i></button>
-      </span>
+  <div class="form-inline">
+    <div class="input-group" id="search_box" data-widget="sidebar-search">
+      <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+      <div class="input-group-append">
+        <button id="search_btn" class="btn btn-sidebar"><i class="fas fa-search fa-fw"></i></button>
+      </div>
     </div>
-  </form>
-  <ul class="sidebar-menu">
-    <li class="active" id="dashboard_link"><a href="#" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> <span data-i18n="dashboard">Dashboard</span></a></li>
-    <li class="treeview" id="sidebar_transactions">
-      <a href="#" data-page="transactions"><i class="fas fa-briefcase"></i> <span data-i18n="transactions">Transactions</span><i class="fa pull-right fa-angle-right" style="padding-top:3px"></i></a>
-      <ul class="treeview-menu" style="display: none;">
+  </div>
         <li><a href="#" data-page="transactions"><i class="fas fa-exchange-alt"></i> <span data-i18n="transactions">Transactions</span></a></li>
         <li><a href="#" data-toggle="modal" data-target="#send_money_modal"><i class="fas fa-paper-plane"></i> <span data-i18n="send_burst">send_burst</span></a></li>
         <li><a href="#" data-toggle="modal" data-target="#request_burst_qr_modal"><i class="fas fa-qrcode"></i> <span data-i18n="request_burst_qr">request_burst_qr</span></a></li>
@@ -67,4 +68,5 @@
     </li>
     <li><a href="#" data-page="peers"><i class="fab fa-connectdevelop"></i> <span data-i18n="peers">Peers</span></a></li>
   </ul>
-</section>
+  </nav>
+</aside>

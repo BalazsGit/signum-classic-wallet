@@ -9,7 +9,7 @@
     "lint": "npx eslint './src/js/brs/*'",
     "build": "node esbuild.config.js",
     "lang": "pushd ./src/locales && ./updateFiles.sh && popd",
-    "dev": "npm run build && cp src/index.html src/index.dev.html && sed -i 's/index.min.js/index.dev.js/g' src/index.dev.html",
+    "dev": "npm run build && ./cpdev.sh",
     "build-all": "npm run lang && npm run build"
   },
   "repository": {
@@ -31,6 +31,7 @@
     "light-server": "^2.9.1"
   },
   "devDependencies": {
+    "admin-lte": "^3.2.0",
     "esbuild": "^0.15.12",
     "eslint": "^8.26.0",
     "eslint-config-standard": "^17.0.0",

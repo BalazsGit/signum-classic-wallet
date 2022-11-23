@@ -36,18 +36,17 @@ export function setupLockableModal () {
     $.extend(_superModal.Constructor.prototype, {
         // locks the dialog so that it cannot be hidden
         lock: function () {
-            this.options.locked = true
+            this.locked = true
             this.$element.addClass('locked')
         }, // unlocks the dialog so that it can be hidden by 'esc' or clicking on the backdrop (if not static)
 
         unlock: function () {
-            this.options.locked = false
+            this.locked = false
             this.$element.removeClass('locked')
         },
         // override the original hide so that the original is only called if the modal is unlocked
         hide: function () {
-            if (this.options.locked) return
-
+            if (this.locked) return
             _hide.apply(this, arguments)
         }
     })

@@ -323,7 +323,6 @@ window.jQuery = window.$ = $
 $(document).ready(function () {
     let done = 0
     const pages = [
-        { location: 'body', path: 'html/header.html' },
         { location: 'body', path: 'html/sidebar_context.html' },
         { location: 'body', path: 'html/modals/account.html' },
         { location: 'body', path: 'html/modals/alias.html' },
@@ -346,6 +345,7 @@ $(document).ready(function () {
         { location: 'body', path: 'html/modals/transaction_operations.html' },
         { location: 'body', path: 'html/modals/user_info.html' },
         { location: 'body', path: 'html/modals/sign_message.html' },
+        { location: '#header-nav', path: 'html/header.html' },
         { location: '#lockscreen', path: 'html/pages/lockscreen.html' },
         { location: '#sidebar', path: 'html/sidebar.html' },
         { location: '#content', path: 'html/pages/dashboard.html' },

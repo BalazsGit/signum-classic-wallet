@@ -1005,7 +1005,7 @@ function showAssetSearchResults (assets) {
 
 export function evIdSearchSubmit (e) {
     e.preventDefault()
-    const userInput = $.trim($('#id_search input[name=q]').val())
+    const userInput = $('#search_box input').val().trim()
     let searchText = userInput
     if (searchText.startsWith('-')) {
         try {

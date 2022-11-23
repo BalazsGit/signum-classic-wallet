@@ -206,7 +206,7 @@ export function addEventListeners () {
 
         goToPageNumber($(this).data('page'))
     })
-    $('#id_search').on('submit', evIdSearchSubmit)
+    $('#search_btn').on('click', evIdSearchSubmit)
     $('#login_button').on('click', evLoginButtonClick)
 
     // from brs.forms.js
