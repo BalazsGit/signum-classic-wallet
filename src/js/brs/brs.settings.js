@@ -57,8 +57,9 @@ export function getSettings () {
 
 function applySettings (key) {
     if (!key || key === 'language') {
-        $.i18n.setLng(BRS.settings.language, null, function () {
-            $('[data-i18n]').i18n()
+        $.i18n.changeLanguage(BRS.settings.language, function (err, _t) {
+            if (err) return console.log('i18next changeLanguage error loading ', err)
+            $('[data-i18n]').localize()
         })
         if (BRS.inApp) {
             parent.postMessage({

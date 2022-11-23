@@ -30,7 +30,7 @@ export function evRequestBurstQrModalOnShowBsModal (e) {
             $('#standard_fee_response').html("<span class='margin-left-5'>(<a href='#' class='btn-fee-response' name='fee_value' data-i18n='[title]click_to_apply'>" + (response.standard / 100000000).toFixed(8) + '</a>)</span>')
             $('#cheap_fee_response').html("<span class='margin-left-5'>(<a href='#' class='btn-fee-response' name='fee_value' data-i18n='[title]click_to_apply'>" + (response.cheap / 100000000).toFixed(8) + '</a>)</span>')
             $('#priority_fee_response').html("<span class='margin-left-5'>(<a href='#' class='btn-fee-response' name='fee_value' data-i18n='[title]click_to_apply'>" + (response.priority / 100000000).toFixed(8) + '</a>)</span>')
-            $("[name='fee_value']").i18n() // apply locale to DOM after ajax call
+            $("[name='fee_value']").localize() // apply locale to DOM after ajax call
             $("[name='fee_value']").on('click', function (e) {
                 e.preventDefault()
                 $('#request_burst_fee').val($(this).text())

@@ -17,10 +17,10 @@ The community can help adding or making translations more complete and accurate!
 | bg | 159 | 83%
 | ca | 159 | 83%
 | cs | 204 | 78%
-| de-de | 152 | 84%
+| de | 152 | 84%
 | el | 345 | 64%
 | en | 0 | 100%
-| es-es | 167 | 82%
+| es | 167 | 82%
 | fi | 171 | 82%
 | fr | 157 | 83%
 | gl | 243 | 74%
@@ -42,5 +42,5 @@ The community can help adding or making translations more complete and accurate!
 | sr-cs | 178 | 81%
 | tr | 495 | 48%
 | uk | 143 | 85%
-| zh-cn | 161 | 83%
+| zh | 161 | 83%
 | zh-tw | 160 | 83%
