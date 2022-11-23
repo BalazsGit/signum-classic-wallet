@@ -4,3 +4,6 @@ src/js/index.js
 src/js/index.min.js
 src/locales/*.json
 src/index.dev.html
+src/css/adminlte.css*
+src/js/3rdparty/adminlte*
+src/js/3rdparty/bootstrap.bundle*
