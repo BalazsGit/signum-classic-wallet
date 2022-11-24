@@ -166,8 +166,6 @@ export function init () {
 
     $("[data-toggle='tooltip']").tooltip()
 
-    $('.sidebar .treeview').tree()
-
     setInterval(setHeaderClock, 1000)
 
     /*
@@ -361,7 +359,7 @@ export function getState (callback) {
     saveCachedAssets()
 }
 
-export function logoSidebarClick (e, data) {
+export function sidebarClick (e, data) {
     if ($(this).hasClass('ignore')) {
         $(this).removeClass('ignore')
         return
@@ -374,6 +372,10 @@ export function logoSidebarClick (e, data) {
     }
 
     const page = $(this).data('page')
+
+    alert('page = ' + page)
+
+    return /*
 
     if (page === 'keep' || page === BRS.currentPage) {
         if (data && data.callback) {
@@ -426,6 +428,7 @@ export function logoSidebarClick (e, data) {
             BRS.pages[page]()
         }
     }
+    */
 }
 
 export function loadPage (page, callback) {

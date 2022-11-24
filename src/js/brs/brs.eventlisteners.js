@@ -9,7 +9,7 @@ import { fnAjaxMultiQueue } from './brs.ajaxmultiqueue'
 import {
     autoSelectServer,
     getState,
-    logoSidebarClick,
+    sidebarClick,
     loadPage,
     goToPage,
     goToPageNumber,
@@ -157,6 +157,7 @@ import {
 } from './brs.modals.transaction'
 
 export function addEventListeners () {
+/*
     // from brs.js
     $('#prefered_node').on('blur', function () {
         getState(null)
@@ -195,12 +196,15 @@ export function addEventListeners () {
         const value = $(this).val()
         updateSettings('language', value)
     })
-    $('#logo, .sidebar-menu a').click(logoSidebarClick)
-    $('button.goto-page, a.goto-page').click(function (event) {
+    */
+    $('.sidebar-menu a').on('click', sidebarClick)
+    $('button.goto-page, a.goto-page').on('click', function (event) {
         event.preventDefault()
 
-        goToPage($(this).data('page'))
+        alert('goto page ' + $(this).data('page'))
+        // goToPage($(this).data('page'))
     })
+    /*
     $('.data-pagination').on('click', 'a', function (e) {
         e.preventDefault()
 
@@ -846,9 +850,12 @@ export function addEventListeners () {
         $('#transaction_info_output_bottom, #transaction_info_output_top, #transaction_info_bottom').html('').hide()
     })
 
+    */
     // from brs.utils.js
     $.fn.tree = FnTree
+    $('.sidebar-menu .treeview').tree()
 
+    /*
     // from brs.ajaxmultiqueue
     $.ajaxMultiQueue = fnAjaxMultiQueue
 
@@ -881,4 +888,5 @@ export function addEventListeners () {
         }
         blocksInfoLoad(currentBlock + 1)
     })
+    */
 }
