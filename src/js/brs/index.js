@@ -345,8 +345,7 @@ $(document).ready(function () {
         { location: 'body', path: 'html/modals/transaction_operations.html' },
         { location: 'body', path: 'html/modals/user_info.html' },
         { location: 'body', path: 'html/modals/sign_message.html' },
-        { location: '#header-nav', path: 'html/header.html' },
-        { location: '#lockscreen', path: 'html/pages/lockscreen.html' },
+        { location: '#header_nav', path: 'html/header.html' },
         { location: '#sidebar', path: 'html/sidebar.html' },
         { location: '#content', path: 'html/pages/dashboard.html' },
         { location: '#content', path: 'html/pages/transactions.html' },
@@ -356,7 +355,8 @@ $(document).ready(function () {
         { location: '#content', path: 'html/pages/asset_exchange.html' },
         { location: '#content', path: 'html/pages/settings.html' },
         { location: '#content', path: 'html/pages/peers.html' },
-        { location: '#content', path: 'html/pages/blocks.html' }
+        { location: '#content', path: 'html/pages/blocks.html' },
+        { location: '#lockscreen', path: 'html/pages/lockscreen.html' }
     ]
     function loadHTMLOn (domName, path) {
         $.get(path, '', (data) => {

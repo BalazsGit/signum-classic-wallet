@@ -157,7 +157,6 @@ import {
 } from './brs.modals.transaction'
 
 export function addEventListeners () {
-/*
     // from brs.js
     $('#prefered_node').on('blur', function () {
         getState(null)
@@ -179,11 +178,11 @@ export function addEventListeners () {
             return
         }
         for (const server of BRS.nodes.filter(obj => obj.testnet === false)) {
-            $list.append("<li><a href='#' data-server='" + server.address + "'>" + server.address + '</a></li>')
+            $list.append("<li><a class='dropdown-item' href='#' data-server='" + server.address + "'>" + server.address + '</a></li>')
         }
-        $list.append("<li class='divider'></li>")
+        $list.append("<li><hr class='dropdown-divider'></li>")
         for (const server of BRS.nodes.filter(obj => obj.testnet === true)) {
-            $list.append("<li><a href='#' data-server='" + server.address + "'>" + server.address + '</a></li>')
+            $list.append("<li><a class='dropdown-item' href='#' data-server='" + server.address + "'>" + server.address + '</a></li>')
         }
     })
     $('span.node_selector').on('click', 'ul li a', function (e) {
@@ -196,15 +195,13 @@ export function addEventListeners () {
         const value = $(this).val()
         updateSettings('language', value)
     })
-    */
+
     $('.sidebar-menu a').on('click', sidebarClick)
     $('button.goto-page, a.goto-page').on('click', function (event) {
         event.preventDefault()
 
-        alert('goto page ' + $(this).data('page'))
-        // goToPage($(this).data('page'))
+        goToPage($(this).data('page'))
     })
-    /*
     $('.data-pagination').on('click', 'a', function (e) {
         e.preventDefault()
 
@@ -229,7 +226,7 @@ export function addEventListeners () {
     })
 
     // from brs.login.js
-    $('#account_phrase_custom_panel form').submit(evAccountPhraseCustomPanelSubmit)
+    $('#account_phrase_custom_panel form').on('submit', evAccountPhraseCustomPanelSubmit)
     $('#menu_logout').on('click', function (event) {
         event.preventDefault()
         logout()
@@ -850,12 +847,10 @@ export function addEventListeners () {
         $('#transaction_info_output_bottom, #transaction_info_output_top, #transaction_info_bottom').html('').hide()
     })
 
-    */
     // from brs.utils.js
     $.fn.tree = FnTree
     $('.sidebar-menu .treeview').tree()
 
-    /*
     // from brs.ajaxmultiqueue
     $.ajaxMultiQueue = fnAjaxMultiQueue
 
@@ -888,5 +883,4 @@ export function addEventListeners () {
         }
         blocksInfoLoad(currentBlock + 1)
     })
-    */
 }
