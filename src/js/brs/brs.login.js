@@ -366,7 +366,7 @@ function unlock () {
     }
 
     $('#lockscreen').hide()
-    $('body, html').removeClass('lockscreen')
+    $('#main_wrapper').show()
 
     $('#login_error').html('').hide()
 
