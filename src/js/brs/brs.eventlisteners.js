@@ -530,26 +530,6 @@ export function addEventListeners () {
         $(target).scrollTop(0)
     })
     resetModalMultiOut()
-    $('.ordinary-nav a').on('click', function (e) {
-        $('#send_multi_out').hide()
-        $('#send_ordinary').fadeIn()
-        if (!$('.ordinary-nav').hasClass('active')) {
-            $('.ordinary-nav').addClass('active')
-        }
-        if ($('.multi-out-nav').toggleClass('active')) {
-            $('.multi-out-nav').removeClass('active')
-        }
-    })
-    $('.multi-out-nav a').on('click', function (e) {
-        $('#send_ordinary').hide()
-        $('#send_multi_out').fadeIn()
-        if ($('.ordinary-nav').hasClass('active')) {
-            $('.ordinary-nav').removeClass('active')
-        }
-        if (!$('.multi-out-nav').hasClass('active')) {
-            $('.multi-out-nav').addClass('active')
-        }
-    })
     $('#multi_out_same_amount').on('change', evMultiOutSameAmountChange)
     $('#send_money_same_out_checkbox').on('change', evSameOutCheckboxChange)
     $('#multi_out_fee').on('change', evMultiOutFeeChange)

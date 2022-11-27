@@ -47,7 +47,7 @@ export function sendMoneyCalculateTotal (element) {
     const fee = isNaN(current_fee) ? BRS.minimumFee : (current_fee < BRS.minimumFee ? BRS.minimumFee : current_fee)
     const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount)
 
-    $('#send_money_fee').val(fee.toFixed(8))
+    $('#send_money_fee').val(fee)
 
     $(element).closest('.modal').find('.total_amount_ordinary').html(formatAmount(convertToNQT(amount + fee)) + ' ' + BRS.valueSuffix)
 }

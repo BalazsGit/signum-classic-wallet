@@ -174,14 +174,7 @@ export function resetModalMultiOut () {
     $('#send_money_same_out_checkbox').prop('checked', false)
     $('#multi_out_fee').val(0.02)
     $('#multi_out_same_amount').val('')
-    $('#send_ordinary').fadeIn()
-    $('#send_multi_out').hide()
-    if (!$('.ordinary-nav').hasClass('active')) {
-        $('.ordinary-nav').addClass('active')
-    }
-    if ($('.multi-out-nav').toggleClass('active')) {
-        $('.multi-out-nav').removeClass('active')
-    }
+    $('#send_ordinary_tab').tab('show')
 }
 
 // Reset form to initial state when modal is closed
