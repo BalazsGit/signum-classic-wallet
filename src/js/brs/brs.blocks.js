@@ -8,7 +8,7 @@ import { BRS } from '.'
 
 import {
     setStateInterval,
-    loadPage,
+    reloadCurrentPage,
     updateBlockchainDownloadProgress,
     checkIfOnAFork
 } from './brs'
@@ -358,7 +358,7 @@ export function pagesBlocks () {
 }
 
 export function incomingBlocks () {
-    loadPage('blocks')
+    reloadCurrentPage()
 }
 
 export function finish100Blocks (response) {

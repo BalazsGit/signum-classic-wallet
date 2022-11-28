@@ -9,8 +9,8 @@ import { fnAjaxMultiQueue } from './brs.ajaxmultiqueue'
 import {
     autoSelectServer,
     getState,
-    sidebarClick,
-    loadPage,
+    evSidebarClick,
+    reloadCurrentPage,
     goToPage,
     goToPageNumber,
     clearData,
@@ -68,7 +68,7 @@ import {
 import {
     convertToNQT,
     formatAmount,
-    FnTree
+    treeViewHandler
 } from './brs.util'
 
 import {
@@ -196,7 +196,7 @@ export function addEventListeners () {
         updateSettings('language', value)
     })
 
-    $('.sidebar-menu a').on('click', sidebarClick)
+    $('.sidebar-menu a').on('click', evSidebarClick)
     $('button.goto-page, a.goto-page').on('click', function (event) {
         event.preventDefault()
 
@@ -313,7 +313,7 @@ export function addEventListeners () {
     $('input[type=radio][name=transactions_from_account]').on('click', function () {
         BRS.pageNumber = 1
         BRS.hasMorePages = false
-        loadPage('transactions')
+        reloadCurrentPage()
     })
     $('#transactions_page_type li a').click(evTransactionsPageTypeClick)
 
@@ -828,7 +828,7 @@ export function addEventListeners () {
     })
 
     // from brs.utils.js
-    $.fn.tree = FnTree
+    $.fn.tree = treeViewHandler
     $('.sidebar-menu .treeview').tree()
 
     // from brs.ajaxmultiqueue

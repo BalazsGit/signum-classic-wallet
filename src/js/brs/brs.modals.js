@@ -37,12 +37,12 @@ export function setupLockableModal () {
         // locks the dialog so that it cannot be hidden
         lock: function () {
             this.locked = true
-            this.$element.addClass('locked')
+            $(this._element).addClass('locked')
         }, // unlocks the dialog so that it can be hidden by 'esc' or clicking on the backdrop (if not static)
 
         unlock: function () {
             this.locked = false
-            this.$element.removeClass('locked')
+            $(this._element).removeClass('locked')
         },
         // override the original hide so that the original is only called if the modal is unlocked
         hide: function () {

@@ -6,7 +6,7 @@ import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
 
 import {
-    loadPage,
+    reloadCurrentPage,
     pageLoaded
 } from './brs'
 
@@ -86,7 +86,7 @@ function validateContactData (data) {
 function notifyContactOperationSuccess (message) {
     $.notify(message, { type: 'success' })
     if (BRS.currentPage === 'contacts') {
-        loadPage('contacts')
+        reloadCurrentPage()
         return
     }
     if (BRS.currentPage === 'messages' && BRS.selectedContext) {
@@ -365,7 +365,7 @@ export function importContacts (imported_contacts) {
                         $.notify($.t('success_contact_add'), { type: 'success' })
 
                         if (BRS.currentPage === 'contacts') {
-                            loadPage('contacts')
+                            reloadCurrentPage()
                         } else if (BRS.currentPage === 'messages' && BRS.selectedContext) {
                             const heading = BRS.selectedContext.find('h4.list-group-item-heading')
                             if (heading.length) {

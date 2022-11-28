@@ -150,6 +150,7 @@ export const BRS = {
     selectedContext: null,
 
     currentPage: 'dashboard',
+    // TODO: currentSubPage is not implemented. Implement or just remove?
     currentSubPage: '',
     pageNumber: 1,
     pageSize: 25,

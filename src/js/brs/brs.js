@@ -359,55 +359,33 @@ export function getState (callback) {
     saveCachedAssets()
 }
 
-export function sidebarClick (e, data) {
-    if ($(this).hasClass('ignore')) {
-        $(this).removeClass('ignore')
-        return
-    }
-
+/**
+ * Handles clicks in sidebar, changing current page if needed
+ */
+export function evSidebarClick (e) {
     e.preventDefault()
-
     if ($(this).data('toggle') === 'modal') {
         return
     }
-
     const page = $(this).data('page')
-
     if (page === 'keep' || page === BRS.currentPage) {
-        if (data && data.callback) {
-            data.callback()
-        }
         return
     }
-
     $('.page').hide()
-
     $('#' + page + '_page').show()
+    // $('.content-header h1').find('.loading_dots').remove()
+    $('#sidebar .active').removeClass('active')
+    $(e.currentTarget).addClass('active')
 
-    $('.content-header h1').find('.loading_dots').remove()
+    // if (BRS.currentPage !== 'messages') {
+    //     $('#inline_message_password').val('')
+    // }
 
-    const changeActive = !($(this).closest('ul').hasClass('treeview-menu'))
+    loadPage(page)
+}
 
-    if (changeActive) {
-        const currentActive = $('ul.sidebar-menu > li.active')
-
-        if (currentActive.hasClass('treeview')) {
-            currentActive.children('a').first().addClass('ignore').click()
-        } else {
-            currentActive.removeClass('active')
-        }
-
-        if ($(this).attr('id') && $(this).attr('id') === 'logo') {
-            $('#dashboard_link').addClass('active')
-        } else {
-            $(this).parent().addClass('active')
-        }
-    }
-
-    if (BRS.currentPage !== 'messages') {
-        $('#inline_message_password').val('')
-    }
-
+/** Load a page for first time (setting up global variables) */
+function loadPage (page) {
     BRS.currentPage = page
     BRS.currentSubPage = ''
     BRS.pageNumber = 1
@@ -415,55 +393,43 @@ export function sidebarClick (e, data) {
 
     if (BRS.pages[page]) {
         pageLoading()
-
-        if (data && data.callback) {
-            BRS.pages[page](data.callback)
-        } else if (data) {
-            BRS.pages[page](data)
-        } else {
-            BRS.pages[page]()
-        }
+        BRS.pages[page]()
     }
 }
 
-export function loadPage (page, callback) {
+/** Reload current page, keeping variables like pagination */
+export function reloadCurrentPage () {
+    if (BRS.pages[BRS.currentPage]) {
+        console.log('Possible bug on reloadCurrentPage.')
+        return
+    }
     pageLoading()
-    BRS.pages[page](callback)
+    BRS.pages[BRS.currentPage]()
 }
 
-export function goToPage (page, callback) {
+/** Go to a page, updating sidebar menu */
+export function goToPage (page) {
     let $link = $('ul.sidebar-menu a[data-page=' + page + ']')
 
     if ($link.length > 1) {
+        // if there are many pages in menubar
         if ($link.last().is(':visible')) {
+            // Select last one if it is visible
             $link = $link.last()
         } else {
             $link = $link.first()
         }
     }
-
     if ($link.length === 1) {
-        if (callback) {
-            $link.trigger('click', [{
-                callback
-            }])
-        } else {
-            $link.trigger('click')
-        }
-    } else {
-        BRS.currentPage = page
-        BRS.currentSubPage = ''
-        BRS.pageNumber = 1
-        BRS.showPageNumbers = false
-
-        $('ul.sidebar-menu a.active').removeClass('active')
-        $('.page').hide()
-        $('#' + page + '_page').show()
-        if (BRS.pages[page]) {
-            pageLoading()
-            BRS.pages[page](callback)
-        }
+        // handle pages that are in sidebar simulating a click
+        $link.trigger('click')
+        return
     }
+    // Handle hidden pages like "search_results"
+    $('ul.sidebar-menu a.active').removeClass('active')
+    $('.page').hide()
+    $('#' + page + '_page').show()
+    loadPage(page)
 }
 
 export function pageLoading () {

@@ -25,10 +25,10 @@
   </div>
 
   <nav class="mt-2">
-    <ul class="sidebar-menu nav nav-sidebar">
+    <ul class="sidebar-menu nav nav-sidebar nav-flat">
       <li class="nav-item active" id="dashboard_link">
-        <a class="nav-link" href="#" data-page="dashboard"
-          ><i class="fas fa-tachometer-alt"></i>
+        <a class="nav-link active" href="#" data-page="dashboard">
+          <i class="fas fa-tachometer-alt"></i>
           <p data-i18n="dashboard">Dashboard</p>
         </a>
       </li>
@@ -37,7 +37,7 @@
           <i class="fas fa-briefcase"></i>
           <p><i class="right fa pull-right fa-angle-right"></i><span data-i18n="transactions">Transactions</span></p>
         </a>
-        <ul class="treeview-menu nav nav-sidebar" style="display: none">
+        <ul class="treeview-menu nav nav-sidebar nav-treeview">
           <li class="nav-item">
             <a class="nav-link" href="#" data-page="transactions">
               <i class="fas fa-exchange-alt"></i>
@@ -81,7 +81,7 @@
           <i class="fas fa-tag"></i>
           <p><i class="right fa pull-right fa-angle-right"></i><span data-i18n="assets">assets</span></p>
         </a>
-        <ul class="treeview-menu nav nav-sidebar" style="display: none">
+        <ul class="treeview-menu nav nav-sidebar nav-treeview">
           <li class="nav-item">
             <a class="nav-link" href="#" data-toggle="modal" data-target="#transfer_asset_modal">
               <i class="fas fa-location-arrow"></i>
@@ -131,7 +131,7 @@
           <i class="fas fa-hdd"></i>
           <p><i class="right fa pull-right fa-angle-right"></i><span data-i18n="mining">Mining</span></p>
         </a>
-        <ul class="treeview-menu nav nav-sidebar" style="display: none">
+        <ul class="treeview-menu nav nav-sidebar nav-treeview">
           <li class="nav-item">
             <a class="nav-link" href="#" data-toggle="modal" data-target="#reward_assignment_modal">
               <i class="fas fa-arrow-circle-right"></i>
@@ -175,7 +175,7 @@
           <i class="fas fa-link"></i>
           <p><i class="right fa pull-right fa-angle-right"></i><span data-i18n="blockchain">blockchain</span></p>
         </a>
-        <ul class="treeview-menu nav nav-sidebar" style="display: none">
+        <ul class="treeview-menu nav nav-sidebar nav-treeview">
           <li class="nav-item">
             <a class="nav-link" href="#" data-page="blocks"><p data-i18n="latest_blocks">latest_blocks</p></a>
           </li>

@@ -805,11 +805,12 @@ export function hasTransactionUpdates (transactions) {
     return ((transactions && transactions.length) || BRS.unconfirmedTransactionsChange)
 }
 
-export function FnTree () {
+/** Handles treeview menu logic (called once on initialization) */
+export function treeViewHandler () {
     return this.each(function () {
         const btn = $(this).children('a').first()
         const menu = $(this).children('.treeview-menu').first()
-        let isActive = $(this).hasClass('active')
+        const isActive = $(this).hasClass('is-open')
 
         // initialize already active menus
         if (isActive) {
@@ -817,20 +818,19 @@ export function FnTree () {
             btn.find('.fa-angle-right').first().removeClass('fa-angle-right').addClass('fa-angle-down')
         }
         // Slide open or close the menu on link click
-        btn.click(function (e) {
+        btn.on('click', function (e) {
             e.preventDefault()
-            if (isActive) {
+            const active = $(this.parentNode).hasClass('is-open')
+            if (active) {
                 // Slide up to close menu
                 menu.slideUp()
-                isActive = false
                 btn.find('.fa-angle-down').first().removeClass('fa-angle-down').addClass('fa-angle-right')
-                btn.parent('li').removeClass('active')
+                btn.parent('li').removeClass('is-open')
             } else {
                 // Slide down to open menu
                 menu.slideDown()
-                isActive = true
                 btn.find('.fa-angle-right').first().removeClass('fa-angle-right').addClass('fa-angle-down')
-                btn.parent('li').addClass('active')
+                btn.parent('li').addClass('is-open')
             }
         })
     })

@@ -4,7 +4,7 @@
 
 import { BRS } from '.'
 
-import { loadPage } from './brs'
+import { reloadCurrentPage } from './brs'
 
 import { sendRequest } from './brs.server'
 
@@ -98,7 +98,7 @@ export function pagesPeers () {
 }
 
 export function incomingPeers () {
-    loadPage('peers')
+    reloadCurrentPage()
 }
 
 class PreleaseTag {

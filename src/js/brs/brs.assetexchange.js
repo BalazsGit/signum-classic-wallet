@@ -7,7 +7,7 @@
 import { BRS } from '.'
 
 import {
-    loadPage,
+    reloadCurrentPage,
     goToPage,
     pageLoaded
 } from './brs'
@@ -1263,7 +1263,7 @@ export function formsAssetExchangeChangeGroupName () {
         groupName: oldGroupName
     }], function () {
         setTimeout(function () {
-            loadPage('asset_exchange')
+            reloadCurrentPage()
             $.notify($.t('success_group_name_update'), { type: 'success' })
         }, 50)
     })
@@ -1342,7 +1342,7 @@ export function evAssetExchangeSidebarContextClick (e) {
             asset: assetId
         }], function () {
             setTimeout(function () {
-                loadPage('asset_exchange')
+                reloadCurrentPage()
                 $.notify($.t('success_asset_group_removal'), { type: 'success' })
             }, 50)
         })
@@ -1360,7 +1360,7 @@ export function evAssetExchangeSidebarContextClick (e) {
                 $.notify($.t('error_save_db'), { type: 'danger' })
             }
             setTimeout(function () {
-                loadPage('asset_exchange')
+                reloadCurrentPage()
                 $.notify($.t('success_asset_bookmark_removal'), { type: 'success' })
             }, 50)
         })
@@ -1388,7 +1388,7 @@ export function formsAssetExchangeGroup () {
         asset: assetId
     }], function () {
         setTimeout(function () {
-            loadPage('asset_exchange')
+            reloadCurrentPage()
             if (!groupName) {
                 $.notify($.t('success_asset_group_removal'), { type: 'success' })
             } else {
@@ -1638,7 +1638,7 @@ function myAssetsPageLoaded (result) {
 }
 
 export function incomingMyAssets () {
-    loadPage('my_assets')
+    reloadCurrentPage()
 }
 
 export function evTransferAssetModalOnShowBsModal (e) {
@@ -1792,7 +1792,10 @@ export function formsTransferAsset (data) {
 }
 
 export function formsTransferAssetComplete (response, data) {
-    loadPage('my_assets')
+    if (BRS.currentPage === 'my_assets') {
+        // TODO Why only in my_assets?
+        reloadCurrentPage()
+    }
 }
 
 export function goToAsset (asset) {
@@ -2001,7 +2004,7 @@ function openOrdersLoaded (orders, type, callback) {
 
 export function incomingOpenOrders (transactions) {
     if (hasTransactionUpdates(transactions)) {
-        loadPage('open_orders')
+        reloadCurrentPage()
     }
 }
 

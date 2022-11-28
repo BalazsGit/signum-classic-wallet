@@ -7,7 +7,7 @@ import converters from '../util/converters'
 import { BRS } from '.'
 
 import {
-    loadPage,
+    reloadCurrentPage,
     pageLoaded,
     showFeeSuggestions
 } from './brs'
@@ -176,7 +176,7 @@ export function incomingMessages (transactions) {
         }
 
         if (BRS.currentPage === 'messages') {
-            loadPage('messages')
+            reloadCurrentPage()
         }
     }
 }

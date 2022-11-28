@@ -6,7 +6,7 @@ import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
 
 import {
-    loadPage,
+    reloadCurrentPage,
     pageLoaded
 } from './brs'
 
@@ -608,7 +608,7 @@ export function evRegisterAliasModalOnShowBsModal (e) {
 
 export function incomingAliases (transactions) {
     if (hasTransactionUpdates(transactions)) {
-        loadPage('aliases')
+        reloadCurrentPage()
     }
 }
 
