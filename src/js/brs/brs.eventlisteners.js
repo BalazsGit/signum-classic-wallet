@@ -315,7 +315,7 @@ export function addEventListeners () {
         BRS.hasMorePages = false
         reloadCurrentPage()
     })
-    $('#transactions_page_type li a').click(evTransactionsPageTypeClick)
+    $('#transactions_page_type li a').on('click', evTransactionsPageTypeClick)
 
     // from brs.assetexchange.js
     $('#asset_exchange_bookmark_this_asset').on('click', function () {

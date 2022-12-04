@@ -399,7 +399,7 @@ function loadPage (page) {
 
 /** Reload current page, keeping variables like pagination */
 export function reloadCurrentPage () {
-    if (BRS.pages[BRS.currentPage]) {
+    if (!BRS.pages[BRS.currentPage]) {
         console.log('Possible bug on reloadCurrentPage.')
         return
     }
@@ -438,6 +438,8 @@ export function pageLoading () {
     const $pageHeader = $('#' + BRS.currentPage + '_page .content-header h1')
     $pageHeader.find('.loading_dots').remove()
     $pageHeader.append("<span class='loading_dots'>" + BRS.loadingDotsHTML + '</span>')
+    const $pageContainer = $('#' + BRS.currentPage + '_page .data-container')
+    $pageContainer.addClass('data-loading')
 }
 
 export function pageLoaded (callback) {
