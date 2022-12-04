@@ -481,12 +481,11 @@ function checkForMerchant (accountInfo, modal) {
 }
 
 export function evSpanRecipientSelectorClickButton (e) {
+    const $list = $(this).parent().find('ul')
     if (!Object.keys(BRS.contacts).length) {
-        e.preventDefault()
-        e.stopPropagation()
+        $list.html(`<li><a class='dropdown-item' href='#' data-contact=''>${$.t('error_no_contacts_available')}</a></li>`)
         return
     }
-    const $list = $(this).parent().find('ul')
     $list.empty()
     const names = []
     for (const accountId in BRS.contacts) {
@@ -500,7 +499,7 @@ export function evSpanRecipientSelectorClickButton (e) {
         return 0
     })
     for (const name of names) {
-        $list.append("<li><a href='#' data-contact='" + name.escapeHTML() + "'>" + name.escapeHTML() + '</a></li>')
+        $list.append("<li><a class='dropdown-item' href='#' data-contact='" + name.escapeHTML() + "'>" + name.escapeHTML() + '</a></li>')
     }
 }
 

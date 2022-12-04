@@ -306,8 +306,8 @@ export function addEventListeners () {
         }
     })
     $('span.asset_selector').on('click', 'ul li a', evTransferAssetModalOnShowBsModal)
-    $('span.recipient_selector').on('click', 'button', evSpanRecipientSelectorClickButton)
-    $('span.recipient_selector').on('click', 'ul li a', evSpanRecipientSelectorClickUlLiA)
+    $('.recipient_selector button').on('click', evSpanRecipientSelectorClickButton)
+    $('.recipient_selector').on('click', 'ul li a', evSpanRecipientSelectorClickUlLiA)
 
     // from brs.transactions.js
     $('input[type=radio][name=transactions_from_account]').on('click', function () {
