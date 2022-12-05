@@ -157,6 +157,12 @@ import {
 } from './brs.modals.transaction'
 
 export function addEventListeners () {
+    // fix adminlte (for some reason no event listener was attached on sidebar-overlay)
+    $('#sidebar-overlay').on('click', function () {
+        $('body').removeClass('sidebar-open')
+        $('body').addClass('sidebar-closed sidebar-collapse')
+    })
+
     // from brs.js
     $('#prefered_node').on('blur', function () {
         getState(null)
