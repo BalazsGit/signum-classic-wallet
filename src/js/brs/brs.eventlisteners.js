@@ -144,7 +144,6 @@ import {
 } from './brs.modals.info'
 
 import {
-    evRequestBurstQrModalOnShowBsModal,
     evGenerateQrButtonClick
 } from './brs.modals.request'
 
@@ -684,89 +683,30 @@ export function addEventListeners () {
     })
 
     // from brs.modals.request.js
-    $('#request_burst_qr_modal').on('show.bs.modal', evRequestBurstQrModalOnShowBsModal)
-    $('#request_burst_amount').change(function () {
-        const amount = Number($('#request_burst_amount').val())
-        $('#request_burst_amount').val(amount)
-        if (amount >= 0.00000001 || (!$('#request_burst_immutable').is(':checked') && (!amount || amount === 0))) {
-            $('#request_burst_amount_div').toggleClass('has-error', false)
-            $('#request_burst_amount_div').toggleClass('has-success', true)
-        } else {
-            $('#request_burst_amount_div').toggleClass('has-success', false)
-            $('#request_burst_amount_div').toggleClass('has-error', true)
-        }
-    })
-    $('#request_burst_fee').change(function () {
-        const radio = document.request_burst_form.request_burst_suggested_fee
-        const fee = Number($('#request_burst_fee').val())
-        $('#request_burst_fee').val(fee)
-        if (fee >= BRS.minimumFeeNumber) {
-            for (let i = 0; i < radio.length; i++) {
-                radio[i].checked = false
-            }
-            $('#request_burst_fee_div').toggleClass('has-error', false)
-            $('#request_burst_fee_div').toggleClass('has-success', true)
-        } else {
-            $('#request_burst_fee_div').toggleClass('has-success', false)
-            $('#request_burst_fee_div').toggleClass('has-error', true)
-        }
-    })
-    $('#request_burst_immutable').change(function () {
-        const amount = Number($('#request_burst_amount').val())
-        if ($(this).is(':checked')) {
-            if (amount >= 0.00000001) {
-                $('#request_burst_amount_div').toggleClass('has-error', false)
-                $('#request_burst_amount_div').toggleClass('has-success', true)
-            } else {
-                $('#request_burst_amount_div').toggleClass('has-success', false)
-                $('#request_burst_amount_div').toggleClass('has-error', true)
-            }
-        } else {
-            if (amount >= 0.00000001 || (!amount || amount === 0)) {
-                $('#request_burst_amount_div').toggleClass('has-error', false)
-                $('#request_burst_amount_div').toggleClass('has-success', true)
-            } else {
-                $('#request_burst_amount_div').toggleClass('has-success', false)
-                $('#request_burst_amount_div').toggleClass('has-error', true)
-            }
-        }
+    $('#request_burst_qr_modal').on('show.bs.modal', function (e) {
+        showFeeSuggestions('#request_burst_fee', '#suggested_fee_request_burst_qr')
+        $('#new_qr_button').hide()
+        $('#request_burst_immutable').prop('checked', true)
+        $('#request_burst_account_id').val(String(BRS.accountRS).escapeHTML())
+        $('#request_burst_response_div').hide()
     })
     $('#generate_qr_button').on('click', evGenerateQrButtonClick)
     $('#request_burst_qr_modal').on('hide.bs.modal', function (e) {
-        $('#request_burst_div').removeClass('display-none')
-        $('#request_burst_div').addClass('display-visible')
-        $('#request_burst_response_div').removeClass('display-visible')
-        $('#request_burst_response_div').addClass('display-none')
-        $('#request_burst_amount_div').toggleClass('has-error', false)
-        $('#request_burst_amount_div').toggleClass('has-success', false)
-        $('#request_burst_fee_div').toggleClass('has-success', true)
-        $('#request_burst_fee_div').toggleClass('has-error', false)
-        const radio = document.request_burst_form.request_burst_suggested_fee
-        for (let i = 0; i < radio.length; i++) {
-            radio[i].checked = false
-        }
-        $('#cancel_button').html('Cancel')
+        $('#request_burst_div').show()
+        $('#request_burst_response_div').hide()
         $('#generate_qr_button').show()
+        $('#request_burst_div').show()
+        $('#request_burst_response_div').hide()
+        $('#request_burst_qr_modal').find('.error_message').html('').hide()
     })
     $('#new_qr_button').on('click', function (e) {
-        $('#request_burst_div').removeClass('display-none')
-        $('#request_burst_div').addClass('display-visible')
-        $('#request_burst_response_div').removeClass('display-visible')
-        $('#request_burst_response_div').addClass('display-none')
-        $('#request_burst_amount_div').toggleClass('has-error', false)
-        $('#request_burst_amount_div').toggleClass('has-success', false)
-        $('#request_burst_fee_div').toggleClass('has-success', true)
-        $('#request_burst_fee_div').toggleClass('has-error', false)
+        $('#request_burst_div').show()
+        $('#request_burst_response_div').hide()
         $('#request_burst_amount').val('')
-        $('#request_burst_fee').val(0.1)
-        const radio = document.request_burst_form.request_burst_suggested_fee
-        for (let i = 0; i < radio.length; i++) {
-            radio[i].checked = false
-        }
         $('#request_burst_immutable').prop('checked', true)
-        $('#cancel_button').html('Cancel')
         $('#generate_qr_button').show()
         $('#new_qr_button').hide()
+        $('#request_burst_qr_modal').find('.error_message').html('').hide()
     })
 
     // from brs.modals.signmessage.js
