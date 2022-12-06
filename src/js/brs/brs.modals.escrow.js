@@ -29,6 +29,7 @@ export function showEscrowDecisionModal (escrow) {
 
 export function processEscrowDecisionModalData (escrow) {
     $('#escrow_decision_escrow').val(escrow.id)
+    $('#escrow_decision_escrow_info').val(escrow.id)
     let decisions = ''
     for (let i = 0; i < escrow.signers.length; i++) {
         decisions += escrow.signers[i].idRS + ' ' + escrow.signers[i].decision + '<br />'

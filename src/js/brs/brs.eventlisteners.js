@@ -662,6 +662,11 @@ export function addEventListeners () {
         const escrowId = $(this).data('escrow')
         showEscrowDecisionModal(escrowId)
     })
+    /* signum-node/issues/677
+    $('#escrow_decision_modal').on('show.bs.modal', function (e) {
+        showFeeSuggestions('#escrow_decision_fee', '#suggested_fee_response_escrow_decision')
+    })
+    */
 
     // from brs.modals.info.js
     $('#brs_modal').on('show.bs.modal', evBrsModalOnShowBsModal)
