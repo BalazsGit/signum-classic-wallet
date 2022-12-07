@@ -2,7 +2,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" data-i18n="escrow_create">Escrow Create</h4>
+        <h4 class="modal-title" data-i18n="create_escrow">create_escrow</h4>
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       </div>
       <div class="modal-body">
@@ -44,11 +44,11 @@
             </div>
           </div>
           <div class="form-group">
-            <label data-i18n="Escrow deadline">Escrow deadline(seconds):</label>
+            <label data-i18n="escrow_deadline_seconds">escrow_deadline_seconds</label>
             <input type="text" name="escrowDeadline" class="form-control" id="escrow_create_escrow" />
           </div>
           <div class="form-group">
-            <label data-i18n="Escrow Deadline Action">Deadline Action:</label>
+            <label data-i18n="escrow_deadline_action">escrow_deadline_action</label>
             <select class="form-control" name="deadlineAction" id="escrow_create_deadline_action">
               <option value="release" data-i18n="release">Release</option>
               <option value="refund" data-i18n="refund">Refund</option>
@@ -56,11 +56,11 @@
             </select>
           </div>
           <div class="form-group">
-            <label data-i18n="Required Signers">Required signers:</label>
+            <label data-i18n="number_of_required_signers">number_of_required_signers</label>
             <input type="text" name="requiredSigners" class="form-control" id="escrow_create_required_signers" />
           </div>
           <div class="form-group">
-            <label data-i18n="Signers">Signers(semicolon ( ; ) separated):</label>
+            <label data-i18n="signers"></label>
             <input type="text" name="signers" class="form-control" id="escrow_create_signers" />
           </div>
           <div class="form-group">
@@ -110,7 +110,7 @@
           type="button"
           class="btn btn-primary"
           data-loading-text="Submitting..."
-          data-i18n="escrow_create;[data-loading-text]submitting">
+          data-i18n="create_escrow;[data-loading-text]submitting">
           Create Escrow
         </button>
       </div>
@@ -127,7 +127,7 @@
       <div class="modal-body">
         <form role="form" autocomplete="off">
           <div class="form-group">
-            <label data-i18n="escrow">escrow</label>
+            <label data-i18n="escrows">escrows</label>
             <input type="text" name="escrow_info" class="form-control" id="escrow_decision_escrow_info" disabled />
             <input type="hidden" name="escrow" id="escrow_decision_escrow" />
           </div>
