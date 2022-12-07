@@ -31,6 +31,7 @@ export function showSubscriptionCancelModal (subscription) {
 }
 
 export function processSubscriptionCancelModalData (subscription) {
+    $('#subscription_cancel_subscription_text').val(subscription.id)
     $('#subscription_cancel_subscription').val(subscription.id)
     $('#subscription_cancel_sender').html(subscription.senderRS)
     $('#subscription_cancel_recipient').html(subscription.recipientRS)

@@ -748,6 +748,12 @@ export function addEventListeners () {
         const subscriptionId = $(this).data('subscription')
         showSubscriptionCancelModal(subscriptionId)
     })
+    $('#subscription_create_modal').on('show.bs.modal', function (e) {
+        showFeeSuggestions('#subscription_create_fee', '#suggested_fee_response_subscription_create')
+    })
+    $('#subscription_cancel_modal').on('show.bs.modal', function (e) {
+        showFeeSuggestions('#subscription_cancel_fee', '#suggested_fee_response_subscription_cancel')
+    })
 
     // from brs.modals.transaction.js
     $('#transactions_table, #dashboard_transactions_table, #transfer_history_table, #asset_exchange_trade_history_table, #block_info_table, #block_info_transactions_table, #user_info_modal_transactions_table').on('click', 'a[data-transaction]', function (e) {
