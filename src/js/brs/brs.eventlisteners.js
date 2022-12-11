@@ -741,10 +741,6 @@ export function addEventListeners () {
         const transactionId = $(this).data('transaction')
         showTransactionModal(transactionId)
     })
-    $('#send_money_modal').on('show.bs.modal', function (e) {
-        showFeeSuggestions('#send_money_fee', '#suggested_fee_response_ordinary')
-        showFeeSuggestions('#multi_out_fee', '#suggested_fee_response_multi')
-    })
     $('#commitment_modal').on('show.bs.modal', function (e) {
         showFeeSuggestions('#commitment_fee', '#suggested_fee_response_commitment')
     })
