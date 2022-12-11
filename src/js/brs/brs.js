@@ -937,6 +937,35 @@ export function showFeeSuggestions (input_fee_field_id, response_span_id, fee_id
     })
 }
 
+export function showFeeSuggestionsNG (input_form) {
+    const $groups = $(input_form).find('.has-suggested-fee-group')
+    if ($groups.length === 0) {
+        return
+    }
+    $groups.find('.suggested_fee_spinner').show()
+    $groups.find('.suggested_fee_response').empty()
+
+    sendRequest('suggestFee', {
+    }, function (response) {
+        $groups.find('.suggested_fee_spinner').hide()
+        if (response.errorCode) {
+            $groups.find('.suggested_fee_response').html(response.errorDescription.escapeHTML())
+            return
+        }
+        $groups.find('[name=feeNXT]').val((response.standard / 100000000))
+        $groups.find('[name=feeNXT]').trigger('change')
+        const cheapMessage = `<span title='${$.t('cheap_fee')}'><i class='fas fa-leaf'></i> <a href='#' name='suggested_fee_value'>${(response.cheap / 100000000)}</a></span>`
+        const standardMessage = `<span title='${$.t('standard_fee')}'><i class='fas fa-balance-scale'></i> <a href='#' name='suggested_fee_value'>${(response.standard / 100000000)}</a></span>`
+        const priorityMessage = `<span title='${$.t('priority_fee')}'><i class='fas  fa-exclamation-triangle'></i> <a href='#' name='suggested_fee_value'>${(response.priority / 100000000)}</a></span>`
+        $groups.find('.suggested_fee_response').html(`${cheapMessage}&nbsp;&nbsp; ${standardMessage}&nbsp;&nbsp; ${priorityMessage}`)
+        $groups.find("[name='suggested_fee_value']").on('click', function (e) {
+            e.preventDefault()
+            $groups.find('[name=feeNXT]').val($(this).text())
+            $groups.find('[name=feeNXT]').trigger('change')
+        })
+    })
+}
+
 function showAccountSearchResults (accountsList) {
     if (BRS.currentPage !== 'search_results') {
         goToPage('search_results')

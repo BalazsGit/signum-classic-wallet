@@ -4,7 +4,7 @@
 
 import { BRS } from '.'
 
-import { checkMinimumFee } from './brs'
+import { checkMinimumFee, showFeeSuggestionsNG } from './brs'
 
 import {
     unlockForm
@@ -141,7 +141,7 @@ export function evMultiOutFeeChange (e) {
 
 // hide modal when another one is activated.
 export function evModalOnShowBsModal (e) {
-    const $visible_modal = $('.modal.in')
+    const $visible_modal = $('.modal.show')
     if ($visible_modal.length) {
         if ($visible_modal.hasClass('locked')) {
             const $btn = $visible_modal.find('button.btn-primary:not([data-dismiss=modal])')
@@ -150,7 +150,8 @@ export function evModalOnShowBsModal (e) {
             $visible_modal.modal('hide')
         }
     }
-    $(this).find('.form-group').css('margin-bottom', '')
+
+    showFeeSuggestionsNG(e.target)
 }
 
 export function resetModalMultiOut () {
