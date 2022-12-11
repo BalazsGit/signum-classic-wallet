@@ -1652,7 +1652,7 @@ export function evTransferAssetModalOnShowBsModal (e) {
     if (assetId === '') {
         return
     }
-    let $formGroup = $invoker.closest('.form-group')
+    let $formGroup = $invoker.closest('.row')
     if ($formGroup.length === 0) {
         // click was not in dropdown-menu... Assume new "transfer asset"
         $formGroup = $('#form-transfer-asset')

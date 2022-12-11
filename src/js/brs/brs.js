@@ -667,7 +667,7 @@ export function getAccountInfo (firstRun, callback) {
             }
 
             // only show if happened within last week
-            const showAssetDifference = (!BRS.downloadingBlockchain || (BRS.blocks && BRS.blocks[0] && BRS.state && BRS.state.time - BRS.blocks[0].timestamp < 60 * 60 * 24 * 7))
+            const showAssetDifference = (!BRS.downloadingBlockchain || (BRS.blocks.length > 0 && BRS.state && BRS.state.time - BRS.blocks[0].timestamp < 60 * 60 * 24 * 7))
 
             if (BRS.databaseSupport) {
                 BRS.database.select('data', [{
@@ -885,7 +885,7 @@ export function checkIfOnAFork () {
     if (!BRS.downloadingBlockchain) {
         let onAFork = true
 
-        if (BRS.blocks && BRS.blocks.length >= 10) {
+        if (BRS.blocks.length >= 10) {
             for (let i = 0; i < 10; i++) {
                 if (BRS.blocks[i].generator !== BRS.account) {
                     onAFork = false

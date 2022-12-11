@@ -299,14 +299,14 @@ export function addEventListeners () {
         const $list = $(this).parent().find('ul')
         $list.empty()
         if (!BRS.accountInfo.assetBalances) {
-            $list.append('<li>no-assets</li>')
+            $list.append(`<li><a class='dropdown-item' href='#' data-name='' data-asset='' data-decimals=''>${$.t('no_asset_found')}</a></li>`)
             return
         }
         sortCachedAssets()
         for (const asset of BRS.assets) {
             const foundAsset = BRS.accountInfo.assetBalances.find((tkn) => tkn.asset === asset.asset)
             if (foundAsset) {
-                $list.append(`<li><a href='#' data-name='${asset.name}' data-asset='${asset.asset}' data-decimals='${asset.decimals}'>${asset.name} - ${asset.asset}</a></li>`)
+                $list.append(`<li><a class='dropdown-item' href='#' data-name='${asset.name}' data-asset='${asset.asset}' data-decimals='${asset.decimals}'>${asset.name} - ${asset.asset}</a></li>`)
             }
         }
     })
@@ -538,26 +538,6 @@ export function addEventListeners () {
     $('#multi_out_same_amount').on('change', evMultiOutSameAmountChange)
     $('#send_money_same_out_checkbox').on('change', evSameOutCheckboxChange)
     $('#multi_out_fee').on('change', evMultiOutFeeChange)
-    $('.transfer-asset-nav a').on('click', function (e) {
-        $('.multi-transfer').hide()
-        $('.transfer-asset').fadeIn()
-        if (!$('.transfer-asset-nav').hasClass('active')) {
-            $('.transfer-asset-nav').addClass('active')
-        }
-        if ($('.multi-transfer-nav').toggleClass('active')) {
-            $('.multi-transfer-nav').removeClass('active')
-        }
-    })
-    $('.multi-transfer-nav a').on('click', function (e) {
-        $('.transfer-asset').hide()
-        $('.multi-transfer').fadeIn()
-        if ($('.transfer-asset-nav').hasClass('active')) {
-            $('.transfer-asset-nav').removeClass('active')
-        }
-        if (!$('.multi-transfer-nav').hasClass('active')) {
-            $('.multi-transfer-nav').addClass('active')
-        }
-    })
     $('.add_recipients').on('click', evAddRecipientsClick)
     $('.add_message').on('change', function (e) {
         if ($(this).is(':checked')) {
