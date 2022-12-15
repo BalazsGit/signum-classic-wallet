@@ -109,7 +109,7 @@
 .context_menu {
     display: none;
     position: absolute;
-    z-index: 1;
+    z-index: 1000;
 }
 
 .testnet_only,.page,#brs_update_explanation span,.show_logout,.advanced,.recipient_public_key,.optional_message,.optional_note {
@@ -161,6 +161,11 @@
     font-style:italic;
 }
 
+/* modal alert */
+.account_info, .error_message {
+    display: none;
+}
+
 /* http://stackoverflow.com/questions/12996736/basic-jquery-animation-elipsis-three-dots-sequentially-appearing */
 
 @keyframes opacity {
@@ -186,4 +191,49 @@
 /* overwrite adminlte defaults */
 .table td, .table th {
     padding: .25rem;
+}
+
+.my-fa-spin {
+    animation: a 1s steps(8) infinite;
+}
+
+
+/* Left: asset-sidebar; Right: orders */
+.asset-content {
+    display: flex;
+    flex-direction: row;
+    gap: .5em;
+    align-items: stretch;
+    align-content: stretch;
+    padding-right: .5em;
+}
+.secondary-sidebar-context {
+    width: min-content;
+    min-width: 12rem;
+}
+.secondary-sidebar-context a {
+    color: inherit;
+}
+.secondary-sidebar-context .right {
+	position: absolute;
+	right: 1rem;
+	top: 1rem;
+}
+.secondary-sidebar-content {
+    flex-grow: 1;
+}
+.list-group-item-heading {
+    margin-right: 1rem;
+}
+.green-asset {
+    color: #48AB6C;
+}
+.red-asset {
+    color: #ED4348;
+}
+.bold {
+    font-weight: bold;
+}
+.pointer {
+    cursor: pointer;
 }

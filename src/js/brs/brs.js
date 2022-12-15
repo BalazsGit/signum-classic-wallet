@@ -48,7 +48,6 @@ import {
 import {
     saveCachedAssets,
     cacheUserAssets,
-    positionAssetSidebar,
     goToAsset
 } from './brs.assetexchange'
 

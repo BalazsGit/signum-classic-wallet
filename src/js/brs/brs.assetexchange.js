@@ -330,15 +330,9 @@ export function saveAssetBookmarks (assets, callback) {
     }
 }
 
-export function positionAssetSidebar () {
-    $('#asset_exchange_sidebar').parent().css('position', 'relative')
-    $('#asset_exchange_sidebar').parent().css('padding-bottom', '5px')
-    $('#asset_exchange_sidebar').height($(window).height() - 120)
-}
-
 function createBookmarkSidebarHTMLItem (asset, quantityHTML) {
-    return `<h4 class='list-group-item-heading'>${asset.name}</h4>
-            <p class='list-group-item-text'>${$.t('quantity_abbr')}: ${quantityHTML}</p>`
+    return `${asset.name}<br>
+            <small>${$.t('quantity_abbr')}: ${quantityHTML}</small>`
 }
 
 /** It does not redraw, it only updates values */
@@ -370,8 +364,6 @@ function loadAssetExchangeSidebar (callback) {
     let rows = ''
 
     $('#asset_exchange_page').removeClass('no_assets')
-
-    positionAssetSidebar()
 
     bookmarkedAssets.sort(function (a, b) {
         if (!a.groupName && !b.groupName) {
@@ -428,10 +420,10 @@ function loadAssetExchangeSidebar (callback) {
 
             if (asset.groupName) {
                 ungrouped = false
-                rows += "<a href='#' class='list-group-item list-group-item-header" + (asset.groupName === 'Ignore List' ? ' no-context' : '') + "'" + (asset.groupName !== 'Ignore List' ? " data-context='asset_exchange_sidebar_group_context' " : "data-context=''") + " data-groupname='" + asset.groupName.escapeHTML() + "' data-closed='" + isClosedGroup + "'><h4 class='list-group-item-heading'>" + asset.groupName.escapeHTML() + "<i class='fas pull-right fa-angle-" + (isClosedGroup ? 'right' : 'down') + "'></i></h4></a>"
+                rows += "<a href='#' class='list-group-item list-group-item-action" + (asset.groupName === 'Ignore List' ? ' no-context' : '') + "'" + (asset.groupName !== 'Ignore List' ? " data-context='asset_exchange_sidebar_group_context' " : "data-context=''") + " data-groupname='" + asset.groupName.escapeHTML() + "' data-closed='" + isClosedGroup + "'><strong>" + asset.groupName.escapeHTML() + "<i class='right fas pull-right fa-angle-" + (isClosedGroup ? 'right' : 'down') + "'></i></strong></a>"
             } else {
                 ungrouped = true
-                rows += "<a href='#' class='list-group-item list-group-item-header no-context' data-closed='" + isClosedGroup + "'><h4 class='list-group-item-heading'>UNGROUPED <i class='fa pull-right fa-angle-" + (isClosedGroup ? 'right' : 'down') + "'></i></h4></a>"
+                rows += "<a href='#' class='list-group-item list-group-item-action no-context' data-closed='" + isClosedGroup + "'><strong class='list-group-item-heading'>" + $.t('ungrouped') + "<i class='right fa pull-right fa-angle-" + (isClosedGroup ? 'right' : 'down') + "'></i></strong></a>"
             }
 
             lastGroup = asset.groupName
@@ -707,7 +699,7 @@ export function updateMiniTradeHistory () {
     // todo BRS.currentSubPageID ??...
     sendRequest('getTrades+', {
         asset: BRS.currentAsset.asset,
-        account: ($('#ae_show_my_trades_only').is(':checked')) ? $('#account_id').text() : '',
+        account: ($('#ae_show_my_trades_only').is(':checked')) ? BRS.account : '',
         firstIndex: 0,
         lastIndex: 49
     }, function (response, input) {
@@ -722,8 +714,8 @@ export function updateMiniTradeHistory () {
                 rows += '<td>' + formatQuantity(trade.quantityQNT, BRS.currentAsset.decimals) + '</td>'
                 rows += "<td class='asset_price'>" + formatOrderPricePerWholeQNT(trade.priceNQT, BRS.currentAsset.decimals) + '</td>'
                 rows += '<td>' + formatAmount(trade.totalNQT) + '</td>'
-                rows += "<td><a href='#' data-transaction='" + String(trade.askOrder).escapeHTML() + "'>" + String(trade.askOrder).escapeHTML() + '</a></td>'
-                rows += "<td><a href='#' data-transaction='" + String(trade.bidOrder).escapeHTML() + "'>" + String(trade.bidOrder).escapeHTML() + '</a></td>'
+                rows += "<td><a href='#' data-transaction='" + trade.askOrder + "'>" + trade.askOrder.slice(0, 8) + '...</a></td>'
+                rows += "<td><a href='#' data-transaction='" + String(trade.bidOrder).escapeHTML() + "'>" + trade.bidOrder.slice(0, 8) + '...</a></td>'
                 rows += '</tr>'
             }
             $('#asset_exchange_trade_history_table tbody').empty().append(rows)
@@ -921,9 +913,9 @@ export function evAssetExchangeOrdersTableClick (e) {
 
     const box = $('#' + type + '_asset_box')
 
-    if (box.hasClass('collapsed-box')) {
-        box.removeClass('collapsed-box')
-        box.find('.box-body').slideDown()
+    if (box.hasClass('collapsed-card')) {
+        box.removeClass('collapsed-card')
+        box.find('.card-body').slideDown()
     }
 }
 

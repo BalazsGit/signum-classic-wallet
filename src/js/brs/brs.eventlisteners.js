@@ -343,20 +343,18 @@ export function addEventListeners () {
         $('#asset_exchange_search input[name=q]').val('')
         $('#asset_exchange_search').trigger('submit')
     })
-    $('#buy_asset_box .box-header, #sell_asset_box .box-header').click(function (e) {
+    $('#buy_asset_box .card-header, #sell_asset_box .card-header').on('click', function (e) {
         e.preventDefault()
         // Find the box parent
-        const box = $(this).parents('.box').first()
+        const box = $(this).parents('.card').first()
         // Find the body and the footer
-        const bf = box.find('.box-body, .box-footer')
-        if (!box.hasClass('collapsed-box')) {
-            box.addClass('collapsed-box')
-            $(this).find('.btn i.fa').removeClass('fa-minus').addClass('fa-plus')
+        const bf = box.find('.card-body, .card-footer')
+        if (!box.hasClass('collapsed-card')) {
+            box.addClass('collapsed-card')
             bf.slideUp()
         } else {
-            box.removeClass('collapsed-box')
+            box.removeClass('collapsed-card')
             bf.slideDown()
-            $(this).find('.btn i.fa').removeClass('fa-plus').addClass('fa-minus')
         }
     })
     $('#asset_exchange_bid_orders_table tbody, #asset_exchange_ask_orders_table tbody').on('click', 'td', evAssetExchangeOrdersTableClick)
@@ -516,7 +514,7 @@ export function addEventListeners () {
     })
 
     // from brs.sidebar.js
-    $('.sidebar_context').on('contextmenu', 'a', evSidebarContextOnContextmenu)
+    $('.secondary-sidebar-context').on('contextmenu', 'a', evSidebarContextOnContextmenu)
 
     // from brs.encryption.js
     $('#decrypt_note_form_container button.btn-primary').click(function () {
