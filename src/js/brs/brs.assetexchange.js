@@ -1122,7 +1122,7 @@ export function evAssetOrderModalOnShowBsModal (e) {
 
     if (quantity !== '1') {
         $('#asset_order_total_tooltip').show()
-        $('#asset_order_total_tooltip').popover('destroy')
+        $('#asset_order_total_tooltip').popover('hide')
         $('#asset_order_total_tooltip').data('content', tooltipTitle)
         $('#asset_order_total_tooltip').popover({
             content: tooltipTitle,
