@@ -22,7 +22,7 @@ import {
 } from './brs.util'
 
 export function automaticallyCheckRecipient () {
-    const $recipientFields = $('#add_contact_account_id, #update_contact_account_id, #buy_alias_recipient, #escrow_create_recipient, #inline_message_recipient, #reward_recipient, #sell_alias_recipient, #send_message_recipient, #send_money_recipient, #subscription_cancel_recipient, #subscription_create_recipient, #transfer_alias_recipient, #transfer_asset_recipient, #transfer_asset_multi_recipient')
+    const $recipientFields = $('#add_contact_account_id, #update_contact_account_id, #buy_alias_recipient, #escrow_create_recipient, #inline_message_recipient, #reward_assignment_recipient, #sell_alias_recipient, #send_message_recipient, #send_money_recipient, #subscription_cancel_recipient, #subscription_create_recipient, #transfer_alias_recipient, #transfer_asset_recipient, #transfer_asset_multi_recipient')
 
     $recipientFields.on('blur', function () {
         $(this).trigger('checkRecipient')
@@ -50,17 +50,6 @@ export function sendMoneyCalculateTotal (element) {
     $('#send_money_fee').val(fee)
 
     $(element).closest('.modal').find('.total_amount_ordinary').html(formatAmount(convertToNQT(amount + fee)) + ' ' + BRS.valueSuffix)
-}
-
-export function commitmentCalculateTotal (element) {
-    const current_amount = parseFloat($('#commitment_amount').val(), 10)
-    const current_fee = parseFloat($('#commitment_fee').val(), 10)
-    const fee = isNaN(current_fee) ? BRS.minimumFee : (current_fee < BRS.minimumFee ? BRS.minimumFee : current_fee)
-    const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount)
-
-    $('#commitment_fee').val(fee.toFixed(8))
-
-    $(element).closest('.modal').find('.total_amount_commitment').html(formatAmount(convertToNQT(amount + fee)) + ' ' + BRS.valueSuffix)
 }
 
 export function formsSendMoneyComplete (response, data) {

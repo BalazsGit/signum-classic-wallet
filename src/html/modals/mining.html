@@ -1,0 +1,356 @@
+<div class="modal fade" id="commitment_modal" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" data-i18n="commitment">Add/Remove Commitment</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="card-text">
+          <tr>
+            <td><span data-i18n="available_balance">available_balance</span>:&nbsp;&nbsp;</td>
+            <td id="account_balance"></td>
+            <td>&nbsp;<span data-value-suffix=""></span></td>
+          </tr>
+          <tr>
+            <td><span data-i18n="locked_balance">locked_balance</span>:&nbsp;&nbsp;</td>
+            <td id="account_balance_locked"></td>
+            <td>&nbsp;<span data-value-suffix=""></span></td>
+          </tr>
+          <tr>
+            <td><span data-i18n="committed_balance">committed_balance</span>:&nbsp;&nbsp;</td>
+            <td id="account_committed_balance"></td>
+            <td>&nbsp;<span data-value-suffix=""></span></td>
+          </tr>
+        </table>
+      </div>
+      <div class="modal-body">
+        <form role="form" autocomplete="off" id="form_commitment">
+          <div class="form-group" style="margin-bottom: 5px">
+            <input type="checkbox" name="removeCommitment" id="commitment_remove" value="1" />
+            <label for="commitment_remove" data-i18n="remove_commitment">Remove Commitment</label>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="amount">amount</label>
+            <div class="input-group">
+              <input
+                type="number"
+                name="amountNXT"
+                id="commitment_amount"
+                class="form-control"
+                step="any"
+                min="0"
+                placeholder="Amount"
+                data-i18n="[placeholder]amount" />
+              <span class="input-group-text" data-value-suffix=""></span>
+            </div>
+          </div>
+
+          <!-- Fee + deadline template -->
+          <div class="row">
+            <div class="col-8">
+              <div class="form-group has-suggested-fee-group">
+                <label data-i18n="fee">FEE</label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    name="feeNXT"
+                    id="commitment_fee"
+                    class="form-control"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="Fee"
+                    data-i18n="[placeholder]fee"
+                    data-default="0.02"
+                    value="0.02" />
+                  <span class="input-group-text" data-value-suffix=""></span>
+                </div>
+                <div>
+                  <span data-toggle="tooltip" data-placement="top" data-html="true" data-i18n="[title]suggested_fee_help">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i> &nbsp;&nbsp;
+                  </span>
+                  <span class="suggested_fee_response"></span>
+                  <span class="suggested_fee_spinner">
+                    <i class="fa fa-spinner fa-spin fa-fw text-danger"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label data-i18n="deadline">DEADLINE</label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    name="deadline"
+                    id="commitment_deadline"
+                    class="form-control"
+                    placeholder="deadline"
+                    data-i18n="[placeholder]deadline"
+                    min="0.1"
+                    step="0.1"
+                    data-default="1"
+                    value="1" />
+                  <span class="input-group-text" data-i18n="hours"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message template -->
+          <div>
+            <input type="checkbox" name="add_message" id="commitment_add_message" class="add_message" />
+            <label for="commitment_add_message"> <span data-i18n="add_message_q">add_message_q</span></label>
+          </div>
+          <div class="form-group optional_message">
+            <label data-i18n="message">MESSAGE</label>
+            <textarea class="form-control" id="commitment_message" name="message" rows="4"></textarea>
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  name="encrypt_message"
+                  id="commitment_encrypt_message"
+                  value="1"
+                  data-default="checked"
+                  checked="checked" />
+                <span data-i18n="encrypt_message">encrypt_message</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Note to Self template -->
+          <div class="advanced">
+            <label>
+              <input type="checkbox" name="add_note_to_self" id="commitment_add_note_to_self" class="add_note_to_self" />
+              <span data-i18n="add_note_to_self_q">add_note_to_self_q</span>
+            </label>
+          </div>
+          <div class="form-group advanced optional_note">
+            <label data-i18n="note_to_self">Note to Self</label>
+            <textarea class="form-control" id="commitment_note_to_self" name="note_to_self" rows="4"></textarea>
+            <div>
+              <span data-i18n="note_is_encrypted">This note is encrypted.</span>
+            </div>
+          </div>
+
+          <!-- Referenced Transaction Hash template -->
+          <div class="form-group advanced">
+            <label data-i18n="referenced_transaction_hash">referenced_transaction_hash</label>
+            <input
+              type="text"
+              class="form-control"
+              name="referencedTransactionFullHash"
+              id="commitment_referenced_transaction"
+              placeholder="Referenced Transaction Full Hash"
+              data-i18n="  [placeholder]referenced_transaction_full_hash"
+              spellcheck="false" />
+          </div>
+
+          <!-- Do Not Broadcast template -->
+          <div class="advanced">
+            <label>
+              <input type="checkbox" name="doNotBroadcast" id="commitment_do_not_broadcast" value="1" />
+              <span data-i18n="do_not_broadcast">Do Not Broadcast</span>
+            </label>
+          </div>
+
+          <!-- Passphrase template -->
+          <div class="form-group secret_phrase">
+            <label data-i18n="passphrase">PASSPHRASE</label>
+            <input type="password" name="secretPhrase" id="commitment_password" class="form-control" placeholder="" autocomplete="" />
+          </div>
+
+          <!-- ALERTS template -->
+          <div class="alert alert-info account_info"></div>
+          <div class="alert alert-danger error_message"></div>
+
+          <input type="hidden" name="request_type" value="addCommitment" data-default="addCommitment" />
+          <input type="hidden" name="converted_account_id" value="" />
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="advanced_info">
+          <strong data-i18n="fee">Fee</strong>: <span class="advanced_fee" id="commitment_bottom_fee">0.1</span> -
+          <a href="#" data-i18n="advanced">advanced</a>
+        </div>
+        <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n="cancel">Cancel</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-loading-text="Submitting..."
+          data-i18n="ok;[data-loading-text]submitting"
+          data-form="form_commitment">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="reward_assignment_modal" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" data-i18n="reward_assignment">Set Reward Assignment</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form role="form" autocomplete="off">
+          <div class="callout callout-warning" data-i18n="[html]reward_recipient_warning">
+            <strong>Warning</strong>: Setting a so called "reward recipient" means that you define a beneficiary who will get the SIGNA
+            reward in case should you (= your miner) find a block. In case you are mining with a pool, you enter the pool's address. In case
+            you are solo mining you enter your own address.
+          </div>
+          <div class="form-group">
+            <label data-i18n="recipient">recipient</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                name="recipient"
+                id="reward_assignment_recipient"
+                placeholder="recipient_account"
+                data-i18n="[placeholder]recipient_account"
+                autofocus />
+              <span class="input-group-btn btn-group recipient_selector">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                  <i class="fas fa-user"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right scrollable-menu" role="menu"></ul>
+              </span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-8">
+              <div class="form-group has-suggested-fee-group">
+                <label data-i18n="fee">FEE</label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    name="feeNXT"
+                    id="reward_assignment_fee"
+                    class="form-control"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="Fee"
+                    data-i18n="[placeholder]fee"
+                    data-default="0.02"
+                    value="0.02" />
+                  <span class="input-group-text" data-value-suffix=""></span>
+                </div>
+                <div>
+                  <span data-toggle="tooltip" data-placement="top" data-html="true" data-i18n="[title]suggested_fee_help">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i> &nbsp;&nbsp;
+                  </span>
+                  <span class="suggested_fee_response"></span>
+                  <span class="suggested_fee_spinner">
+                    <i class="fa fa-spinner fa-spin fa-fw text-danger"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label data-i18n="deadline">DEADLINE</label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    name="deadline"
+                    id="reward_assignment_deadline"
+                    class="form-control"
+                    placeholder="deadline"
+                    data-i18n="[placeholder]deadline"
+                    min="0.1"
+                    step="0.1"
+                    data-default="1"
+                    value="1" />
+                  <span class="input-group-text" data-i18n="hours"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <input type="checkbox" name="add_message" id="reward_assignment_add_message" class="add_message" />
+            <label for="reward_assignment_add_message"> <span data-i18n="add_message_q">add_message_q</span></label>
+          </div>
+          <div class="form-group optional_message">
+            <label data-i18n="message">MESSAGE</label>
+            <textarea class="form-control" id="reward_assignment_message" name="message" rows="4"></textarea>
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  name="encrypt_message"
+                  id="reward_assignment_encrypt_message"
+                  value="1"
+                  data-default="checked"
+                  checked="checked" />
+                <span data-i18n="encrypt_message">encrypt_message</span>
+              </label>
+            </div>
+          </div>
+          <div class="advanced">
+            <label>
+              <input type="checkbox" name="add_note_to_self" id="reward_assignment_add_note_to_self" class="add_note_to_self" />
+              <span data-i18n="add_note_to_self_q">add_note_to_self_q</span>
+            </label>
+          </div>
+          <div class="form-group advanced optional_note">
+            <label data-i18n="note_to_self">Note to Self</label>
+            <textarea class="form-control" id="reward_assignment_note_to_self" name="note_to_self" rows="4"></textarea>
+            <div>
+              <span data-i18n="note_is_encrypted">This note is encrypted.</span>
+            </div>
+          </div>
+          <div class="form-group advanced">
+            <label data-i18n="referenced_transaction_hash">referenced_transaction_hash</label>
+            <input
+              type="text"
+              class="form-control"
+              name="referencedTransactionFullHash"
+              id="reward_assignment_referenced_transaction"
+              placeholder="Referenced Transaction Full Hash"
+              data-i18n="  [placeholder]referenced_transaction_full_hash"
+              spellcheck="false" />
+          </div>
+          <div class="advanced">
+            <label>
+              <input type="checkbox" name="doNotBroadcast" id="reward_assignment_do_not_broadcast" value="1" />
+              <span data-i18n="do_not_broadcast">Do Not Broadcast</span>
+            </label>
+          </div>
+          <div class="form-group secret_phrase">
+            <label data-i18n="passphrase">PASSPHRASE</label>
+            <input
+              type="password"
+              name="secretPhrase"
+              id="reward_assignment_password"
+              class="form-control"
+              placeholder=""
+              autocomplete="" />
+          </div>
+          <div class="alert alert-info account_info"></div>
+          <div class="alert alert-danger error_message"></div>
+
+          <input type="hidden" name="request_type" value="setRewardRecipient" data-default="setRewardRecipient" />
+          <input type="hidden" name="converted_account_id" value="" />
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="advanced_info">
+          <strong data-i18n="fee">Fee</strong>: <span class="advanced_fee" id="reward_assignment_bottom_fee">?</span> -
+          <a href="#" data-i18n="advanced">advanced</a>
+        </div>
+        <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n="cancel">Cancel</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-loading-text="Submitting..."
+          data-i18n="set_reward_assignment;[data-loading-text]submitting">
+          Set Reward Recipient
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
