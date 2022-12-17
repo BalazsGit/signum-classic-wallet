@@ -51,6 +51,7 @@ import {
 } from './brs.console'
 
 import {
+    evDeleteContactModalOnShowBsModal,
     evUpdateContactModalOnShowBsModal,
     exportContacts,
     importContacts
@@ -461,7 +462,7 @@ export function addEventListeners () {
 
     // from brs.contacts.js
     $('#update_contact_modal').on('show.bs.modal', evUpdateContactModalOnShowBsModal)
-    $('#delete_contact_modal').on('show.bs.modal', BRS.evDeleteContactModalOnShowBsModal)
+    $('#delete_contact_modal').on('show.bs.modal', evDeleteContactModalOnShowBsModal)
     $('#export_contacts_button').on('click', function () {
         exportContacts()
     })

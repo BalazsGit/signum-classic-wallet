@@ -60,7 +60,14 @@ export function pagesContacts () {
                 contactDescription = '-'
             }
 
-            rows += "<tr><td><a href='#' data-toggle='modal' data-target='#update_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>" + contact.name.escapeHTML() + "</a></td><td><a href='#' data-user='" + getAccountFormatted(contact, 'account') + "' class='user_info'>" + getAccountFormatted(contact, 'account') + '</a></td><td>' + (contact.email ? contact.email.escapeHTML() : '-') + '</td><td>' + contactDescription.escapeHTML() + "</td><td style='white-space:nowrap'><a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_money_modal' data-contact='" + String(contact.name).escapeHTML() + "'>" + $.t('send_burst') + "</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_message_modal' data-contact='" + String(contact.name).escapeHTML() + "'>" + $.t('message') + "</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#delete_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>" + $.t('delete') + '</a></td></tr>'
+            const cName = String(contact.name).escapeHTML()
+            rows += '<tr>'
+            rows += `<td><a href='#' data-toggle='modal' data-target='#update_contact_modal' data-contact='${contact.id}'>${contact.name.escapeHTML()}</a></td>`
+            rows += `<td><a href='#' data-user='${getAccountFormatted(contact, 'account')}' class='user_info'>${getAccountFormatted(contact, 'account')}</a></td>`
+            rows += `<td>${contact.email ? contact.email.escapeHTML() : '-'}</td>`
+            rows += `<td>${contactDescription.escapeHTML()}</td>`
+            rows += `<td><div class="btn-group"><a class='btn btn-default' href='#' data-toggle='modal' data-target='#send_money_modal' data-contact='${cName}'><i class="fas fa-paper-plane"></i></a><a class='btn btn-default' href='#' data-toggle='modal' data-target='#send_message_modal' data-contact='${cName}'><i class="fas fa-envelope"></i></a><a class='btn btn-default' href='#' data-toggle='modal' data-target='#delete_contact_modal' data-contact='${contact.id}'><i class="fas fa-trash"></i></a></div></td>`
+            rows += '</tr>'
         }
 
         dataLoaded(rows)
@@ -250,7 +257,7 @@ function updateContactToDatabase (data) {
         account: data.account
     }], function (error, contacts) {
         if (error ||
-                (contacts && contacts.length && contacts[0].id !== data.contact_id)) {
+                (contacts && contacts.length && String(contacts[0].id) !== data.contact_id)) {
             $.notify($.t('error_save_db'))
             return
         }
