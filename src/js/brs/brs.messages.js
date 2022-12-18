@@ -8,8 +8,7 @@ import { BRS } from '.'
 
 import {
     reloadCurrentPage,
-    pageLoaded,
-    showFeeSuggestions
+    pageLoaded
 } from './brs'
 
 import {
@@ -68,33 +67,23 @@ export function pagesMessages (callback) {
         if (response.transactions && response.transactions.length) {
             for (let i = 0; i < response.transactions.length; i++) {
                 const otherUser = (response.transactions[i].recipient === BRS.account ? response.transactions[i].sender : response.transactions[i].recipient)
-
                 if (!(otherUser in BRS._messages)) {
                     BRS._messages[otherUser] = []
                 }
-
                 BRS._messages[otherUser].push(response.transactions[i])
             }
-
-            displayMessageSidebar(callback)
+            displayMessageSidebar()
         } else {
             $('#no_message_selected').hide()
             $('#no_messages_available').show()
+            $('#messages_card').hide()
             $('#messages_sidebar').empty()
-            pageLoaded(callback)
         }
+        pageLoaded(callback)
     })
 }
 
-function displayMessageSidebar (callback) {
-    let activeAccount = false
-
-    const $active = $('#messages_sidebar a.active')
-
-    if ($active.length) {
-        activeAccount = $active.data('account')
-    }
-
+function displayMessageSidebar () {
     let rows = ''
 
     const sortedMessages = []
@@ -138,16 +127,14 @@ function displayMessageSidebar (callback) {
             extra = " data-contact='" + getAccountTitle(sortedMessage, 'user') + "' data-context='messages_sidebar_update_context'"
         }
 
-        rows += "<a href='#' class='list-group-item' data-account='" + getAccountFormatted(sortedMessage, 'user') + "' data-account-id='" + getAccountFormatted(sortedMessage.user) + "'" + extra + "><h4 class='list-group-item-heading'>" + getAccountTitle(sortedMessage, 'user') + "</h4><p class='list-group-item-text'>" + formatTimestamp(sortedMessage.timestamp) + '</p></a>'
+        rows += "<a href='#' class='list-group-item no-wrap' data-account='" + getAccountFormatted(sortedMessage, 'user') + "' data-account-id='" + getAccountFormatted(sortedMessage.user) + "'" + extra + '>' + getAccountTitle(sortedMessage, 'user') + '<br><small>' + formatTimestamp(sortedMessage.timestamp) + '</small></a>'
     }
 
     $('#messages_sidebar').empty().append(rows)
 
-    if (activeAccount) {
-        $('#messages_sidebar a[data-account=' + activeAccount + ']').addClass('active').trigger('click')
+    if (BRS.currentSubPage) {
+        $('#messages_sidebar a[data-account-id=' + BRS.currentSubPage + ']').addClass('active')
     }
-
-    pageLoaded(callback)
 }
 
 export function incomingMessages (transactions) {
@@ -181,24 +168,50 @@ export function incomingMessages (transactions) {
     }
 }
 
+const msgFromTemplate = `
+<div class="direct-chat-msg %pendingClass%">
+    <div class="direct-chat-infos clearfix">
+        <span class="direct-chat-name float-left">%from%</span>
+        <span class="direct-chat-timestamp float-right">%timestamp%</span>
+    </div>
+    <img class="direct-chat-img" src="%imgsrc%">
+    <div class="direct-chat-text">%message%</div>
+</div>`
+const msgToTemplate = `
+<div class="direct-chat-msg right %pendingClass%">
+    <div class="direct-chat-infos clearfix">
+        <span class="direct-chat-name float-right">%from%</span>
+        <span class="direct-chat-timestamp float-left">%timestamp%</span>
+    </div>
+    <img class="direct-chat-img" src="%imgsrc%">
+    <div class="direct-chat-text">%message%</div>
+</div>`
+
 export function evMessagesSidebarClick (e) {
     e.preventDefault()
-    showFeeSuggestions('#send_message_fee_page', '#suggested_fee_response_messages_page')
 
     $('#messages_sidebar a.active').removeClass('active')
     $(this).addClass('active')
 
     const otherUser = $(this).data('account-id')
+    BRS.currentSubPage = otherUser
 
     $('#no_message_selected, #no_messages_available').hide()
+    $('#messages_card').hide()
 
     $('#inline_message_recipient').val(otherUser)
-    $('#inline_message_form').show()
 
-    let last_day = ''
-    let output = "<dl class='chat'>"
+    let output = ''
 
     const messages = BRS._messages[otherUser]
+
+    const unconfirmedTransactions = getUnconfirmedTransactionsFromCache(1, 0, {
+        recipient: otherUser
+    })
+
+    if (unconfirmedTransactions) {
+        messages.push(...unconfirmedTransactions.reverse())
+    }
 
     if (messages) {
         for (let i = 0; i < messages.length; i++) {
@@ -244,7 +257,7 @@ export function evMessagesSidebarClick (e) {
                 decoded = String(decoded).escapeHTML().nl2br()
 
                 if (extra === 'to_decrypt') {
-                    decoded = "<i class='fas fa-exclamation-triangle'></i> " + decoded
+                    decoded = "<i class='fas fa-exclamation-triangle'></i> " + '<button class="btn btn-warning unlock-messages"><i class="fas fa-key"></i></button>'
                 } else if (extra === 'decrypted') {
                     if (type === 'payment') {
                         decoded = '<strong>+' + formatAmount(messages[i].amountNQT) + ' ' + BRS.valueSuffix + '</strong><br />' + decoded
@@ -257,78 +270,38 @@ export function evMessagesSidebarClick (e) {
                 extra = 'decryption_failed'
             }
 
-            const day = formatTimestamp(messages[i].timestamp, true)
+            const day = formatTimestamp(messages[i].timestamp)
 
-            if (day !== last_day) {
-                output += '<dt><strong>' + day + '</strong></dt>'
-                last_day = day
+            let pendingClass = ''
+            if (messages[i].unconfirmed === true) {
+                pendingClass = 'messagePending'
             }
-
-            output += "<dd class='" + (messages[i].recipient === BRS.account ? 'from' : 'to') + (extra ? ' ' + extra : '') + "'><p>" + decoded + '</p></dd>'
-        }
-    }
-
-    let unconfirmedTransactions = getUnconfirmedTransactionsFromCache(1, 0, {
-        recipient: otherUser
-    })
-
-    if (!unconfirmedTransactions) {
-        unconfirmedTransactions = []
-    } else {
-        unconfirmedTransactions = unconfirmedTransactions.reverse()
-    }
-
-    for (let i = 0; i < unconfirmedTransactions.length; i++) {
-        const unconfirmedTransaction = unconfirmedTransactions[i]
-
-        let decoded = false
-        let extra = ''
-
-        if (!unconfirmedTransaction.attachment) {
-            decoded = $.t('message_empty')
-        } else if (unconfirmedTransaction.attachment.encryptedMessage) {
-            try {
-                decoded = tryToDecryptMessage(unconfirmedTransaction)
-                extra = 'decrypted'
-            } catch (err) {
-                if (err.errorCode && err.errorCode === 1) {
-                    decoded = $.t('error_decryption_passphrase_required')
-                    extra = 'to_decrypt'
-                } else {
-                    decoded = $.t('error_decryption_unknown')
-                }
-            }
-        } else {
-            if (!unconfirmedTransaction.attachment['version.Message']) {
-                try {
-                    decoded = converters.hexStringToString(unconfirmedTransaction.attachment.message)
-                } catch (err) {
-                    // legacy
-                    if (unconfirmedTransaction.attachment.message.indexOf('feff') === 0) {
-                        decoded = convertFromHex16(unconfirmedTransaction.attachment.message)
-                    } else {
-                        decoded = convertFromHex8(unconfirmedTransaction.attachment.message)
-                    }
-                }
+            if (messages[i].sender === BRS.account) {
+                output += msgToTemplate
+                    .replace('%pendingClass%', pendingClass)
+                    .replace('%from%', $.t('you'))
+                    .replace('%timestamp%', day)
+                    .replace('%imgsrc%', '') // TODO
+                    .replace('%message%', decoded)
             } else {
-                decoded = String(unconfirmedTransaction.attachment.message)
+                output += msgFromTemplate
+                    .replace('%pendingClass%', pendingClass)
+                    .replace('%from%', messages[i].senderRS)
+                    .replace('%timestamp%', day)
+                    .replace('%imgsrc%', '') // TODO
+                    .replace('%message%', decoded)
             }
         }
-
-        if (decoded === false) {
-            decoded = "<i class='fas fa-exclamation-triangle'></i> " + $.t('error_could_not_decrypt_message')
-            extra = 'decryption_failed'
-        } else if (!decoded) {
-            decoded = $.t('message_empty')
-        }
-
-        output += "<dd class='to tentative" + (extra ? ' ' + extra : '') + "'><p>" + (extra === 'to_decrypt' ? "<i class='fas fa-exclamation-triangle'></i> " : (extra === 'decrypted' ? "<i class='fas fa-lock'></i> " : '')) + String(decoded).escapeHTML().nl2br() + '</p></dd>'
     }
-
-    output += '</dl>'
 
     $('#message_details').empty().append(output)
+    $('#messages_card').show()
+    $('#message_details .unlock-messages').on('click', function () {
+        $('#messages_decrypt_modal').modal('show')
+    })
+    /* TODO scroll bottom!
     $('#messages_page .content-splitter-right-inner').scrollTop($('#messages_page .content-splitter-right-inner')[0].scrollHeight)
+    */
 }
 
 export function evMessagesSidebarContextClick (e) {
