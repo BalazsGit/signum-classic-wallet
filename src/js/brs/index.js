@@ -308,7 +308,6 @@ export const BRS = {
 
     // from messages
     _messages: {},
-    _latestMessages: {},
 
     // from modals
     fetchingModalData: false,
@@ -333,7 +332,6 @@ $(document).ready(function () {
         { location: 'body', path: 'html/modals/contact.html' },
         { location: 'body', path: 'html/modals/dividends.html' },
         { location: 'body', path: 'html/modals/escrow.html' },
-        { location: 'body', path: 'html/modals/messages_decrypt.html' },
         { location: 'body', path: 'html/modals/raw_transaction.html' },
         { location: 'body', path: 'html/modals/request_burst_qr.html' },
         { location: 'body', path: 'html/modals/mining.html' },

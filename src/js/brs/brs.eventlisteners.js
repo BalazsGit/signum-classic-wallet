@@ -67,6 +67,7 @@ import {
 } from './brs.forms'
 
 import {
+    convertNumericToRSAccountFormat,
     convertToNQT,
     formatAmount,
     treeViewHandler
@@ -100,8 +101,7 @@ import {
 
 import {
     evMessagesSidebarClick,
-    evMessagesSidebarContextClick,
-    evInlineMessageFormSubmit
+    evMessagesSidebarContextClick
 } from './brs.messages'
 
 import {
@@ -393,15 +393,16 @@ export function addEventListeners () {
 
     // from brs.messages.js
     $('#send_message_modal').on('show.bs.modal', function (e) {
-        showFeeSuggestions('#send_message_fee', '#suggested_fee_response_send_message')
-    })
-    $('#suggested_fee_send_message').on('click', function (e) {
-        e.preventDefault()
-        showFeeSuggestions('#send_message_fee', '#suggested_fee_response_send_message')
-    })
-    $('#suggested_fee_messages_page').on('click', function (e) {
-        e.preventDefault()
-        showFeeSuggestions('#send_message_fee_page', '#suggested_fee_response_messages_page')
+        if (BRS.currentPage === 'messages' && BRS.currentSubPage) {
+            const recipientAddress = convertNumericToRSAccountFormat(BRS.currentSubPage)
+            $('#send_message_message').val($('#message_in_chatbox').val())
+            $('#message_in_chatbox').val('')
+            if (BRS.contacts[recipientAddress]) {
+                $('#send_message_recipient').val(BRS.contacts[recipientAddress].name).trigger('checkRecipient')
+            } else {
+                $('#send_message_recipient').val(recipientAddress).trigger('checkRecipient')
+            }
+        }
     })
     $('#messages_sidebar').on('click', 'a', evMessagesSidebarClick)
     $('#messages_sidebar_context').on('click', 'a', evMessagesSidebarContextClick)
@@ -422,10 +423,6 @@ export function addEventListeners () {
         goToPage('messages', function () {
             $('#message_sidebar a[data-account=' + account + ']').trigger('click')
         })
-    })
-    $('#inline_message_form').submit(evInlineMessageFormSubmit)
-    $('#message_details').on('click', 'dd.to_decrypt', function (e) {
-        $('#messages_decrypt_modal').modal('show')
     })
 
     // from brs.aliases.js
