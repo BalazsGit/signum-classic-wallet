@@ -128,30 +128,17 @@ export default {
         if (len === 0) {
             return new Array(0)
         }
-        const byteArray = new Array(wordArray.sigBytes)
+        const byteArray = new Array(wordArray.words.length * 4)
         let offset = 0
         let word; let i
-        for (i = 0; i < len - 1; i++) {
+        for (i = 0; i < len; i++) {
             word = wordArray.words[i]
             byteArray[offset++] = word >> 24
             byteArray[offset++] = (word >> 16) & 0xff
             byteArray[offset++] = (word >> 8) & 0xff
             byteArray[offset++] = word & 0xff
         }
-        word = wordArray.words[len - 1]
-        byteArray[offset++] = word >> 24
-        if (wordArray.sigBytes % 4 === 0) {
-            byteArray[offset++] = (word >> 16) & 0xff
-            byteArray[offset++] = (word >> 8) & 0xff
-            byteArray[offset++] = word & 0xff
-        }
-        if (wordArray.sigBytes % 4 > 1) {
-            byteArray[offset++] = (word >> 16) & 0xff
-        }
-        if (wordArray.sigBytes % 4 > 2) {
-            byteArray[offset++] = (word >> 8) & 0xff
-        }
-        return byteArray
+        return byteArray.slice(0, wordArray.sigBytes)
     },
     byteArrayToString (bytes, opt_startIndex, length) {
         if (length === 0) {
