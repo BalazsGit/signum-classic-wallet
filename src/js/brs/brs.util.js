@@ -166,7 +166,7 @@ export function amountToPrecision (amount, decimals) {
 
 export function convertToNQT (currency) {
     if (typeof currency === 'string') {
-        currency = parseFloat(currency, 10)
+        currency = parseFloat(currency.replace(/,/g, ''), 10)
         currency = currency.toFixed(8) ///  this fixes rounding issues (for the Total field on modals)
     } else {
         currency = currency.toFixed(8)
