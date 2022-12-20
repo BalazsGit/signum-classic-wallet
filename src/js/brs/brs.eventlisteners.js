@@ -608,6 +608,10 @@ export function addEventListeners () {
 
     // from brs.modals.block.js
     $('#blocks_table, #blocks_forged_table, #dashboard_blocks_table').on('click', 'a[data-block]', evBlocksTableClick)
+    $('#block_info_modal_info_tab').tab('show')
+    $('#block_info_modal').on('hide.bs.modal', function (e) {
+        $('#block_info_modal_info_tab').tab('show')
+    })
 
     // from brs.modals.escrow.js
     $('#escrow_table').on('click', 'a[data-escrow]', function (e) {
