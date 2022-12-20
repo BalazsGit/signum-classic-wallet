@@ -728,9 +728,11 @@ export function addEventListeners () {
         e.preventDefault()
         showFeeSuggestions('#multi_out_fee', '#suggested_fee_response_multi')
     })
+    $('#transaction_info_modal_info_tab').tab('show')
     $('#transaction_info_modal').on('hide.bs.modal', function (e) {
+        $('#transaction_info_modal_info_tab').tab('show')
         removeDecryptionForm($(this))
-        $('#transaction_info_output_bottom, #transaction_info_output_top, #transaction_info_bottom').html('').hide()
+        $('#transaction_info_output_bottom, #transaction_info_bottom').html('').hide()
     })
 
     // from brs.utils.js

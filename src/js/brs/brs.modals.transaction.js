@@ -41,8 +41,7 @@ export function showTransactionModal (transaction) {
 
     BRS.fetchingModalData = true
 
-    $('#transaction_info_output_top, #transaction_info_output_bottom, #transaction_info_bottom').html('').hide()
-    $('#transaction_info_callout').hide()
+    $('#transaction_info_output_bottom, #transaction_info_bottom').html('').hide()
     $('#transaction_info_table').hide()
     $('#transaction_info_table tbody').empty()
 
