@@ -124,7 +124,7 @@ import {
 
 import {
     showAccountModal,
-    loadUserInfoModal
+    evShowBsTab
 } from './brs.modals.account'
 
 import {
@@ -558,25 +558,11 @@ export function addEventListeners () {
         showAccountModal(account)
     })
     $('#user_info_modal').on('hidden.bs.modal', function (e) {
-        $(this).find('.user_info_modal_content').hide()
-        $(this).find('.user_info_modal_content table tbody').empty()
-        $(this).find('.user_info_modal_content:not(.data-loading,.data-never-loading)').addClass('data-loading')
-        $(this).find('ul.nav li.active').removeClass('active')
-        $('#user_info_transactions').addClass('active')
+        $(this).find('table tbody').empty()
+        $(this).find('.data-container:not(.data-loading,.data-never-loading)').addClass('data-loading')
         BRS.userInfoModal.user = 0
     })
-    $('#user_info_modal ul.nav li').click(function (e) {
-        e.preventDefault()
-        const tab = $(this).data('tab')
-        $(this).siblings().removeClass('active')
-        $(this).addClass('active')
-        $('.user_info_modal_content').hide()
-        const content = $('#user_info_modal_' + tab)
-        content.show()
-        if (content.hasClass('data-loading')) {
-            loadUserInfoModal(tab)
-        }
-    })
+    $('#user_info_modal a[data-toggle="pill"]').on('shown.bs.tab', evShowBsTab)
 
     // from brs.modals.accountinfo.js
     $('#account_info_modal').on('show.bs.modal', function (e) {
