@@ -381,12 +381,6 @@ export function evAliasModalOnShowBsModal (e) {
 
     $(this).find('input[name=aliasName]').val(alias.escapeHTML())
     $(this).find('.alias_name_display').html(alias.escapeHTML())
-
-    if ($(this).attr('id') === 'sell_alias_modal') {
-        $(this).find('ul.nav-pills li').removeClass('active')
-        $(this).find('ul.nav-pills li:first-child').addClass('active')
-        $('#sell_alias_recipient_div').show()
-    }
 }
 
 export function formsSellAlias (data) {
@@ -396,27 +390,26 @@ export function formsSellAlias (data) {
     if (data.modal === 'cancel_alias_sale') {
         data.priceNXT = '0'
         data.recipient = BRS.accountRS
-
         successMessage = $.t('success_cancel_alias')
         errorMessage = $.t('error_cancel_alias')
     } else if (data.modal === 'transfer_alias') {
         data.priceNXT = '0'
-
         successMessage = $.t('success_transfer_alias')
         errorMessage = $.t('error_transfer_alias')
     } else {
-        if (!data.recipient) {
-            return {
-                error: $.t('error_not_specified', {
-                    name: $.t('recipient').toLowerCase()
-                }).capitalize()
-            }
-        }
-
         successMessage = $.t('success_sell_alias')
         errorMessage = $.t('error_sell_alias')
-
-        if (data.recipient === BRS.genesisRS) {
+        if (data.sell_to_specific) {
+            if (!data.recipient) {
+                return {
+                    error: $.t('error_not_specified', {
+                        name: $.t('recipient').toLowerCase()
+                    }).capitalize()
+                }
+            }
+            delete data.sell_to_specific
+        } else {
+            // No recipient in this transaction type
             if (!data.priceNXT || data.priceNXT === '0') {
                 return {
                     error: $.t('error_not_specified', {
@@ -424,10 +417,11 @@ export function formsSellAlias (data) {
                     }).capitalize()
                 }
             }
-
-            delete data.add_message
-            delete data.encrypt_message
-            delete data.message
+            if (data.add_message && data.encrypt_message) {
+                return {
+                    error: $.t('error_recipient_no_public_key').capitalize()
+                }
+            }
             delete data.recipient
         }
     }
@@ -467,32 +461,11 @@ export function formsSellAliasComplete (response, data) {
     }
 }
 
-export function evSellAliasClick (e) {
-    e.preventDefault()
-
-    $(this).closest('ul').find('li').removeClass('active')
-    $(this).parent().addClass('active')
-
-    const $modal = $(this).closest('.modal')
-
-    if ($(this).attr('id') === 'sell_alias_to_anyone') {
-        $modal.find('input[name=recipient]').val(BRS.genesisRS)
-        $('#sell_alias_recipient_div').hide()
-        $modal.find('.add_message_container, .optional_message').hide()
-    } else {
-        $modal.find('input[name=recipient]').val('')
-        $('#sell_alias_recipient_div').show()
-        $modal.find('.add_message_container').show()
-
-        if ($('#sell_alias_add_message').is(':checked')) {
-            $modal.find('.optional_message').show()
-        } else {
-            $modal.find('.optional_message').hide()
-        }
-    }
-
-    $modal.find('input[name=converted_account_id]').val('')
-    $modal.find('.callout').hide()
+export function evSellAliasSellToSpecificClick (e) {
+    const $form = $(this).closest('form')
+    $form.find('.account_info').hide()
+    $form.find('input[name=recipient]').val('')
+    $form.find('input[name=converted_account_id]').val('')
 }
 
 export function evBuyAliasModalOnShowBsModal (e) {
@@ -520,7 +493,6 @@ export function evBuyAliasModalOnShowBsModal (e) {
                 e.preventDefault()
                 $.notify($.t('error_alias_sale_different_account'), { type: 'danger' })
             } else {
-                $modal.find('input[name=recipient]').val(String(response.accountRS).escapeHTML())
                 $modal.find('input[name=aliasName]').val(alias.escapeHTML())
                 $modal.find('.alias_name_display').html(alias.escapeHTML())
                 $modal.find('input[name=amountNXT]').val(convertToNXT(response.priceNQT)).prop('readonly', true)
@@ -571,8 +543,7 @@ export function evRegisterAliasModalOnShowBsModal (e) {
                 $.notify($.t('error_alias_not_found'), { type: 'danger' })
             } else {
                 let aliasURI
-                const keyword = 'http://'
-                const reg = new RegExp(keyword, 'i')
+                const reg = /^https?:\/\//i
                 if (reg.test(response.aliasURI)) {
                     setAliasType('uri', response.aliasURI)
                 } else if ((aliasURI = /acct:(.*)@burst/.exec(response.aliasURI)) || (aliasURI = /nacc:(.*)/.exec(response.aliasURI))) {
@@ -649,18 +620,17 @@ export function setAliasType (type, uri) {
     if (type === 'uri') {
         $('#register_alias_uri_label').html($.t('uri'))
         $('#register_alias_uri').prop('placeholder', $.t('uri'))
-        const keyword = 'https?://'
-        const reg = new RegExp(keyword, 'i')
+        const reg = /^https?:\/\//i
         if (uri) {
             if (uri === BRS.accountRS) {
-                $('#register_alias_uri').val('http://')
+                $('#register_alias_uri').val('https://')
             } else if (!reg.test(uri)) {
-                $('#register_alias_uri').val('http://' + uri)
+                $('#register_alias_uri').val('https://' + uri)
             } else {
                 $('#register_alias_uri').val(uri)
             }
         } else {
-            $('#register_alias_uri').val('http://')
+            $('#register_alias_uri').val('https://')
         }
         $('#register_alias_help').hide()
     } else if (type === 'account') {
@@ -698,7 +668,7 @@ export function setAliasType (type, uri) {
         if (uri) {
             if (uri === BRS.accountRS) {
                 $('#register_alias_uri').val('')
-            } else if (uri === 'http://') {
+            } else if (uri === 'https://') {
                 $('#register_alias_uri').val('')
             } else {
                 $('#register_alias_uri').val(uri)

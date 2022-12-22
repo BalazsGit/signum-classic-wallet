@@ -39,11 +39,11 @@ import {
 
 import {
     evAliasModalOnShowBsModal,
-    evSellAliasClick,
     evBuyAliasModalOnShowBsModal,
     evRegisterAliasModalOnShowBsModal,
     setAliasType,
-    evAliasSearchSubmit
+    evAliasSearchSubmit,
+    evSellAliasSellToSpecificClick
 } from './brs.aliases'
 
 import {
@@ -426,29 +426,8 @@ export function addEventListeners () {
     })
 
     // from brs.aliases.js
-    $('#transfer_alias_modal').on('show.bs.modal', function (e) {
-        showFeeSuggestions('#transfer_alias_fee', '#suggested_fee_response_alias_transfer')
-    })
-    $('#suggested_fee_alias_transfer').on('click', function (e) {
-        e.preventDefault()
-        showFeeSuggestions('#transfer_alias_fee', '#suggested_fee_response_alias_transfer')
-    })
-    $('#sell_alias_modal').on('show.bs.modal', function (e) {
-        showFeeSuggestions('#sell_alias_fee', '#suggested_fee_response_alias_sell')
-    })
-    $('#suggested_fee_alias_sell').on('click', function (e) {
-        e.preventDefault()
-        showFeeSuggestions('#sell_alias_fee', '#suggested_fee_response_alias_sell')
-    })
-    $('#buy_alias_modal').on('show.bs.modal', function (e) {
-        showFeeSuggestions('#buy_alias_fee', '#suggested_fee_response_alias_buy')
-    })
-    $('#suggested_fee_alias_buy').on('click', function (e) {
-        e.preventDefault()
-        showFeeSuggestions('#buy_alias_fee', '#suggested_fee_response_alias_buy')
-    })
     $('#transfer_alias_modal, #sell_alias_modal, #cancel_alias_sale_modal').on('show.bs.modal', evAliasModalOnShowBsModal)
-    $('#sell_alias_to_specific_account, #sell_alias_to_anyone').on('click', evSellAliasClick)
+    $('#sell_alias_sell_to_specific').on('click', evSellAliasSellToSpecificClick)
     $('#buy_alias_modal').on('show.bs.modal', evBuyAliasModalOnShowBsModal)
     $('#register_alias_modal').on('show.bs.modal', evRegisterAliasModalOnShowBsModal)
     $('#register_alias_type').on('change', function () {
@@ -535,6 +514,13 @@ export function addEventListeners () {
             $(this).closest('form').find('.optional_note').hide()
         }
     })
+    $('.sell_to_specific').on('change', function (e) {
+        if ($(this).is(':checked')) {
+            $(this).closest('form').find('.optional_sell_to_specific').fadeIn()
+        } else {
+            $(this).closest('form').find('.optional_sell_to_specific').hide()
+        }
+    })
     $('.modal').on('show.bs.modal', evModalOnShowBsModal)
     $('.modal').on('shown.bs.modal', function () {
         $(this).find('input[type=text]:first, textarea:first, input[type=password]:first').not('[readonly]').first().focus()
@@ -552,7 +538,7 @@ export function addEventListeners () {
     $('.advanced_info a').on('click', evAdvancedInfoClick)
 
     // from brs.modals.account.js
-    $('#blocks_table, #blocks_forged_table, #contacts_table, #transactions_table, #dashboard_transactions_table, #asset_account, #asset_exchange_ask_orders_table, #transfer_history_table, #asset_exchange_bid_orders_table, #alias_info_table, .dgs_page_contents, .modal-content, #register_alias_modal, #block_info_table, #search_results_ul_container').on('click', 'a[data-user]', function (e) {
+    $('#blocks_table, #blocks_forged_table, #contacts_table, #transactions_table, #dashboard_transactions_table, #asset_account, #asset_exchange_ask_orders_table, #transfer_history_table, #asset_exchange_bid_orders_table, #alias_info_table, .dgs_page_contents, .modal-content, #block_info_table, #search_results_ul_container').on('click', 'a[data-user]', function (e) {
         e.preventDefault()
         const account = $(this).data('user')
         showAccountModal(account)

@@ -240,7 +240,7 @@ export function evModalOnHiddenBsModal (e) {
 
     $(this).find('.recipient_public_key').hide()
 
-    $(this).find('.optional_message, .optional_note').hide()
+    $(this).find('.optional_message, .optional_note, .optional_sell_to_specific').hide()
 
     $(this).find('.advanced_info a').text($.t('advanced'))
 
