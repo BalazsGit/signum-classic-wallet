@@ -83,18 +83,18 @@ function accountModalDataReady (account) {
 
     $('#user_info_modal').modal('show')
 
-    $('#user_info_modal_transactions_tab').tab('show')
-    userInfoModalTransactions()
+    $('#user_info_modal_details_tab').tab('show')
+    userInfoModalDetails()
 }
 
 export function evShowBsTab (e) {
     switch (e.target.id) {
     case 'user_info_modal_transactions_tab':
-        return
+        return userInfoModalTransactions()
     case 'user_info_modal_assets_tab':
         return userInfoModalAssets()
     case 'user_info_modal_details_tab':
-        return userInfoModalDetails()
+        return
     case 'user_info_modal_smartcontract_tab':
         return userInfoModalSmartcontract()
     case 'user_info_modal_aliases_tab':
