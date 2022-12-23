@@ -104,7 +104,7 @@
     z-index: 1000;
 }
 
-.testnet_only,.page,#brs_update_explanation span,.show_logout,.advanced,.recipient_public_key,.optional_message,.optional_note {
+.testnet_only,.page,#brs_update_explanation span,.show_logout,.advanced,.recipient_public_key,.optional_message,.optional_note, .optional_sell_to_specific {
     display: none;
 }
 
@@ -228,4 +228,36 @@
 }
 .pointer {
     cursor: pointer;
+}
+.no-wrap {
+    white-space: nowrap;
+}
+.messagePending {
+    animation: flickerAnimation 2s infinite;
+}
+@keyframes flickerAnimation {
+    0%   { opacity:0.6; }
+    50%  { opacity:0.3; }
+    100% { opacity:0.6; }
+}
+.custom-message-max-height {
+    height: auto;
+    max-height: 50vh;
+}
+
+.modal-text-box {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1ch;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+}
+
+
+.bold {
+    font-weight:bold;
+}
+.mono-font {
+    font-family: monospace,monospace;
+    font-size:1em
 }
