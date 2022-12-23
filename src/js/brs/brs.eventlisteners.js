@@ -484,6 +484,11 @@ export function addEventListeners () {
         }
         updateSettings(key, value)
     })
+    $('#settings_box input[type=checkbox]').on('change', function (e) {
+        const key = $(this).attr('name')
+        const value = this.checked
+        updateSettings(key, value)
+    })
 
     // from brs.sidebar.js
     $('.secondary-sidebar-context').on('contextmenu', 'a', evSidebarContextOnContextmenu)

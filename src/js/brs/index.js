@@ -257,12 +257,11 @@ export const BRS = {
 
     // from brs.settings
     defaultSettings: {
-        submit_on_enter: 0,
-        console_log: 0,
+        submit_on_enter: false,
         fee_warning: '100000000000',
         amount_warning: '10000000000000',
         asset_transfer_warning: '10000',
-        '24_hour_format': 1,
+        theme_dark: false,
         remember_passphrase: 0,
         remember_account: 0,
         automatic_node_selection: 1,
