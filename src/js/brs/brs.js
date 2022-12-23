@@ -17,8 +17,6 @@ import {
     getSettings
 } from './brs.settings'
 
-import { theme } from './brs.theme'
-
 import {
     sendRequest
 } from './brs.server'
@@ -88,7 +86,6 @@ export function init () {
         placement: { from: 'bottom', align: 'right' },
         offset: 10
     })
-    theme()
 
     createDatabase(function () {
         getSettings()
@@ -606,7 +603,6 @@ export function clearData () {
             BRS.database.drop('data', onDropped)
             localStorage.removeItem('i18next_lng')
             localStorage.removeItem('logged_in')
-            localStorage.removeItem('theme')
         }
     }
 
