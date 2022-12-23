@@ -102,60 +102,12 @@ export function init () {
         showLockscreen()
     }, 250)
 
-    if (window.parent) {
-        const match = window.location.href.match(/\?app=?(win|mac|lin)?-?([\d.]+)?/i)
-
-        if (match) {
-            BRS.inApp = true
-            if (match[1]) {
-                BRS.appPlatform = match[1]
-            }
-            if (match[2]) {
-                BRS.appVersion = match[2]
-            }
-
-            if (!BRS.appPlatform || BRS.appPlatform === 'mac') {
-                let macVersion = navigator.userAgent.match(/OS X 10_([0-9]+)/i)
-                if (macVersion && macVersion[1]) {
-                    macVersion = parseInt(macVersion[1])
-
-                    if (macVersion < 9) {
-                        $('.modal').removeClass('fade')
-                    }
-                }
-            }
-
-            $('#show_console').hide()
-
-            // TODO: remove inApp
-            // parent.postMessage('loaded', '*')
-            // window.addEventListener('message', receiveMessage, false)
-        }
-    }
-
     setStateInterval(30)
 
     automaticallyCheckRecipient()
 
     $('.show_popover').popover({
         trigger: 'hover'
-    })
-
-    $('#dashboard_transactions_table, #transactions_table').on('mouseenter', 'td.confirmations', function () {
-        $(this).popover('show')
-    }).on('mouseleave', 'td.confirmations', function () {
-        $(this).popover('destroy')
-        $('.popover').remove()
-    })
-
-    _fix()
-
-    $(window).on('resize', function () {
-        _fix()
-
-        if (BRS.currentPage === 'asset_exchange') {
-            positionAssetSidebar()
-        }
     })
 
     $("[data-toggle='tooltip']").tooltip()
@@ -175,20 +127,6 @@ export function init () {
           right: 0,
           top: 4
           }); */
-}
-
-function _fix () {
-    const height = $(window).height() - $('body > .header').height()
-    // $(".wrapper").css("min-height", height + "px");
-    const content = $('.wrapper').height()
-
-    $('.content.content-stretch:visible').width($('.page:visible').width())
-
-    if (content > height) {
-        $('.left-side, html, body').css('min-height', content + 'px')
-    } else {
-        $('.left-side, html, body').css('min-height', height + 'px')
-    }
 }
 
 export function setStateInterval (seconds) {
