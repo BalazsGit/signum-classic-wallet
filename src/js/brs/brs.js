@@ -904,39 +904,10 @@ export function checkMinimumFee (value) {
     return (isNaN(value) ? BRS.minimumFeeNumber : (value < BRS.minimumFeeNumber ? BRS.minimumFeeNumber : value))
 }
 
-export function showFeeSuggestions (input_fee_field_id, response_span_id, fee_id) {
-    $("[name='suggested_fee_spinner']").show()
-    $(response_span_id).empty()
-    sendRequest('suggestFee', {
-    }, function (response) {
-        $("[name='suggested_fee_spinner']").hide()
-        if (response.errorCode) {
-            $(response_span_id).html(response.errorDescription.escapeHTML())
-            return
-        }
-        $(input_fee_field_id).val((response.standard / 100000000))
-        $(input_fee_field_id).trigger('change')
-        const cheapMessage = `<span title='${$.t('cheap_fee')}'><i class='fas fa-leaf'></i> <a href='#' name='suggested_fee_value'>${(response.cheap / 100000000)}</a></span>`
-        const standardMessage = `<span title='${$.t('standard_fee')}'><i class='fas fa-balance-scale'></i> <a href='#' name='suggested_fee_value'>${(response.standard / 100000000)}</a></span>`
-        const priorityMessage = `<span title='${$.t('priority_fee')}'><i class='fas  fa-exclamation-triangle'></i> <a href='#' name='suggested_fee_value'>${(response.priority / 100000000)}</a></span>`
-        $(response_span_id).html(`${cheapMessage}&nbsp;&nbsp; ${standardMessage}&nbsp;&nbsp; ${priorityMessage}`)
-        $(`${response_span_id} [name='suggested_fee_value']`).on('click', function (e) {
-            e.preventDefault()
-            $(input_fee_field_id).val($(this).text())
-            if (fee_id === undefined) {
-                // for modals with Total field trigger sendMoneyCalculateTotal
-                $(input_fee_field_id).trigger('change')
-            } else {
-                // for modals without Total field set Fee field
-                $(fee_id).html($(this).text() + ' ' + BRS.valueSuffix)
-            }
-        })
-    })
-}
-
 export function showFeeSuggestionsNG (input_form) {
     const $groups = $(input_form).find('.has-suggested-fee-group')
     if ($groups.length === 0) {
+        $(input_form).find('[name=feeNXT]').trigger('change')
         return
     }
     $groups.find('.suggested_fee_spinner').show()

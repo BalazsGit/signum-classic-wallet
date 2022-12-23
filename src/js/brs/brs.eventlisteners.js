@@ -14,7 +14,6 @@ import {
     goToPage,
     goToPageNumber,
     clearData,
-    showFeeSuggestions,
     evIdSearchSubmit
 } from './brs'
 
@@ -429,13 +428,13 @@ export function addEventListeners () {
             $('#send_money_modal').modal('show')
         }
     })
-    $('body').on('click', 'a[data-goto-messages-account]', function (e) {
-        e.preventDefault()
-        const account = $(this).data('goto-messages-account')
-        goToPage('messages', function () {
-            $('#message_sidebar a[data-account=' + account + ']').trigger('click')
-        })
-    })
+    // $('body').on('click', 'a[data-goto-messages-account]', function (e) {
+    //     e.preventDefault()
+    //     const account = $(this).data('goto-messages-account')
+    //     goToPage('messages', function () {
+    //         $('#message_sidebar a[data-account=' + account + ']').trigger('click')
+    //     })
+    // })
 
     // from brs.aliases.js
     $('#transfer_alias_modal, #sell_alias_modal, #cancel_alias_sale_modal').on('show.bs.modal', evAliasModalOnShowBsModal)
@@ -516,10 +515,8 @@ export function addEventListeners () {
     $('.add_message').on('change', function (e) {
         if ($(this).is(':checked')) {
             $(this).closest('form').find('.optional_message').fadeIn()
-            $(this).closest('.form-group').css('margin-bottom', '5px')
         } else {
             $(this).closest('form').find('.optional_message').hide()
-            $(this).closest('.form-group').css('margin-bottom', '')
         }
     })
     $('.add_note_to_self').on('change', function (e) {
@@ -538,8 +535,8 @@ export function addEventListeners () {
     })
     $('.modal').on('show.bs.modal', evModalOnShowBsModal)
     $('.modal').on('shown.bs.modal', function () {
-        $(this).find('input[type=text]:first, textarea:first, input[type=password]:first').not('[readonly]').first().focus()
-        $(this).find('input[name=converted_account_id]').val('')
+        // $(this).find('input[type=text]:first, textarea:first, input[type=password]:first').not('[readonly]').first().focus()
+        // $(this).find('input[name=converted_account_id]').val('')
         BRS.showedFormWarning = false // maybe not the best place... we assume forms are only in modals?
     })
     $('.modal').on('hidden.bs.modal', evModalOnHiddenBsModal)
@@ -569,11 +566,6 @@ export function addEventListeners () {
     $('#account_info_modal').on('show.bs.modal', function (e) {
         $('#account_info_name').val(BRS.accountInfo.name)
         $('#account_info_description').val(BRS.accountInfo.description)
-        showFeeSuggestions('#account_info_fee', '#suggested_fee_response_account', '#account_info_bottom_fee')
-    })
-    $('#account_info_fee_suggested').on('click', function (e) {
-        e.preventDefault()
-        showFeeSuggestions('#account_info_fee', '#suggested_fee_response_account', '#account_info_bottom_fee')
     })
 
     // from brs.modals.advanced.js
@@ -606,11 +598,6 @@ export function addEventListeners () {
         const escrowId = $(this).data('escrow')
         showEscrowDecisionModal(escrowId)
     })
-    /* signum-node/issues/677
-    $('#escrow_decision_modal').on('show.bs.modal', function (e) {
-        showFeeSuggestions('#escrow_decision_fee', '#suggested_fee_response_escrow_decision')
-    })
-    */
 
     // from brs.modals.info.js
     $('#brs_modal').on('show.bs.modal', evBrsModalOnShowBsModal)
@@ -633,7 +620,6 @@ export function addEventListeners () {
 
     // from brs.modals.request.js
     $('#request_burst_qr_modal').on('show.bs.modal', function (e) {
-        showFeeSuggestions('#request_burst_fee', '#suggested_fee_request_burst_qr')
         $('#new_qr_button').hide()
         $('#request_burst_immutable').prop('checked', true)
         $('#request_burst_account_id').val(String(BRS.accountRS).escapeHTML())
@@ -692,12 +678,6 @@ export function addEventListeners () {
         const subscriptionId = $(this).data('subscription')
         showSubscriptionCancelModal(subscriptionId)
     })
-    $('#subscription_create_modal').on('show.bs.modal', function (e) {
-        showFeeSuggestions('#subscription_create_fee', '#suggested_fee_response_subscription_create')
-    })
-    $('#subscription_cancel_modal').on('show.bs.modal', function (e) {
-        showFeeSuggestions('#subscription_cancel_fee', '#suggested_fee_response_subscription_cancel')
-    })
 
     // from brs.modals.transaction.js
     $('#transactions_table, #dashboard_transactions_table, #transfer_history_table, #asset_exchange_trade_history_table, #block_info_table, #block_info_transactions_table, #user_info_modal_transactions_table').on('click', 'a[data-transaction]', function (e) {
@@ -705,19 +685,8 @@ export function addEventListeners () {
         const transactionId = $(this).data('transaction')
         showTransactionModal(transactionId)
     })
-    $('#commitment_modal').on('show.bs.modal', function (e) {
-        showFeeSuggestions('#commitment_fee', '#suggested_fee_response_commitment')
-    })
     $('#send_money_modal').on('hide.bs.modal', function (e) {
         $('#total_amount_multi_out').html('?')
-    })
-    $('#suggested_fee_ordinary').on('click', function (e) {
-        e.preventDefault()
-        showFeeSuggestions('#send_money_fee', '#suggested_fee_response_ordinary')
-    })
-    $('#suggested_fee_multi').on('click', function (e) {
-        e.preventDefault()
-        showFeeSuggestions('#multi_out_fee', '#suggested_fee_response_multi')
     })
     $('#transaction_info_modal_info_tab').tab('show')
     $('#transaction_info_modal').on('hide.bs.modal', function (e) {
