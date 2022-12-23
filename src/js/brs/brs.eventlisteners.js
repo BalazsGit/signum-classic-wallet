@@ -476,6 +476,9 @@ export function addEventListeners () {
 
     // from brs.sidebar.js
     $('.secondary-sidebar-context').on('contextmenu', 'a', evSidebarContextOnContextmenu)
+    $('.open_my_account_modal').on('click', function () {
+        showAccountModal(BRS.accountInfo.accountRS)
+    })
 
     // from brs.encryption.js
     $('#decrypt_note_form_container button.btn-primary').click(function () {
