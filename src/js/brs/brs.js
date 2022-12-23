@@ -24,7 +24,6 @@ import {
 } from './brs.server'
 
 import {
-    allowLoginViaEnter,
     showLockscreen,
     logout
 } from './brs.login'
@@ -139,7 +138,6 @@ export function init () {
 
     setStateInterval(30)
 
-    allowLoginViaEnter()
     automaticallyCheckRecipient()
 
     $('.show_popover').popover({

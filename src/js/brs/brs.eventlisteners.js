@@ -201,6 +201,18 @@ export function addEventListeners () {
         updateSettings('language', value)
     })
 
+    // allowLoginViaEnter
+    $('#login_password, #login_account').on('keypress', function (e) {
+        if (e.key === 'Enter') {
+            evLoginButtonClick(e)
+        }
+    })
+    $('input[name=q]').on('keypress', function (e) {
+        if (e.key === 'Enter') {
+            $(this).trigger('submit')
+        }
+    })
+
     $('.sidebar-menu a').on('click', evSidebarClick)
     $('button.goto-page, a.goto-page').on('click', function (event) {
         event.preventDefault()
@@ -216,11 +228,11 @@ export function addEventListeners () {
     $('#login_button').on('click', evLoginButtonClick)
 
     // from brs.forms.js
-    $('.modal form input').keydown(function (e) {
-        if (e.which === '13') {
+    $('.modal form input').on('keydown', function (e) {
+        if (e.key === 'Enter') {
             e.preventDefault()
             if (BRS.settings.submit_on_enter && e.target.type !== 'textarea') {
-                $(this).submit()
+                $(this).trigger('submit')
             } else {
                 return false
             }
