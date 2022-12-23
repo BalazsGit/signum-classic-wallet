@@ -78,7 +78,6 @@ export function handleInitialBlocks (response) {
                 $('#brs_update_explanation span').hide()
                 $('#brs_update_explanation_wait').attr('style', 'display: none !important')
                 $('#downloading_blockchain, #brs_update_explanation_blockchain_sync').show()
-                $('#show_console').hide()
                 updateBlockchainDownloadProgress()
             } else {
                 // continue with faster state intervals if we still haven't reached current block from within 1 hour
@@ -174,9 +173,6 @@ export function incomingUpdateDashboardBlocks (newBlocks) {
                 $('#dashboard_message').hide()
                 $('#downloading_blockchain, #brs_update_explanation_blockchain_sync').hide()
                 $('#brs_update_explanation_wait').removeAttr('style')
-                if (BRS.settings.console_log && !BRS.inApp) {
-                    $('#show_console').show()
-                }
                 $.notify($.t('success_blockchain_up_to_date'), { type: 'success' })
                 checkIfOnAFork()
             } else {

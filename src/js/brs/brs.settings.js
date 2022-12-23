@@ -9,8 +9,7 @@ import { pageLoaded } from './brs'
 import { submitForm } from './brs.forms'
 
 import {
-    convertToNXT,
-    formatTimestamp
+    convertToNXT
 } from './brs.util'
 
 export function pagesSettings () {
@@ -72,18 +71,6 @@ function applySettings (key) {
             })
         } else {
             $('.modal form').off('submit.onEnter')
-        }
-    }
-
-    if (!key || key === 'console_log') {
-        if (BRS.inApp) {
-            $('#show_console').hide()
-        } else {
-            if (BRS.downloadingBlockchain || BRS.settings.console_log === 0) {
-                $('#show_console').hide()
-            } else {
-                $('#show_console').show()
-            }
         }
     }
 

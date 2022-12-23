@@ -46,10 +46,6 @@ import {
 } from './brs.aliases'
 
 import {
-    showConsole
-} from './brs.console'
-
-import {
     evDeleteContactModalOnShowBsModal,
     evUpdateContactModalOnShowBsModal,
     exportContacts,
@@ -250,12 +246,6 @@ export function addEventListeners () {
     $('#menu_clear_data').on('click', function (event) {
         event.preventDefault()
         clearData()
-    })
-
-    // from brs.console.js
-    $('#show_console a').on('click', function (event) {
-        event.preventDefault()
-        showConsole()
     })
 
     // found on lockscreen.html
