@@ -154,3 +154,57 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="clear_data_modal" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" data-i18n="clear_data">clear_data</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form role="form" autocomplete="off" id="form_clear_data">
+          <div class="form-group">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" name="contacts" id="clear_data_contacts" class="custom-control-input" />
+              <label class="custom-control-label" for="clear_data_contacts">
+                <span data-i18n="remove_contacts_bookmark">remove_contacts_bookmark</span></label
+              >
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" name="assets" id="clear_data_assets" class="custom-control-input" />
+              <label class="custom-control-label" for="clear_data_assets">
+                <span data-i18n="remove_assets_bookmark">remove_assets_bookmark</span></label
+              >
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" name="settings" id="clear_data_settings" class="custom-control-input" />
+              <label class="custom-control-label" for="clear_data_settings">
+                <span data-i18n="remove_saved_settings">remove_saved_settings</span></label
+              >
+            </div>
+          </div>
+
+          <!-- ALERTS template -->
+          <div class="alert alert-danger error_message"></div>
+
+          <input type="hidden" name="request_type" value="clearData" />
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n="cancel">Cancel</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-loading-text="Submitting..."
+          data-i18n="clear;[placeholder]submitting"
+          data-form="form_clear_data">
+          submit_button
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

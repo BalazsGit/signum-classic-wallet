@@ -22,8 +22,7 @@ import {
 } from './brs.server'
 
 import {
-    showLockscreen,
-    logout
+    showLockscreen
 } from './brs.login'
 
 import {
@@ -519,32 +518,6 @@ export function createDatabase (callback) {
             callback()
         }
     }
-}
-
-export function clearData () {
-    const onDropped = function (error) {
-        if (error != null) {
-            alert('Something wrong happened')
-        } else {
-            console.log('Table deleted')
-        }
-    }
-
-    if (BRS.databaseSupport) {
-        if (window.confirm($.t('remove_contacts_bookmark_q'))) {
-            BRS.database.drop('contacts', onDropped)
-        }
-        if (window.confirm($.t('remove_assets_bookmark_q'))) {
-            BRS.database.drop('assets', onDropped)
-        }
-        if (window.confirm($.t('remove_settings_q'))) {
-            BRS.database.drop('data', onDropped)
-            localStorage.removeItem('i18next_lng')
-            localStorage.removeItem('logged_in')
-        }
-    }
-
-    setTimeout(logout, 250)
 }
 
 export function getAccountInfo (firstRun, callback) {

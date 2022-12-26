@@ -13,7 +13,6 @@ import {
     reloadCurrentPage,
     goToPage,
     goToPageNumber,
-    clearData,
     evIdSearchSubmit
 } from './brs'
 
@@ -242,10 +241,6 @@ export function addEventListeners () {
     $('#menu_logout').on('click', function (event) {
         event.preventDefault()
         logout()
-    })
-    $('#menu_clear_data').on('click', function (event) {
-        event.preventDefault()
-        clearData()
     })
 
     // found on lockscreen.html

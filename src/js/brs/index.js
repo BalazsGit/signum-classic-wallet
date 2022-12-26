@@ -115,6 +115,7 @@ import {
     formsVerifyMessage
 } from './brs.modals.signmessage'
 import { init } from './brs'
+import { formsClearData } from './brs.modal.cleardata'
 
 export const BRS = {
     server: '',
@@ -215,6 +216,7 @@ export const BRS = {
         sendMessageComplete: formsSendMessageComplete,
         decryptMessages: formsDecryptMessages,
         setAccountInfoComplete: formsSetAccountInfoComplete,
+        clearData: formsClearData,
         broadcastTransactionComplete: formsBroadcastTransactionComplete,
         parseTransactionComplete: formsParseTransactionComplete,
         parseTransactionError: formsParseTransactionError,
