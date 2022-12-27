@@ -75,9 +75,7 @@ export function handleInitialBlocks (response) {
                     setStateInterval(10)
                 }
                 BRS.downloadingBlockchain = true
-                $('#brs_update_explanation span').hide()
-                $('#brs_update_explanation_wait').attr('style', 'display: none !important')
-                $('#downloading_blockchain, #brs_update_explanation_blockchain_sync').show()
+                $('#downloading_blockchain').show()
                 updateBlockchainDownloadProgress()
             } else {
                 // continue with faster state intervals if we still haven't reached current block from within 1 hour
@@ -171,8 +169,7 @@ export function incomingUpdateDashboardBlocks (newBlocks) {
                 }
                 BRS.downloadingBlockchain = false
                 $('#dashboard_message').hide()
-                $('#downloading_blockchain, #brs_update_explanation_blockchain_sync').hide()
-                $('#brs_update_explanation_wait').removeAttr('style')
+                $('#downloading_blockchain').hide()
                 $.notify($.t('success_blockchain_up_to_date'), { type: 'success' })
                 checkIfOnAFork()
             } else {

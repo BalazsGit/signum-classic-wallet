@@ -104,7 +104,7 @@
     z-index: 1000;
 }
 
-.testnet_only,.page,#brs_update_explanation span,.show_logout,.advanced,.recipient_public_key,.optional_message,.optional_note, .optional_sell_to_specific {
+.testnet_only,.page,.show_logout,.advanced,.recipient_public_key,.optional_message,.optional_note, .optional_sell_to_specific {
     display: none;
 }
 

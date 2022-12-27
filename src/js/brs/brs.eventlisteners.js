@@ -591,22 +591,6 @@ export function addEventListeners () {
 
     // from brs.modals.info.js
     $('#brs_modal').on('show.bs.modal', evBrsModalOnShowBsModal)
-    $('#brs_modal').on('hide.bs.modal', function (e) {
-        $('body').off('dragover.brs, drop.brs')
-        $('#brs_update_drop_zone, #brs_update_result, #brs_update_hashes, #brs_update_hash_progress').hide()
-        $(this).find('ul.nav li.active').removeClass('active')
-        $('#brs_modal_state_nav').addClass('active')
-        $('.brs_modal_content').hide()
-    })
-    $('#brs_modal ul.nav li').click(function (e) {
-        e.preventDefault()
-        const tab = $(this).data('tab')
-        $(this).siblings().removeClass('active')
-        $(this).addClass('active')
-        $('.brs_modal_content').hide()
-        const content = $('#brs_modal_' + tab)
-        content.show()
-    })
 
     // from brs.modals.request.js
     $('#request_burst_qr_modal').on('show.bs.modal', function (e) {
