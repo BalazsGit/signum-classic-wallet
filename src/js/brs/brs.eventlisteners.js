@@ -151,6 +151,12 @@ export function addEventListeners () {
         $('body').removeClass('sidebar-open')
         $('body').addClass('sidebar-closed sidebar-collapse')
     })
+    // fix adminlte (for some reason there is bug hiding sidebar on start)
+    if (document.body.clientWidth > 991.98) {
+        $('[data-widget="pushmenu"]').PushMenu('expand')
+    } else {
+        $('[data-widget="pushmenu"]').PushMenu('collapse')
+    }
 
     // from brs.js
     $('#prefered_node').on('blur', function () {
