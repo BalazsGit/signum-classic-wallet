@@ -4,7 +4,7 @@
 
 import { BRS } from '.'
 
-import { checkMinimumFee } from './brs'
+import { checkMinimumFee, showFeeSuggestionsNG } from './brs'
 
 import {
     unlockForm
@@ -36,18 +36,17 @@ export function setupLockableModal () {
     $.extend(_superModal.Constructor.prototype, {
         // locks the dialog so that it cannot be hidden
         lock: function () {
-            this.options.locked = true
-            this.$element.addClass('locked')
+            this.locked = true
+            $(this._element).addClass('locked')
         }, // unlocks the dialog so that it can be hidden by 'esc' or clicking on the backdrop (if not static)
 
         unlock: function () {
-            this.options.locked = false
-            this.$element.removeClass('locked')
+            this.locked = false
+            $(this._element).removeClass('locked')
         },
         // override the original hide so that the original is only called if the modal is unlocked
         hide: function () {
-            if (this.options.locked) return
-
+            if (this.locked) return
             _hide.apply(this, arguments)
         }
     })
@@ -142,7 +141,7 @@ export function evMultiOutFeeChange (e) {
 
 // hide modal when another one is activated.
 export function evModalOnShowBsModal (e) {
-    const $visible_modal = $('.modal.in')
+    const $visible_modal = $('.modal.show')
     if ($visible_modal.length) {
         if ($visible_modal.hasClass('locked')) {
             const $btn = $visible_modal.find('button.btn-primary:not([data-dismiss=modal])')
@@ -151,7 +150,8 @@ export function evModalOnShowBsModal (e) {
             $visible_modal.modal('hide')
         }
     }
-    $(this).find('.form-group').css('margin-bottom', '')
+
+    showFeeSuggestionsNG(e.target)
 }
 
 export function resetModalMultiOut () {
@@ -175,14 +175,7 @@ export function resetModalMultiOut () {
     $('#send_money_same_out_checkbox').prop('checked', false)
     $('#multi_out_fee').val(0.02)
     $('#multi_out_same_amount').val('')
-    $('#send_ordinary').fadeIn()
-    $('#send_multi_out').hide()
-    if (!$('.ordinary-nav').hasClass('active')) {
-        $('.ordinary-nav').addClass('active')
-    }
-    if ($('.multi-out-nav').toggleClass('active')) {
-        $('.multi-out-nav').removeClass('active')
-    }
+    $('#send_ordinary_tab').tab('show')
 }
 
 // Reset form to initial state when modal is closed
@@ -247,7 +240,7 @@ export function evModalOnHiddenBsModal (e) {
 
     $(this).find('.recipient_public_key').hide()
 
-    $(this).find('.optional_message, .optional_note').hide()
+    $(this).find('.optional_message, .optional_note, .optional_sell_to_specific').hide()
 
     $(this).find('.advanced_info a').text($.t('advanced'))
 

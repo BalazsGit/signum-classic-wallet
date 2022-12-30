@@ -6,7 +6,7 @@ import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
 
 import {
-    loadPage,
+    reloadCurrentPage,
     getAccountInfo
 } from './brs'
 
@@ -350,7 +350,7 @@ export function pagesTransactions () {
 }
 
 export function incomingTransactions (transactions) {
-    loadPage('transactions')
+    reloadCurrentPage()
 }
 
 function displayUnconfirmedTransactions (viewAccount) {
@@ -760,5 +760,5 @@ export function evTransactionsPageTypeClick (e) {
 
     $('.popover').remove()
 
-    loadPage('transactions')
+    reloadCurrentPage()
 }

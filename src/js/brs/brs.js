@@ -17,16 +17,12 @@ import {
     getSettings
 } from './brs.settings'
 
-import { theme } from './brs.theme'
-
 import {
     sendRequest
 } from './brs.server'
 
 import {
-    allowLoginViaEnter,
-    showLockscreen,
-    logout
+    showLockscreen
 } from './brs.login'
 
 import {
@@ -48,7 +44,6 @@ import {
 import {
     saveCachedAssets,
     cacheUserAssets,
-    positionAssetSidebar,
     goToAsset
 } from './brs.assetexchange'
 
@@ -90,7 +85,6 @@ export function init () {
         placement: { from: 'bottom', align: 'right' },
         offset: 10
     })
-    theme()
 
     createDatabase(function () {
         getSettings()
@@ -107,66 +101,15 @@ export function init () {
         showLockscreen()
     }, 250)
 
-    if (window.parent) {
-        const match = window.location.href.match(/\?app=?(win|mac|lin)?-?([\d.]+)?/i)
-
-        if (match) {
-            BRS.inApp = true
-            if (match[1]) {
-                BRS.appPlatform = match[1]
-            }
-            if (match[2]) {
-                BRS.appVersion = match[2]
-            }
-
-            if (!BRS.appPlatform || BRS.appPlatform === 'mac') {
-                let macVersion = navigator.userAgent.match(/OS X 10_([0-9]+)/i)
-                if (macVersion && macVersion[1]) {
-                    macVersion = parseInt(macVersion[1])
-
-                    if (macVersion < 9) {
-                        $('.modal').removeClass('fade')
-                    }
-                }
-            }
-
-            $('#show_console').hide()
-
-            // TODO: remove inApp
-            // parent.postMessage('loaded', '*')
-            // window.addEventListener('message', receiveMessage, false)
-        }
-    }
-
     setStateInterval(30)
 
-    allowLoginViaEnter()
     automaticallyCheckRecipient()
 
     $('.show_popover').popover({
         trigger: 'hover'
     })
 
-    $('#dashboard_transactions_table, #transactions_table').on('mouseenter', 'td.confirmations', function () {
-        $(this).popover('show')
-    }).on('mouseleave', 'td.confirmations', function () {
-        $(this).popover('destroy')
-        $('.popover').remove()
-    })
-
-    _fix()
-
-    $(window).on('resize', function () {
-        _fix()
-
-        if (BRS.currentPage === 'asset_exchange') {
-            positionAssetSidebar()
-        }
-    })
-
     $("[data-toggle='tooltip']").tooltip()
-
-    $('.sidebar .treeview').tree()
 
     setInterval(setHeaderClock, 1000)
 
@@ -183,20 +126,6 @@ export function init () {
           right: 0,
           top: 4
           }); */
-}
-
-function _fix () {
-    const height = $(window).height() - $('body > .header').height()
-    // $(".wrapper").css("min-height", height + "px");
-    const content = $('.wrapper').height()
-
-    $('.content.content-stretch:visible').width($('.page:visible').width())
-
-    if (content > height) {
-        $('.left-side, html, body').css('min-height', content + 'px')
-    } else {
-        $('.left-side, html, body').css('min-height', height + 'px')
-    }
 }
 
 export function setStateInterval (seconds) {
@@ -361,55 +290,33 @@ export function getState (callback) {
     saveCachedAssets()
 }
 
-export function logoSidebarClick (e, data) {
-    if ($(this).hasClass('ignore')) {
-        $(this).removeClass('ignore')
-        return
-    }
-
+/**
+ * Handles clicks in sidebar, changing current page if needed
+ */
+export function evSidebarClick (e) {
     e.preventDefault()
-
     if ($(this).data('toggle') === 'modal') {
         return
     }
-
     const page = $(this).data('page')
-
     if (page === 'keep' || page === BRS.currentPage) {
-        if (data && data.callback) {
-            data.callback()
-        }
         return
     }
-
     $('.page').hide()
-
     $('#' + page + '_page').show()
+    // $('.content-header h1').find('.loading_dots').remove()
+    $('#sidebar .active').removeClass('active')
+    $(e.currentTarget).addClass('active')
 
-    $('.content-header h1').find('.loading_dots').remove()
+    // if (BRS.currentPage !== 'messages') {
+    //     $('#inline_message_password').val('')
+    // }
 
-    const changeActive = !($(this).closest('ul').hasClass('treeview-menu'))
+    loadPage(page)
+}
 
-    if (changeActive) {
-        const currentActive = $('ul.sidebar-menu > li.active')
-
-        if (currentActive.hasClass('treeview')) {
-            currentActive.children('a').first().addClass('ignore').click()
-        } else {
-            currentActive.removeClass('active')
-        }
-
-        if ($(this).attr('id') && $(this).attr('id') === 'logo') {
-            $('#dashboard_link').addClass('active')
-        } else {
-            $(this).parent().addClass('active')
-        }
-    }
-
-    if (BRS.currentPage !== 'messages') {
-        $('#inline_message_password').val('')
-    }
-
+/** Load a page for first time (setting up global variables) */
+function loadPage (page) {
     BRS.currentPage = page
     BRS.currentSubPage = ''
     BRS.pageNumber = 1
@@ -417,55 +324,43 @@ export function logoSidebarClick (e, data) {
 
     if (BRS.pages[page]) {
         pageLoading()
-
-        if (data && data.callback) {
-            BRS.pages[page](data.callback)
-        } else if (data) {
-            BRS.pages[page](data)
-        } else {
-            BRS.pages[page]()
-        }
+        BRS.pages[page]()
     }
 }
 
-export function loadPage (page, callback) {
+/** Reload current page, keeping variables like pagination */
+export function reloadCurrentPage () {
+    if (!BRS.pages[BRS.currentPage]) {
+        console.log('Possible bug on reloadCurrentPage.')
+        return
+    }
     pageLoading()
-    BRS.pages[page](callback)
+    BRS.pages[BRS.currentPage]()
 }
 
-export function goToPage (page, callback) {
+/** Go to a page, updating sidebar menu */
+export function goToPage (page) {
     let $link = $('ul.sidebar-menu a[data-page=' + page + ']')
 
     if ($link.length > 1) {
+        // if there are many pages in menubar
         if ($link.last().is(':visible')) {
+            // Select last one if it is visible
             $link = $link.last()
         } else {
             $link = $link.first()
         }
     }
-
     if ($link.length === 1) {
-        if (callback) {
-            $link.trigger('click', [{
-                callback
-            }])
-        } else {
-            $link.trigger('click')
-        }
-    } else {
-        BRS.currentPage = page
-        BRS.currentSubPage = ''
-        BRS.pageNumber = 1
-        BRS.showPageNumbers = false
-
-        $('ul.sidebar-menu a.active').removeClass('active')
-        $('.page').hide()
-        $('#' + page + '_page').show()
-        if (BRS.pages[page]) {
-            pageLoading()
-            BRS.pages[page](callback)
-        }
+        // handle pages that are in sidebar simulating a click
+        $link.trigger('click')
+        return
     }
+    // Handle hidden pages like "search_results"
+    $('ul.sidebar-menu a.active').removeClass('active')
+    $('.page').hide()
+    $('#' + page + '_page').show()
+    loadPage(page)
 }
 
 export function pageLoading () {
@@ -474,6 +369,8 @@ export function pageLoading () {
     const $pageHeader = $('#' + BRS.currentPage + '_page .content-header h1')
     $pageHeader.find('.loading_dots').remove()
     $pageHeader.append("<span class='loading_dots'>" + BRS.loadingDotsHTML + '</span>')
+    const $pageContainer = $('#' + BRS.currentPage + '_page .data-container')
+    $pageContainer.addClass('data-loading')
 }
 
 export function pageLoaded (callback) {
@@ -623,33 +520,6 @@ export function createDatabase (callback) {
     }
 }
 
-export function clearData () {
-    const onDropped = function (error) {
-        if (error != null) {
-            alert('Something wrong happened')
-        } else {
-            console.log('Table deleted')
-        }
-    }
-
-    if (BRS.databaseSupport) {
-        if (window.confirm($.t('remove_contacts_bookmark_q'))) {
-            BRS.database.drop('contacts', onDropped)
-        }
-        if (window.confirm($.t('remove_assets_bookmark_q'))) {
-            BRS.database.drop('assets', onDropped)
-        }
-        if (window.confirm($.t('remove_settings_q'))) {
-            BRS.database.drop('data', onDropped)
-            localStorage.removeItem('i18next_lng')
-            localStorage.removeItem('logged_in')
-            localStorage.removeItem('theme')
-        }
-    }
-
-    setTimeout(logout, 250)
-}
-
 export function getAccountInfo (firstRun, callback) {
     sendRequest('getAccount', {
         account: BRS.account,
@@ -701,7 +571,7 @@ export function getAccountInfo (firstRun, callback) {
             }
 
             // only show if happened within last week
-            const showAssetDifference = (!BRS.downloadingBlockchain || (BRS.blocks && BRS.blocks[0] && BRS.state && BRS.state.time - BRS.blocks[0].timestamp < 60 * 60 * 24 * 7))
+            const showAssetDifference = (!BRS.downloadingBlockchain || (BRS.blocks.length > 0 && BRS.state && BRS.state.time - BRS.blocks[0].timestamp < 60 * 60 * 24 * 7))
 
             if (BRS.databaseSupport) {
                 BRS.database.select('data', [{
@@ -919,7 +789,7 @@ export function checkIfOnAFork () {
     if (!BRS.downloadingBlockchain) {
         let onAFork = true
 
-        if (BRS.blocks && BRS.blocks.length >= 10) {
+        if (BRS.blocks.length >= 10) {
             for (let i = 0; i < 10; i++) {
                 if (BRS.blocks[i].generator !== BRS.account) {
                     onAFork = false
@@ -941,31 +811,33 @@ export function checkMinimumFee (value) {
     return (isNaN(value) ? BRS.minimumFeeNumber : (value < BRS.minimumFeeNumber ? BRS.minimumFeeNumber : value))
 }
 
-export function showFeeSuggestions (input_fee_field_id, response_span_id, fee_id) {
-    $("[name='suggested_fee_spinner']").removeClass('suggested_fee_spinner_display_none')
+export function showFeeSuggestionsNG (input_form) {
+    const $groups = $(input_form).find('.has-suggested-fee-group')
+    if ($groups.length === 0) {
+        $(input_form).find('[name=feeNXT]').trigger('change')
+        return
+    }
+    $groups.find('.suggested_fee_spinner').show()
+    $groups.find('.suggested_fee_response').empty()
+
     sendRequest('suggestFee', {
     }, function (response) {
-        if (!response.errorCode) {
-            $(input_fee_field_id).val((response.standard / 100000000))
-            $(input_fee_field_id).trigger('change')
-            $(response_span_id).html("<span class='margin-left-5' data-i18n='standard_fee'>Standard: <a href='#' class='btn-fee-response' name='suggested_fee_value_" + response_span_id.id + "' data-i18n='[title]click_to_apply'>" + (response.standard / 100000000) + "</a></span> <span class='margin-left-5' data-i18n='cheap_fee'>Cheap: <a href='#' class='btn-fee-response' name='suggested_fee_value_" + response_span_id.id + "' data-i18n='[title]click_to_apply'>" + (response.cheap / 100000000) + "</a></span> <span class='margin-left-5' data-i18n='priority_fee'>Priority: <a href='#' class='btn-fee-response' name='suggested_fee_value_" + response_span_id.id + "' data-i18n='[title]click_to_apply'>" + (response.priority / 100000000) + '</a></span>')
-            $("[name='suggested_fee_value_" + response_span_id.id + "']").localize() // apply locale to DOM after ajax call
-            $("[name='suggested_fee_spinner']").addClass('suggested_fee_spinner_display_none')
-            $("[name='suggested_fee_value_" + response_span_id.id + "']").on('click', function (e) {
-                e.preventDefault()
-                $(input_fee_field_id).val($(this).text())
-                if (fee_id === undefined) {
-                    // for modals with Total field trigger sendMoneyCalculateTotal
-                    $(input_fee_field_id).trigger('change')
-                } else {
-                    // for modals without Total field set Fee field
-                    $(fee_id).html($(this).text() + ' ' + BRS.valueSuffix)
-                }
-            })
-        } else {
-            $('#suggested_fee_response').html(response.errorDescription)
-            $("[name='suggested_fee_spinner']").addClass('suggested_fee_spinner_display_none')
+        $groups.find('.suggested_fee_spinner').hide()
+        if (response.errorCode) {
+            $groups.find('.suggested_fee_response').html(response.errorDescription.escapeHTML())
+            return
         }
+        $groups.find('[name=feeNXT]').val((response.standard / 100000000))
+        $groups.find('[name=feeNXT]').trigger('change')
+        const cheapMessage = `<span title='${$.t('cheap_fee')}'><i class='fas fa-leaf'></i> <a href='#' name='suggested_fee_value'>${(response.cheap / 100000000)}</a></span>`
+        const standardMessage = `<span title='${$.t('standard_fee')}'><i class='fas fa-balance-scale'></i> <a href='#' name='suggested_fee_value'>${(response.standard / 100000000)}</a></span>`
+        const priorityMessage = `<span title='${$.t('priority_fee')}'><i class='fas  fa-exclamation-triangle'></i> <a href='#' name='suggested_fee_value'>${(response.priority / 100000000)}</a></span>`
+        $groups.find('.suggested_fee_response').html(`${cheapMessage}&nbsp;&nbsp; ${standardMessage}&nbsp;&nbsp; ${priorityMessage}`)
+        $groups.find("[name='suggested_fee_value']").on('click', function (e) {
+            e.preventDefault()
+            $groups.find('[name=feeNXT]').val($(this).text())
+            $groups.find('[name=feeNXT]').trigger('change')
+        })
     })
 }
 
@@ -1005,7 +877,7 @@ function showAssetSearchResults (assets) {
 
 export function evIdSearchSubmit (e) {
     e.preventDefault()
-    const userInput = $.trim($('#id_search input[name=q]').val())
+    const userInput = $('#search_box input').val().trim()
     let searchText = userInput
     if (searchText.startsWith('-')) {
         try {

@@ -344,7 +344,7 @@ export function submitForm ($btn) {
             errorMessage = output.errorMessage
         }
         if (output.stop) {
-            unlockForm($modal, $btn, true)
+            unlockForm($modal, $btn, output.hide)
             return
         }
     }

@@ -1,123 +1,62 @@
 <!DOCTYPE html>
-<html class="lockscreen">
+<html style="height: auto;" lang="en">
   <head>
-    <meta charset="UTF-8" http-equiv="X-UA-Compatible" content="IE=edge">
-    <title data-i18n="app.title">Signum Classic Wallet</title>
-    <script src="js/index.min.js"></script>
-    <script src="js/3rdparty/bootstrap.min.js"  integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" type="text/javascript"></script>
-<!--ui css -->
-    <link href="css/dev/burstold.css" rel="stylesheet" type="text/css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title data-i18n="app.title">NeoClassic Wallet</title>
+    
+    <link rel="stylesheet" href="./css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="./css/adminlte.min.css">
+    <link rel="stylesheet" href="./css/custom.css">
 
-    <link href="css/ui/sidebar.css" rel="stylesheet" type="text/css" />
-    <link href="css/ui/sidebarmini.css" rel="stylesheet" type="text/css" />
-    <link href="css/ui/sidebar_context.css" rel="stylesheet" type="text/css" />
-    <link href="css/ui/etc.css" rel="stylesheet" type="text/css" />
-    <link href="css/ui/data_container.css" rel="stylesheet" type="text/css" />
-<!--page css -->
-    <link href="css/pages/lockscreen.css" rel="stylesheet" type="text/css" />
-    <link href="css/pages/asset_exchange.css" rel="stylesheet" type="text/css" />
-    <link href="css/pages/msg.css" rel="stylesheet" type="text/css" />
-<!--theme css -->
-    <link href="css/themes/theme-blue.css" rel="stylesheet" type="text/css" />
-    <link href="css/themes/theme-green.css" rel="stylesheet" type="text/css" />
-    <link href="css/themes/theme-purple.css" rel="stylesheet" type="text/css" />
-    <link href="css/themes/theme-red.css" rel="stylesheet" type="text/css" />
-    <link href="css/themes/theme-yellow.css" rel="stylesheet" type="text/css" />
-    <link href="css/themes/theme-dark.css" rel="stylesheet" type="text/css" />
-<!--css -->
-    <link href="css/AdminLTE.css" rel="stylesheet" type="text/css" />
-    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/fontawesome-all.min.css" rel="stylesheet" type="text/css"  />
-    <link href="css/ionicons.min.css" rel="stylesheet" type="text/css" />
+    <script src="./js/index.min.js"></script>
+    <script src="./js/3rdparty/bootstrap.bundle.js"></script>
+    <script src="./js/3rdparty/adminlte.min.js"></script>
   </head>
-<body class="theme-blue sidebar-mini">
-    <div id="lockscreen">
-        <div id="old_browser_warning" style="display:none;margin-left:auto;margin-right:auto;margin-top:200px;background:white;color:black;padding:20px;width:300px;" data-i18n="old_browser_warning">You are using an old Internet Explorer. Please update your IE or open localhost:8125 with your favorite Browser!</div>
+<body class="sidebar-mini layout-fixed" style="height: auto;">
+    <div class="dark-mode" id="lockscreen">
+        <!--
+        <div id="old_browser_warning" data-i18n="old_browser_warning">You are using an old Internet Explorer. Please update your IE or open localhost:8125 with your favorite Browser!</div>
+        -->
           <div id="lockscreen_loading">
             <progress id="loading_bar" value="0" max="100"></progress>
           </div>
     </div>
- <!-- lockscreen moved to html/page/lockscreen.html -->  
-    <div id="page" class="wrapper row-offcanvas row-offcanvas-left">
-      <aside id="sidebar" class="main-sidebar sidebar-offcanvas">
-        <!-- Sidebar moved to html/sidebar.html -->
-      </aside>
-      <aside id="content" class="content-wrapper">
-        <!-- Pages moved to own files in html/pages/ -->
-      </aside>
+  <div id="main_wrapper" class="wrapper" style="display: none;">
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light" id="header_nav"></nav>
+    <aside class="main-sidebar sidebar-dark-primary" id="sidebar"></aside>
+    
+    <div id="content" class="content-wrapper">
     </div>
-
-
-    <!-- Sidebar context infos moved to html/sidebar_context.html -->
-    <!-- Pages moved to own files in html/pages/ -->
-
-    <!-- Modals moved to own files in html/modals/ -->
-    <script type="text/javascript">
-
-      $("#loading_bar" ).val (25);
-    </script>
-    <script src="js/3rdparty/ajaxretry.js"      integrity="sha384-ia90j7KZ3lHwnJ/jSofQNFuwwtGrcTHwjd9+SY8Ls7EFiyx+vFfXvURO9fW0odQj" type="text/javascript"></script>
-    <script src="js/3rdparty/adminlte.js" type="text/javascript"></script>
-    <script src="js/3rdparty/clipboard.js" type="text/javascript"></script>
-    <script src="js/3rdparty/webdb.js" type="text/javascript"></script>
-    <script src="js/3rdparty/notify.min.js"      integrity="sha384-Qnyy4lkYCL9J8NhIWAT7bMPccirUwfiBj7PLqr1ZBlSSJ0+A2XDB0UlqZcg+0VGS" type="text/javascript"></script>
-    <script src="js/3rdparty/jsbn.js" type="text/javascript"></script>
-    <script src="js/3rdparty/jsbn2.js" type="text/javascript"></script>
-    <script>
-        $("#loading_bar" ).val (30);
-    </script>
-    <script src="js/util/extensions.js" type="text/javascript"></script>
-    <script src="js/crypto/3rdparty/aes.js" type="text/javascript"></script>
-    <script>
-        $("#loading_bar" ).val (45);
-    </script>
-    <!--
-    <script src="js/brs.js" type="text/javascript"></script>
-    <script src="js/brs.server.js" type="text/javascript"></script>
-    <script src="js/brs.forms.js" type="text/javascript"></script>
-    <script src="js/brs.login.js" type="text/javascript"></script>
-    <script src="js/brs.version.js" type="text/javascript"></script>
-    <script src="js/brs.recipient.js" type="text/javascript"></script>
-    <script src="js/brs.eventlisteners.js" type="text/javascript"></script>
-    <script>
-        $("#loading_bar" ).val (55);
-    </script>
-    <script src="js/brs.assetexchange.js" type="text/javascript"></script>
-    <script src="js/brs.messages.js" type="text/javascript"></script>
-    <script src="js/brs.aliases.js" type="text/javascript"></script>
-    <script src="js/brs.blocks.js" type="text/javascript"></script>
-    <script src="js/brs.transactions.js" type="text/javascript"></script>
-    <script src="js/brs.peers.js" type="text/javascript"></script>
-    <script src="js/brs.contacts.js" type="text/javascript"></script>
-    <script src="js/brs.news.js" type="text/javascript"></script>
-    <script src="js/brs.settings.js" type="text/javascript"></script>
-    <script src="js/brs.sidebar.js" type="text/javascript"></script>
-    <script src="js/brs.theme.js" type="text/javascript"></script>
-    <script>
-        $("#loading_bar" ).val (65);
-    </script>
-    <script src="js/brs.encryption.js" type="text/javascript"></script>
-    <script src="js/brs.modals.js" type="text/javascript"></script>
-    <script src="js/brs.modals.account.js" type="text/javascript"></script>
-    <script src="js/brs.modals.accountdetails.js" type="text/javascript"></script>
-    <script src="js/brs.modals.block.js" type="text/javascript"></script>
-    <script src="js/brs.modals.info.js" type="text/javascript"></script>
-    <script src="js/brs.modals.transaction.js" type="text/javascript"></script>
-    <script src="js/brs.modals.accountinfo.js" type="text/javascript"></script>
-    <script src="js/brs.modals.advanced.js" type="text/javascript"></script>
-    <script src="js/brs.modals.request.js" type="text/javascript"></script>
-    <script src="js/brs.modals.signmessage.js" type="text/javascript"></script>
-    <script src="js/brs.console.js" type="text/javascript"></script>
-    <script src="js/brs.util.js" type="text/javascript"></script>
-    <script>
-        $("#loading_bar" ).val (75);
-    </script>
-    <script src="js/brs.escrow.js" type="text/javascript"></script>
-    <script src="js/brs.modals.escrow.js" type="text/javascript"></script>
-    <script src="js/brs.subscription.js" type="text/javascript"></script>
-    <script src="js/brs.modals.subscription.js" type="text/javascript"></script>
-    <script src="js/brs.at.js" type="text/javascript"></script>
-    <script src="js/nsv.dividends.js" type="text/javascript"></script>
-    -->
+    
+    <aside class="control-sidebar control-sidebar-dark" style="display: none;">
+      <div class="p-3">
+        <h5>Title</h5>
+        <p>Sidebar content</p>
+      </div>
+    </aside>
+    
+    <footer class="main-footer">
+      <div class="float-right d-none d-sm-inline">
+      Anything you want
+      </div>
+      <strong>Copyright © 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+    </footer>
+    <div id="sidebar-overlay"></div>
+  </div>
+  <script type="text/javascript">
+    $("#loading_bar" ).val (25);
+  </script>
+  <script src="./js/3rdparty/ajaxretry.js" type="text/javascript"></script>
+  <script src="./js/3rdparty/clipboard.js" type="text/javascript"></script>
+  <script src="./js/3rdparty/webdb.js" type="text/javascript"></script>
+  <script src="./js/3rdparty/notify.min.js" type="text/javascript"></script>
+  <script src="./js/3rdparty/jsbn.js" type="text/javascript"></script>
+  <script src="./js/3rdparty/jsbn2.js" type="text/javascript"></script>
+  <script src="./js/util/extensions.js" type="text/javascript"></script>
+  <script src="./js/crypto/3rdparty/aes.js" type="text/javascript"></script>
+  <script>
+      $("#loading_bar" ).val (45);
+  </script>
   </body>
 </html>

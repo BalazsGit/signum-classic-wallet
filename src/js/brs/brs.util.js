@@ -805,32 +805,32 @@ export function hasTransactionUpdates (transactions) {
     return ((transactions && transactions.length) || BRS.unconfirmedTransactionsChange)
 }
 
-export function FnTree () {
+/** Handles treeview menu logic (called once on initialization) */
+export function treeViewHandler () {
     return this.each(function () {
         const btn = $(this).children('a').first()
         const menu = $(this).children('.treeview-menu').first()
-        let isActive = $(this).hasClass('active')
+        const isActive = $(this).hasClass('is-open')
 
         // initialize already active menus
         if (isActive) {
             menu.show()
-            btn.children('.fa-angle-right').first().removeClass('fa-angle-right').addClass('fa-angle-down')
+            btn.find('.fa-angle-right').first().removeClass('fa-angle-right').addClass('fa-angle-down')
         }
         // Slide open or close the menu on link click
-        btn.click(function (e) {
+        btn.on('click', function (e) {
             e.preventDefault()
-            if (isActive) {
+            const active = $(this.parentNode).hasClass('is-open')
+            if (active) {
                 // Slide up to close menu
                 menu.slideUp()
-                isActive = false
-                btn.children('.fa-angle-down').first().removeClass('fa-angle-down').addClass('fa-angle-right')
-                btn.parent('li').removeClass('active')
+                btn.find('.fa-angle-down').first().removeClass('fa-angle-down').addClass('fa-angle-right')
+                btn.parent('li').removeClass('is-open')
             } else {
                 // Slide down to open menu
                 menu.slideDown()
-                isActive = true
-                btn.children('.fa-angle-right').first().removeClass('fa-angle-right').addClass('fa-angle-down')
-                btn.parent('li').addClass('active')
+                btn.find('.fa-angle-right').first().removeClass('fa-angle-right').addClass('fa-angle-down')
+                btn.parent('li').addClass('is-open')
             }
         })
     })
@@ -950,18 +950,18 @@ export function translateServerError (response) {
             }).capitalize()
         }
 
-        match = response.errorDescription.match(/At least one of (.*) must be specified/i)
+        match = response.errorDescription.match(/At least one of \[(.*)\] must be specified/i)
         if (match && match[1]) {
             const fieldNames = match[1].split(',')
             const translatedFieldNames = []
 
-            $.each(fieldNames, function (fieldName) {
+            for (const fieldName of fieldNames) {
                 translatedFieldNames.push(getTranslatedFieldName(fieldName).toLowerCase())
-            })
+            }
 
             const translatedFieldNamesJoined = translatedFieldNames.join(', ')
 
-            return $.t('error_not_specified', {
+            return $.t('error_not_specified_plural', {
                 names: translatedFieldNamesJoined,
                 count: translatedFieldNames.length
             }).capitalize()

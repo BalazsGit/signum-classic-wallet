@@ -23,17 +23,27 @@ import {
 import {
     getTransactionDetails
 } from './brs.transactions'
+import { checkRecipient } from './brs.recipient'
 
 export function showAccountModal (account) {
     if (BRS.fetchingModalData) {
         return
     }
 
+    checkRecipient(account, $('#user_info_modal'))
+
     if (typeof account === 'object') {
         BRS.userInfoModal.user = account.account
+        accountModalDataReady(account)
     } else {
         BRS.userInfoModal.user = account
         BRS.fetchingModalData = true
+        sendRequest('getAccount', {
+            account: BRS.userInfoModal.user
+        }, function (response) {
+            accountModalDataReady(response)
+            BRS.fetchingModalData = false
+        })
     }
 
     $('#user_info_modal_account').html(getAccountFormatted(BRS.userInfoModal.user))
@@ -48,24 +58,9 @@ export function showAccountModal (account) {
     }
 
     $('#user_info_modal_actions button').data('account', accountButton)
-
-    if (BRS.fetchingModalData) {
-        sendRequest('getAccount', {
-            account: BRS.userInfoModal.user
-        }, function (response) {
-            processAccountModalData(response)
-            BRS.fetchingModalData = false
-        })
-    } else {
-        processAccountModalData(account)
-    }
-
-    $('#user_info_modal_transactions').show()
-
-    userInfoModalTransactions()
 }
 
-function processAccountModalData (account) {
+function accountModalDataReady (account) {
     if (account.unconfirmedBalanceNQT === '0') {
         $('#user_info_modal_account_balance').html('0')
     } else {
@@ -87,28 +82,32 @@ function processAccountModalData (account) {
     }
 
     $('#user_info_modal').modal('show')
+
+    $('#user_info_modal_details_tab').tab('show')
+    userInfoModalDetails()
 }
 
-export function loadUserInfoModal (tabName, param) {
-    switch (tabName) {
-    case 'transactions':
-        return userInfoModalTransactions(param)
-    case 'details':
-        return userInfoModalDetails()
-    case 'aliases':
-        return userInfoModalAliases()
-    case 'smartcontract':
-        return userInfoModalSmartcontract()
-    case 'assets':
+export function evShowBsTab (e) {
+    switch (e.target.id) {
+    case 'user_info_modal_transactions_tab':
+        return userInfoModalTransactions()
+    case 'user_info_modal_assets_tab':
         return userInfoModalAssets()
-    case 'addIssuedAssets':
-        return userInfoModalAddIssuedAssets(param)
-    case 'assetsLoaded':
-        return userInfoModalAssetsLoaded(param)
+    case 'user_info_modal_details_tab':
+        return
+    case 'user_info_modal_smartcontract_tab':
+        return userInfoModalSmartcontract()
+    case 'user_info_modal_aliases_tab':
+        return userInfoModalAliases()
+    case 'user_info_modal_vcard_tab':
+        // TODO
+        return
+    case 'user_info_modal_actions_tab':
+        return userInfoModalDetails()
     }
 }
 
-function userInfoModalTransactions (type) {
+function userInfoModalTransactions () {
     sendRequest('getAccountTransactions', {
         account: BRS.userInfoModal.user,
         firstIndex: 0,

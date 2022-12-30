@@ -31,13 +31,10 @@ export function evBlocksTableClick (event) {
 
 export function showBlockModal (block) {
     $('#block_info_modal_block').html(String(block.block).escapeHTML())
-    $('#block_info_transactions_tab_link').tab('show')
     const blockDetails = $.extend({}, block)
     delete blockDetails.transactions
     delete blockDetails.previousBlockHash
     delete blockDetails.nextBlockHash
-    delete blockDetails.generationSignature
-    delete blockDetails.payloadHash
     delete blockDetails.block
     $('#block_info_details_table tbody').empty().append(createInfoTable(blockDetails))
     $('#block_info_details_table').show()

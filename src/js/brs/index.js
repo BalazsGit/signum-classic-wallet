@@ -115,6 +115,7 @@ import {
     formsVerifyMessage
 } from './brs.modals.signmessage'
 import { init } from './brs'
+import { formsClearData } from './brs.modal.cleardata'
 
 export const BRS = {
     server: '',
@@ -150,6 +151,7 @@ export const BRS = {
     selectedContext: null,
 
     currentPage: 'dashboard',
+    // TODO: currentSubPage is not implemented. Implement or just remove?
     currentSubPage: '',
     pageNumber: 1,
     pageSize: 25,
@@ -214,6 +216,7 @@ export const BRS = {
         sendMessageComplete: formsSendMessageComplete,
         decryptMessages: formsDecryptMessages,
         setAccountInfoComplete: formsSetAccountInfoComplete,
+        clearData: formsClearData,
         broadcastTransactionComplete: formsBroadcastTransactionComplete,
         parseTransactionComplete: formsParseTransactionComplete,
         parseTransactionError: formsParseTransactionError,
@@ -256,12 +259,11 @@ export const BRS = {
 
     // from brs.settings
     defaultSettings: {
-        submit_on_enter: 0,
-        console_log: 0,
+        submit_on_enter: false,
         fee_warning: '100000000000',
         amount_warning: '10000000000000',
         asset_transfer_warning: '10000',
-        '24_hour_format': 1,
+        theme_dark: false,
         remember_passphrase: 0,
         remember_account: 0,
         automatic_node_selection: 1,
@@ -307,7 +309,6 @@ export const BRS = {
 
     // from messages
     _messages: {},
-    _latestMessages: {},
 
     // from modals
     fetchingModalData: false,
@@ -323,30 +324,25 @@ window.jQuery = window.$ = $
 $(document).ready(function () {
     let done = 0
     const pages = [
-        { location: 'body', path: 'html/header.html' },
         { location: 'body', path: 'html/sidebar_context.html' },
         { location: 'body', path: 'html/modals/account.html' },
         { location: 'body', path: 'html/modals/alias.html' },
         { location: 'body', path: 'html/modals/asset.html' },
-        { location: 'body', path: 'html/modals/at_create.html' },
         { location: 'body', path: 'html/modals/block_info.html' },
         { location: 'body', path: 'html/modals/brs.html' },
         { location: 'body', path: 'html/modals/contact.html' },
         { location: 'body', path: 'html/modals/dividends.html' },
         { location: 'body', path: 'html/modals/escrow.html' },
-        { location: 'body', path: 'html/modals/messages_decrypt.html' },
         { location: 'body', path: 'html/modals/raw_transaction.html' },
         { location: 'body', path: 'html/modals/request_burst_qr.html' },
-        { location: 'body', path: 'html/modals/reward_assignment.html' },
+        { location: 'body', path: 'html/modals/mining.html' },
         { location: 'body', path: 'html/modals/send_message.html' },
         { location: 'body', path: 'html/modals/send_money.html' },
-        { location: 'body', path: 'html/modals/commitment.html' },
         { location: 'body', path: 'html/modals/subscription.html' },
         { location: 'body', path: 'html/modals/transaction_info.html' },
-        { location: 'body', path: 'html/modals/transaction_operations.html' },
         { location: 'body', path: 'html/modals/user_info.html' },
         { location: 'body', path: 'html/modals/sign_message.html' },
-        { location: '#lockscreen', path: 'html/pages/lockscreen.html' },
+        { location: '#header_nav', path: 'html/header.html' },
         { location: '#sidebar', path: 'html/sidebar.html' },
         { location: '#content', path: 'html/pages/dashboard.html' },
         { location: '#content', path: 'html/pages/transactions.html' },
@@ -356,7 +352,8 @@ $(document).ready(function () {
         { location: '#content', path: 'html/pages/asset_exchange.html' },
         { location: '#content', path: 'html/pages/settings.html' },
         { location: '#content', path: 'html/pages/peers.html' },
-        { location: '#content', path: 'html/pages/blocks.html' }
+        { location: '#content', path: 'html/pages/blocks.html' },
+        { location: '#lockscreen', path: 'html/pages/lockscreen.html' }
     ]
     function loadHTMLOn (domName, path) {
         $.get(path, '', (data) => {
@@ -374,7 +371,7 @@ $(document).ready(function () {
             lowerCaseLng: true,
             detectLngFromLocalStorage: true,
             backend: {
-                loadPath: '/locales/__lng__.json'
+                loadPath: './locales/__lng__.json'
             },
             debug: false,
             load: 'currentOnly',

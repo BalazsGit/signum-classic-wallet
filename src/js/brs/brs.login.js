@@ -53,16 +53,6 @@ import {
     getInitialTransactions
 } from './brs.transactions'
 
-export function allowLoginViaEnter () {
-    $('#login_password').keypress(function (e) {
-        if (e.which === '13') {
-            e.preventDefault()
-            const password = $('#login_password').val()
-            BRS.loginWithPassphrase(password)
-        }
-    })
-}
-
 export function showLoginOrWelcomeScreen () {
     if (BRS.hasLocalStorage && localStorage.getItem('logged_in')) {
         showLoginScreen()
@@ -366,7 +356,7 @@ function unlock () {
     }
 
     $('#lockscreen').hide()
-    $('body, html').removeClass('lockscreen')
+    $('#main_wrapper').show()
 
     $('#login_error').html('').hide()
 

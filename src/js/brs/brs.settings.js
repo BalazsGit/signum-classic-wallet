@@ -9,26 +9,18 @@ import { pageLoaded } from './brs'
 import { submitForm } from './brs.forms'
 
 import {
-    convertToNXT,
-    formatTimestamp
+    convertToNXT
 } from './brs.util'
 
 export function pagesSettings () {
-    for (const key in BRS.settings) {
-        if (/_warning/i.test(key) && key !== 'asset_transfer_warning') {
-            if ($('#settings_' + key).length) {
-                $('#settings_' + key).val(convertToNXT(BRS.settings[key]))
-            }
-        } else if (!/_color/i.test(key)) {
-            if ($('#settings_' + key).length) {
-                $('#settings_' + key).val(BRS.settings[key])
-            }
-        }
-    }
+    $('#settings_language').val(BRS.settings.language)
+    $('#settings_page_size').val(String(BRS.settings.page_size))
+    $('#settings_submit_on_enter').prop('checked', BRS.settings.submit_on_enter)
+    $('#settings_theme_dark').prop('checked', BRS.settings.theme_dark)
 
-    if (BRS.inApp) {
-        $('#settings_console_log_div').hide()
-    }
+    $('#settings_amount_warning').val(convertToNXT(BRS.settings.amount_warning))
+    $('#settings_fee_warning').val(convertToNXT(BRS.settings.fee_warning))
+    $('#settings_asset_transfer_warning').val(BRS.settings.asset_transfer_warning)
 
     pageLoaded()
 }
@@ -82,18 +74,6 @@ function applySettings (key) {
         }
     }
 
-    if (!key || key === 'console_log') {
-        if (BRS.inApp) {
-            $('#show_console').hide()
-        } else {
-            if (BRS.downloadingBlockchain || BRS.settings.console_log === 0) {
-                $('#show_console').hide()
-            } else {
-                $('#show_console').show()
-            }
-        }
-    }
-
     if (!key || key === 'automatic_node_selection') {
         if (BRS.settings.automatic_node_selection) {
             $('#automatic_node_selection').prop('checked', true)
@@ -110,11 +90,10 @@ function applySettings (key) {
         BRS.pageSize = Number(BRS.settings.page_size)
     }
 
-    if (key === '24_hour_format') {
-        const $dashboard_dates = $('#dashboard_transactions_table a[data-timestamp], #dashboard_blocks_table td[data-timestamp]')
-        $.each($dashboard_dates, function (key, value) {
-            $(this).html(formatTimestamp($(this).data('timestamp')))
-        })
+    if (!key || key === 'theme_dark') {
+        if (BRS.settings.theme_dark ^ $('body').hasClass('dark-mode')) {
+            $('body').toggleClass('dark-mode')
+        }
     }
 
     if (!key || key === 'remember_passphrase') {

@@ -36,9 +36,6 @@ export function evBrsModalOnShowBsModal (e) {
             }
         }
 
-        $('#brs_update_explanation').show()
-        $('#brs_modal_state').show()
-
         BRS.fetchingModalData = false
     })
 }

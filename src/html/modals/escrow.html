@@ -1,36 +1,52 @@
-<div class="modal fade" id="escrow_create_modal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog">
+<div class="modal fade" id="escrow_create_modal" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
+        <h4 class="modal-title" data-i18n="create_escrow">create_escrow</h4>
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" data-i18n="escrow_create">Escrow Create</h4>
       </div>
       <div class="modal-body">
         <form role="form" autocomplete="off">
-          <div class="callout callout-danger error_message" style="display:none"></div>
           <div class="form-group">
             <label for="escrow_create_recipient" data-i18n="recipient">RECIPIENT</label>
             <div class="input-group">
-              <input type="text" class="form-control" name="recipient" id="escrow_create_recipient" placeholder="Recipient Account" data-i18n="[placeholder]recipient_account" autofocus tabindex="1" />
+              <input
+                type="text"
+                class="form-control"
+                name="recipient"
+                id="escrow_create_recipient"
+                placeholder="Recipient Account"
+                data-i18n="[placeholder]recipient_account"
+                autofocus />
               <span class="input-group-btn btn-group recipient_selector">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span></button>      
-                <ul class="dropdown-menu scrollable-menu" role="menu" style="right:0;left:auto;"></ul>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                  <i class="fas fa-user"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right scrollable-menu" role="menu"></ul>
               </span>
             </div>
           </div>
           <div class="form-group">
             <label for="escrow_create_amount" data-i18n="amount">AMOUNT</label>
             <div class="input-group">
-              <input type="text" name="amountNXT" id="escrow_create_amount" step="any" min="0" class="form-control" placeholder="Amount" data-i18n="[placeholder]amount" tabindex="3">
-              <span class="input-group-addon" data-value-suffix=""></span>
+              <input
+                type="text"
+                name="amountNXT"
+                id="escrow_create_amount"
+                step="any"
+                min="0"
+                class="form-control"
+                placeholder="Amount"
+                data-i18n="[placeholder]amount" />
+              <span class="input-group-text" data-value-suffix=""></span>
             </div>
           </div>
           <div class="form-group">
-            <label data-i18n="Escrow deadline">Escrow deadline(seconds):</label>
+            <label data-i18n="escrow_deadline_seconds">escrow_deadline_seconds</label>
             <input type="text" name="escrowDeadline" class="form-control" id="escrow_create_escrow" />
           </div>
           <div class="form-group">
-            <label data-i18n="Escrow Deadline Action">Deadline Action:</label>
+            <label data-i18n="escrow_deadline_action">escrow_deadline_action</label>
             <select class="form-control" name="deadlineAction" id="escrow_create_deadline_action">
               <option value="release" data-i18n="release">Release</option>
               <option value="refund" data-i18n="refund">Refund</option>
@@ -38,66 +54,76 @@
             </select>
           </div>
           <div class="form-group">
-            <label data-i18n="Required Signers">Required signers:</label>
+            <label data-i18n="number_of_required_signers">number_of_required_signers</label>
             <input type="text" name="requiredSigners" class="form-control" id="escrow_create_required_signers" />
           </div>
           <div class="form-group">
-            <label data-i18n="Signers">Signers(semicolon ( ; ) separated):</label>
+            <label data-i18n="signers"></label>
             <input type="text" name="signers" class="form-control" id="escrow_create_signers" />
           </div>
           <div class="form-group">
-            <input type="checkbox" name="add_message" id="send_money_add_message_2" class="add_message"  tabindex="6" /> <label for="send_money_add_message_2" style="font-weight:normal;margin-bottom:0;"> <span data-i18n="add_message_q">Add a Message?</span></label><br />
+            <input type="checkbox" name="add_message" id="escrow_create_add_message" class="add_message" />
+            <label for="escrow_create_add_message"> <span data-i18n="add_message_q">Add a Message?</span></label>
+          </div>
+          <div class="form-group optional_message">
             <label for="escrow_create_message" data-i18n="message">MESSAGE</label>
-            <textarea class="form-control" id="escrow_create_message" name="message" rows="4" tabindex="7"></textarea>
-            <div style="margin-top:3px">
-              <label for="escrow_create_encrypt_message" style="font-weight:normal;color:#666"><input type="checkbox" name="encrypt_message" id="escrow_create_encrypt_message" value="0" /> <span data-i18n="encrypt_message">Encrypt Message</span></label>
+            <textarea class="form-control" id="escrow_create_message" name="message" rows="4"></textarea>
+            <div>
+              <label for="escrow_create_encrypt_message">
+                <input type="checkbox" name="encrypt_message" id="escrow_create_encrypt_message" value="0" />
+                <span data-i18n="encrypt_message">Encrypt Message</span>
+              </label>
             </div>
           </div>
-          <div class="form-group">
-          </div>
-          <div class="row advanced">
-            <div class="col-xs-6 col-sm-6 col-md-6">
-              <div class="form-group">
-                <label for="escrow_create_fee" data-i18n="fee">FEE</label>
-                <div class="input-group">
-                  <input type="number" name="feeNXT" id="escrow_create_fee" class="form-control" step="any" min="0.00735" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.1" value="0.1" tabindex="4">
-                  <span class="input-group-addon" data-value-suffix=""></span>
-                </div>
-              </div>
-            </div>
+          <div class="form-group advanced">
+            <input type="checkbox" name="doNotBroadcast" id="escrow_create_do_not_broadcast" value="1" />
+            <label for="escrow_create_do_not_broadcast" data-i18n="do_not_broadcast"> Do Not Broadcast </label>
           </div>
           <div class="form-group secret_phrase">
             <label for="escrow_create_password" data-i18n="passphrase">PASSPHRASE</label>
-            <input type="password" name="secretPhrase" id="escrow_create_password" class="form-control" placeholder="" tabindex="6" autocomplete="">
+            <input type="password" name="secretPhrase" id="escrow_create_password" class="form-control" />
           </div>
-          <div class="callout account_info" style="display:none;margin-bottom: 0;"></div>
+          <div class="alert alert-info account_info"></div>
+          <div class="alert alert-danger error_message"></div>
           <input type="hidden" name="request_type" value="sendMoneyEscrow" />
-          <input type="hidden" name="deadline" value="24" />
+          <input type="hidden" name="deadline" value="1" />
+          <input type="hidden" name="feeNXT" value="1" />
           <input type="hidden" name="modal" value="escrow_create" disabled="disabled" />
           <input type="hidden" name="converted_account_id" value="" />
         </form>
       </div>
-      <div class="modal-footer" style="margin-top:0;">
-        <div class="advanced_info"><strong data-i18n="fee">Fee</strong>: <span class="advanced_fee">0.1</span> - <a href="#" data-i18n="advanced">advanced</a></div>
+      <div class="modal-footer">
+        <div class="advanced_info">
+          <strong data-i18n="fee">Fee</strong>: <span class="advanced_fee">1</span> - <a href="#" data-i18n="advanced">advanced</a>
+        </div>
         <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n="cancel">Cancel</button>
-        <button type="button" class="btn btn-primary" data-loading-text="Submitting..." data-i18n="escrow_create;[data-loading-text]submitting">Create Escrow</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-loading-text="Submitting..."
+          data-i18n="create_escrow;[data-loading-text]submitting">
+          Create Escrow
+        </button>
       </div>
     </div>
   </div>
 </div>
-<div class="modal fade" id="escrow_decision_modal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog">
+<div class="modal fade" id="escrow_decision_modal" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title" data-i18n="escrow_decision">Escrow Decision</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       </div>
       <div class="modal-body">
         <form role="form" autocomplete="off">
-          <div class="callout callout-danger error_message" style="display:none"></div>
           <div class="form-group">
-            <label data-i18n="Escrow">Escrow</label>
-            <input type="text" name="escrow" class="form-control" id="escrow_decision_escrow" />
+            <label data-i18n="escrows">escrows</label>
+            <input type="text" name="escrow_info" class="form-control" id="escrow_decision_escrow_info" disabled />
+            <input type="hidden" name="escrow" id="escrow_decision_escrow" />
+          </div>
+          <div class="form-group">
+            <label data-i18n="decision">decision</label>
             <select class="form-control" name="decision" id="escrow_decision_decision">
               <option value="release" data-i18n="release">Release</option>
               <option value="refund" data-i18n="refund">Refund</option>
@@ -113,32 +139,85 @@
           <div class="form-group">
             <label id="escrow_decision_deadline">DEADLINE</label>
           </div>
-          <div class="row advanced">
-            <div class="col-xs-6 col-sm-6 col-md-6">
+          <div class="row">
+            <div class="col-8">
+              <!-- Issue /signum-node/issues/677
               <div class="form-group">
                 <label for="escrow_decision_fee" data-i18n="fee">FEE</label>
                 <div class="input-group">
-                  <input type="number" name="feeNXT" id="escrow_decision_fee" class="form-control" step="any" min="0.00735" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.1" value="0.1" tabindex="4">
-                  <span class="input-group-addon" data-value-suffix=""></span>
+                  <input
+                    type="number"
+                    name="feeNXT"
+                    class="form-control"
+                    id="escrow_decision_fee"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="Fee"
+                    data-i18n="[placeholder]fee"
+                    data-default="0.01"
+                    value="0.01" />
+                  <span class="input-group-text" data-value-suffix=""></span>
+                </div>
+                <div>
+                  <span data-toggle="tooltip" data-placement="top" data-html="true" data-i18n="[title]suggested_fee_help">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i> &nbsp;&nbsp;
+                  </span>
+                  <span id="suggested_fee_response_escrow_decision"></span>
+                  <span class="suggested_fee" name="suggested_fee_spinner">
+                    <i class="fa fa-spinner fa-spin fa-fw text-danger"></i>
+                  </span>
+                </div>
+              </div>
+              -->
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label for="escrow_decision_deadline" data-i18n="deadline">DEADLINE (HOURS)</label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    name="deadline"
+                    id="escrow_decision_deadline"
+                    class="form-control"
+                    placeholder="deadline"
+                    data-i18n="[placeholder]deadline"
+                    min="0.1"
+                    step="0.1"
+                    data-default="1"
+                    value="1" />
+                  <span class="input-group-text" data-i18n="hours"></span>
                 </div>
               </div>
             </div>
           </div>
+          <div class="form-group advanced">
+            <input type="checkbox" name="doNotBroadcast" value="1" id="escrow_decision_do_not_broadcast" />
+            <label for="escrow_decision_do_not_broadcast" data-i18n="do_not_broadcast"> Do Not Broadcast </label>
+          </div>
           <div class="form-group secret_phrase">
             <label for="escrow_decision_password" data-i18n="passphrase">PASSPHRASE</label>
-            <input type="password" name="secretPhrase" id="escrow_decision_password" class="form-control" placeholder="" tabindex="6" autocomplete="">
+            <input type="password" name="secretPhrase" id="escrow_decision_password" class="form-control" placeholder="" autocomplete="" />
           </div>
-          <div class="callout account_info" style="display:none;margin-bottom: 0;"></div>
+          <div class="alert alert-info account_info"></div>
+          <div class="alert alert-danger error_message"></div>
           <input type="hidden" name="request_type" value="escrowSign" />
-          <input type="hidden" name="deadline" value="24" />
+          <input type="hidden" name="feeNXT" value="1" />
           <input type="hidden" name="modal" value="escrow_decision" disabled="disabled" />
           <input type="hidden" name="converted_account_id" value="" />
         </form>
       </div>
-      <div class="modal-footer" style="margin-top:0;">
-        <div class="advanced_info"><strong data-i18n="fee">Fee</strong>: <span class="advanced_fee">0.1</span> - <a href="#" data-i18n="advanced">advanced</a></div>
+      <div class="modal-footer">
+        <div class="advanced_info">
+          <strong data-i18n="fee">Fee</strong>: <span class="advanced_fee">1</span> - <a href="#" data-i18n="advanced">advanced</a>
+        </div>
         <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n="cancel">Cancel</button>
-        <button type="button" class="btn btn-primary" data-loading-text="Submitting..." data-i18n="escrow_decision;[data-loading-text]submitting">Make Decision</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-loading-text="Submitting..."
+          data-i18n="escrow_decision;[data-loading-text]submitting">
+          escrow_decision
+        </button>
       </div>
     </div>
   </div>

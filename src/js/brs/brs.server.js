@@ -7,10 +7,6 @@ import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
 
 import {
-    addToConsole
-} from './brs.console'
-
-import {
     generatePublicKey,
     getAccountId,
     signBytes,
@@ -304,10 +300,6 @@ export function processAjaxRequest (requestType, data, callback, async) {
         shouldRetry: (type === 'GET' ? 2 : undefined),
         data
     }).done(function (response, status, xhr) {
-        if (BRS.console) {
-            addToConsole(this.url, this.type, this.data, response)
-        }
-
         response = addUnconfirmedProperty(response, requestType)
 
         if (secretPhrase && response.unsignedTransactionBytes && !response.errorCode && !response.error) {
@@ -375,10 +367,6 @@ export function processAjaxRequest (requestType, data, callback, async) {
             }
         }
     }).fail(function (xhr, textStatus, error) {
-        if (BRS.console) {
-            addToConsole(this.url, this.type, this.data, error, true)
-        }
-
         if ((error === 'error' || textStatus === 'error') && (xhr.status === 404 || xhr.status === 0)) {
             if (type === 'POST') {
                 $.notify($.t('error_server_connect'), { type: 'danger' })
@@ -948,10 +936,6 @@ export function broadcastTransactionBytes (transactionData, callback, originalRe
             transactionBytes: transactionData
         }
     }).done(function (response, status, xhr) {
-        if (BRS.console) {
-            addToConsole(this.url, this.type, this.data, response)
-        }
-
         if (callback) {
             if (response.errorCode) {
                 if (!response.errorDescription) {
@@ -976,10 +960,6 @@ export function broadcastTransactionBytes (transactionData, callback, originalRe
             }
         }
     }).fail(function (xhr, textStatus, error) {
-        if (BRS.console) {
-            addToConsole(this.url, this.type, this.data, error, true)
-        }
-
         if (callback) {
             if (error === 'timeout') {
                 error = $.t('error_request_timeout')

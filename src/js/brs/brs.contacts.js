@@ -6,7 +6,7 @@ import { BRS } from '.'
 import { NxtAddress } from '../util/nxtaddress'
 
 import {
-    loadPage,
+    reloadCurrentPage,
     pageLoaded
 } from './brs'
 
@@ -60,7 +60,14 @@ export function pagesContacts () {
                 contactDescription = '-'
             }
 
-            rows += "<tr><td><a href='#' data-toggle='modal' data-target='#update_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>" + contact.name.escapeHTML() + "</a></td><td><a href='#' data-user='" + getAccountFormatted(contact, 'account') + "' class='user_info'>" + getAccountFormatted(contact, 'account') + '</a></td><td>' + (contact.email ? contact.email.escapeHTML() : '-') + '</td><td>' + contactDescription.escapeHTML() + "</td><td style='white-space:nowrap'><a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_money_modal' data-contact='" + String(contact.name).escapeHTML() + "'>" + $.t('send_burst') + "</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_message_modal' data-contact='" + String(contact.name).escapeHTML() + "'>" + $.t('message') + "</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#delete_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>" + $.t('delete') + '</a></td></tr>'
+            const cName = String(contact.name).escapeHTML()
+            rows += '<tr>'
+            rows += `<td><a href='#' data-toggle='modal' data-target='#update_contact_modal' data-contact='${contact.id}'>${contact.name.escapeHTML()}</a></td>`
+            rows += `<td><a href='#' data-user='${getAccountFormatted(contact, 'account')}' class='user_info'>${getAccountFormatted(contact, 'account')}</a></td>`
+            rows += `<td>${contact.email ? contact.email.escapeHTML() : '-'}</td>`
+            rows += `<td>${contactDescription.escapeHTML()}</td>`
+            rows += `<td><div class="btn-group"><a class='btn btn-default' href='#' data-toggle='modal' data-target='#send_money_modal' data-contact='${cName}'><i class="fas fa-paper-plane"></i></a><a class='btn btn-default' href='#' data-toggle='modal' data-target='#send_message_modal' data-contact='${cName}'><i class="fas fa-envelope"></i></a><a class='btn btn-default' href='#' data-toggle='modal' data-target='#delete_contact_modal' data-contact='${contact.id}'><i class="fas fa-trash"></i></a></div></td>`
+            rows += '</tr>'
         }
 
         dataLoaded(rows)
@@ -86,7 +93,7 @@ function validateContactData (data) {
 function notifyContactOperationSuccess (message) {
     $.notify(message, { type: 'success' })
     if (BRS.currentPage === 'contacts') {
-        loadPage('contacts')
+        reloadCurrentPage()
         return
     }
     if (BRS.currentPage === 'messages' && BRS.selectedContext) {
@@ -133,7 +140,7 @@ export function formsAddContact (data) {
 
     addContactToDatabase(data)
 
-    return { stop: true }
+    return { stop: true, hide: true }
 }
 
 function addContactToDatabase (data) {
@@ -234,7 +241,7 @@ export function formsUpdateContact (data) {
 
     updateContactToDatabase(data)
 
-    return { stop: true }
+    return { stop: true, hide: true }
 }
 
 function updateContactToDatabase (data) {
@@ -250,7 +257,7 @@ function updateContactToDatabase (data) {
         account: data.account
     }], function (error, contacts) {
         if (error ||
-                (contacts && contacts.length && contacts[0].id !== data.contact_id)) {
+                (contacts && contacts.length && String(contacts[0].id) !== data.contact_id)) {
             $.notify($.t('error_save_db'))
             return
         }
@@ -305,7 +312,7 @@ export function formsDeleteContact () {
         setTimeout(notifyContactOperationSuccess, 50, $.t('success_contact_delete'))
     })
 
-    return { stop: true }
+    return { stop: true, hide: true }
 }
 
 export function exportContacts () {
@@ -365,7 +372,7 @@ export function importContacts (imported_contacts) {
                         $.notify($.t('success_contact_add'), { type: 'success' })
 
                         if (BRS.currentPage === 'contacts') {
-                            loadPage('contacts')
+                            reloadCurrentPage()
                         } else if (BRS.currentPage === 'messages' && BRS.selectedContext) {
                             const heading = BRS.selectedContext.find('h4.list-group-item-heading')
                             if (heading.length) {

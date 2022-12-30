@@ -22,7 +22,7 @@ import {
 } from './brs.util'
 
 export function automaticallyCheckRecipient () {
-    const $recipientFields = $('#add_contact_account_id, #update_contact_account_id, #buy_alias_recipient, #escrow_create_recipient, #inline_message_recipient, #reward_recipient, #sell_alias_recipient, #send_message_recipient, #send_money_recipient, #subscription_cancel_recipient, #subscription_create_recipient, #transfer_alias_recipient, #transfer_asset_recipient, #transfer_asset_multi_recipient')
+    const $recipientFields = $('#add_contact_account_id, #update_contact_account_id, #buy_alias_recipient, #escrow_create_recipient, #inline_message_recipient, #reward_assignment_recipient, #sell_alias_recipient, #send_message_recipient, #send_money_recipient, #subscription_cancel_recipient, #subscription_create_recipient, #transfer_alias_recipient, #transfer_asset_recipient, #transfer_asset_multi_recipient')
 
     $recipientFields.on('blur', function () {
         $(this).trigger('checkRecipient')
@@ -47,20 +47,9 @@ export function sendMoneyCalculateTotal (element) {
     const fee = isNaN(current_fee) ? BRS.minimumFee : (current_fee < BRS.minimumFee ? BRS.minimumFee : current_fee)
     const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount)
 
-    $('#send_money_fee').val(fee.toFixed(8))
+    $('#send_money_fee').val(fee)
 
     $(element).closest('.modal').find('.total_amount_ordinary').html(formatAmount(convertToNQT(amount + fee)) + ' ' + BRS.valueSuffix)
-}
-
-export function commitmentCalculateTotal (element) {
-    const current_amount = parseFloat($('#commitment_amount').val(), 10)
-    const current_fee = parseFloat($('#commitment_fee').val(), 10)
-    const fee = isNaN(current_fee) ? BRS.minimumFee : (current_fee < BRS.minimumFee ? BRS.minimumFee : current_fee)
-    const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount)
-
-    $('#commitment_fee').val(fee.toFixed(8))
-
-    $(element).closest('.modal').find('.total_amount_commitment').html(formatAmount(convertToNQT(amount + fee)) + ' ' + BRS.valueSuffix)
 }
 
 export function formsSendMoneyComplete (response, data) {
@@ -298,7 +287,7 @@ export function correctAddressMistake (el) {
 }
 
 export function checkRecipient (account, modal) {
-    const classes = 'callout-info callout-danger callout-warning'
+    const classes = 'alert-info alert-danger alert-warning'
 
     const callout = modal.find('.account_info').first()
     const accountInputField = modal.find('input[name=converted_account_id]')
@@ -322,10 +311,10 @@ export function checkRecipient (account, modal) {
 
                 if (!checkRS.includes(accountParts[2])) {
                     // Public key does not match RS Address
-                    callout.removeClass(classes).addClass('callout-danger').html($.t('recipient_malformed')).show()
+                    callout.removeClass(classes).addClass('alert-danger').html($.t('recipient_malformed')).show()
                 } else {
                     // Address verified
-                    callout.removeClass(classes).addClass('callout-info').html($.t('recipient_info_extended')).show()
+                    callout.removeClass(classes).addClass('alert-info').html($.t('recipient_info_extended')).show()
                 }
             } else {
                 // Account is RS Address and it isn't extended
@@ -336,7 +325,7 @@ export function checkRecipient (account, modal) {
                         checkForMerchant(response.account.description, modal)
                     }
                     // let message = response.message.escapeHTML();
-                    callout.removeClass(classes).addClass('callout-' + response.type).html(response.message).show()
+                    callout.removeClass(classes).addClass('alert-' + response.type).html(response.message).show()
                 })
             }
         } else {
@@ -344,7 +333,7 @@ export function checkRecipient (account, modal) {
             // Account seems to be RS Address but there is an error
             if (guessedAddresses.length === 1) {
                 // There is only one option of error correction suggestion.
-                callout.removeClass(classes).addClass('callout-danger').html($.t('recipient_malformed_suggestion', {
+                callout.removeClass(classes).addClass('alert-danger').html($.t('recipient_malformed_suggestion', {
                     recipient: `<span class='malformed_address' data-address='${guessedAddresses[0]}'>${address.formatGuess(guessedAddresses[0], account)}</span>`
                 })).show()
             } else if (guessedAddresses.length > 1) {
@@ -356,10 +345,10 @@ export function checkRecipient (account, modal) {
                     html += `<li><span clas='malformed_address' data-address='${guessedAddresses[i]}'>${address.formatGuess(guessedAddresses[i], account)} </span></li>`
                 }
                 html += '</ul>'
-                callout.removeClass(classes).addClass('callout-danger').html(html).show()
+                callout.removeClass(classes).addClass('alert-danger').html(html).show()
             } else {
                 // There is no error correction suggestion
-                callout.removeClass(classes).addClass('callout-danger').html($.t('recipient_malformed')).show()
+                callout.removeClass(classes).addClass('alert-danger').html($.t('recipient_malformed')).show()
             }
             callout.find('.malformed_address').on('click', correctAddressMistake)
         }
@@ -368,7 +357,7 @@ export function checkRecipient (account, modal) {
     if (BRS.idRegEx.test(account)) {
         // Account matches numeric ID
         getAccountTypeAndMessage(account, function (response) {
-            callout.removeClass(classes).addClass('callout-' + response.type).html(response.message.escapeHTML()).show()
+            callout.removeClass(classes).addClass('alert-' + response.type).html(response.message.escapeHTML()).show()
         })
         return
     }
@@ -391,7 +380,7 @@ export function checkRecipient (account, modal) {
             if (response.account && response.account.description) {
                 checkForMerchant(response.account.description, modal)
             }
-            callout.removeClass(classes).addClass('callout-' + response.type).html($.t('contact_account_link', {
+            callout.removeClass(classes).addClass('alert-' + response.type).html($.t('contact_account_link', {
                 account_id: getAccountFormatted(contact, 'account')
             }) + ' ' + response.message.escapeHTML()).show()
             if (response.type === 'info' || response.type === 'warning') {
@@ -400,11 +389,11 @@ export function checkRecipient (account, modal) {
         })
         return
     }
-    callout.removeClass(classes).addClass('callout-danger').html($.t('name_not_in_contacts', { name: account }) + ' ' + $.t('recipient_alias_suggestion')).show()
+    callout.removeClass(classes).addClass('alert-danger').html($.t('name_not_in_contacts', { name: account }) + ' ' + $.t('recipient_alias_suggestion')).show()
 }
 
 function checkRecipientAlias (account, modal) {
-    const classes = 'callout-info callout-danger callout-warning'
+    const classes = 'alert-info alert-danger alert-warning'
     const callout = modal.find('.account_info').first()
     const accountInputField = modal.find('input[name=converted_account_id]')
 
@@ -414,7 +403,7 @@ function checkRecipientAlias (account, modal) {
         aliasName: account
     }, function (response) {
         if (response.errorCode) {
-            callout.removeClass(classes).addClass('callout-danger').html($.t('error_invalid_alias_name')).show()
+            callout.removeClass(classes).addClass('alert-danger').html($.t('error_invalid_alias_name')).show()
         } else {
             if (response.aliasURI) {
                 const alias = String(response.aliasURI)
@@ -448,19 +437,19 @@ function checkRecipientAlias (account, modal) {
                             account_id: address.getAccountRS(BRS.prefix)
                         }) + '.<br>' + $.t('alias_last_adjusted', {
                             timestamp: formatTimestamp(timestamp)
-                        }) + '<br>' + response.message).removeClass(classes).addClass('callout-' + response.type).show()
+                        }) + '<br>' + response.message).removeClass(classes).addClass('alert-' + response.type).show()
                     })
                 } else {
-                    callout.removeClass(classes).addClass('callout-danger').html($.t('alias_account_no_link') + (!alias
+                    callout.removeClass(classes).addClass('alert-danger').html($.t('alias_account_no_link') + (!alias
                         ? $.t('error_uri_empty')
                         : $.t('uri_is', {
                             uri: String(alias).escapeHTML()
                         }))).show()
                 }
             } else if (response.aliasName) {
-                callout.removeClass(classes).addClass('callout-danger').html($.t('error_alias_empty_uri')).show()
+                callout.removeClass(classes).addClass('alert-danger').html($.t('error_alias_empty_uri')).show()
             } else {
-                callout.removeClass(classes).addClass('callout-danger').html(response.errorDescription ? $.t('error') + ': ' + String(response.errorDescription).escapeHTML() : $.t('error_alias')).show()
+                callout.removeClass(classes).addClass('alert-danger').html(response.errorDescription ? $.t('error') + ': ' + String(response.errorDescription).escapeHTML() : $.t('error_alias')).show()
             }
         }
     })
@@ -481,12 +470,11 @@ function checkForMerchant (accountInfo, modal) {
 }
 
 export function evSpanRecipientSelectorClickButton (e) {
+    const $list = $(this).parent().find('ul')
     if (!Object.keys(BRS.contacts).length) {
-        e.preventDefault()
-        e.stopPropagation()
+        $list.html(`<li><a class='dropdown-item' href='#' data-contact=''>${$.t('error_no_contacts_available')}</a></li>`)
         return
     }
-    const $list = $(this).parent().find('ul')
     $list.empty()
     const names = []
     for (const accountId in BRS.contacts) {
@@ -500,7 +488,7 @@ export function evSpanRecipientSelectorClickButton (e) {
         return 0
     })
     for (const name of names) {
-        $list.append("<li><a href='#' data-contact='" + name.escapeHTML() + "'>" + name.escapeHTML() + '</a></li>')
+        $list.append("<li><a class='dropdown-item' href='#' data-contact='" + name.escapeHTML() + "'>" + name.escapeHTML() + '</a></li>')
     }
 }
 
