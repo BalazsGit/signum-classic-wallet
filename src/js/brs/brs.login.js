@@ -102,8 +102,8 @@ export function registerAccount () {
 
     if (typeof PassPhraseGenerator === 'undefined') {
         $.when(
-            $.getScript('js/crypto/3rdparty/seedrandom.min.js'),
-            $.getScript('js/crypto/passphrasegenerator.js')
+            $.getScript('js/3rdparty/seedrandom.min.js'),
+            $.getScript('js/3rdparty/passphrasegenerator.js')
         ).done(function () {
             $loading.hide()
             $loaded.show()

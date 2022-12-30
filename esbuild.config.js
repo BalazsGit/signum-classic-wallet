@@ -2,7 +2,7 @@ const esbuild = require('esbuild')
 
 const configDev = {
     entryPoints: ['src/js/brs/index.js'],
-    outfile: 'src/js/index.dev.js',
+    outfile: 'dist/js/index.dev.js',
     bundle: true,
     minify: false,
     platform: 'browser',
@@ -11,7 +11,7 @@ const configDev = {
 }
 const configMin = {
     entryPoints: ['src/js/brs/index.js'],
-    outfile: 'src/js/index.min.js',
+    outfile: 'dist/js/index.min.js',
     bundle: true,
     minify: true,
     platform: 'browser',

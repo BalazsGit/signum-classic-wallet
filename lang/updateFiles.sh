@@ -69,3 +69,7 @@ rm .json
 let i--
 
 echo "${languagesLength} translation files generated. ${i} expressions processed"
+
+rm -Rf ../dist/locales
+mkdir -p ../dist/locales/
+mv *.json ../dist/locales

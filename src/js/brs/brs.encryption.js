@@ -9,7 +9,7 @@ import { NxtAddress } from '../util/nxtaddress'
 import pako from 'pako'
 
 import * as curve25519 from '../crypto/curve25519'
-import * as jssha from '../crypto/3rdparty/jssha256'
+import * as jssha from '../crypto/jssha256'
 import converters from '../util/converters'
 
 import {
