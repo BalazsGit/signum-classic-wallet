@@ -255,7 +255,7 @@ export function formsAddAssetBookmark (data) {
     }
     saveAssetBookmarks([foundAsset], BRS.forms.addAssetBookmarkComplete)
 
-    return { stop: true }
+    return { stop: true, hide: true }
 }
 
 export function formsAddAssetBookmarkComplete (newAssets, submittedAssets) {
@@ -1261,7 +1261,8 @@ export function formsAssetExchangeChangeGroupName () {
     })
 
     return {
-        stop: true
+        stop: true,
+        hide: true
     }
 }
 
@@ -1390,7 +1391,8 @@ export function formsAssetExchangeGroup () {
     })
 
     return {
-        stop: true
+        stop: true,
+        hide: true
     }
 }
 

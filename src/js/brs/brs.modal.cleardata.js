@@ -44,5 +44,5 @@ export function formsClearData (data) {
     }, 110)
 
     setTimeout(logout, 250)
-    return { stop: true }
+    return { stop: true, hide: true }
 }

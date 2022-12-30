@@ -140,7 +140,7 @@ export function formsAddContact (data) {
 
     addContactToDatabase(data)
 
-    return { stop: true }
+    return { stop: true, hide: true }
 }
 
 function addContactToDatabase (data) {
@@ -241,7 +241,7 @@ export function formsUpdateContact (data) {
 
     updateContactToDatabase(data)
 
-    return { stop: true }
+    return { stop: true, hide: true }
 }
 
 function updateContactToDatabase (data) {
@@ -312,7 +312,7 @@ export function formsDeleteContact () {
         setTimeout(notifyContactOperationSuccess, 50, $.t('success_contact_delete'))
     })
 
-    return { stop: true }
+    return { stop: true, hide: true }
 }
 
 export function exportContacts () {

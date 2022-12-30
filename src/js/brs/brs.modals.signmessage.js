@@ -24,36 +24,45 @@ export function formsSignModalButtonClicked () {
 }
 
 export function formsSignMessage () {
+    $('#sign_message_output').hide()
     const isHex = $('#sign_message_data_is_hex').is(':checked')
     let data = $('#sign_message_data').val()
     const passphrase = converters.stringToHexString($('#sign_message_passphrase').val())
-    if (!isHex) data = converters.stringToHexString(data)
+    if (!isHex) {
+        data = converters.stringToHexString(data)
+    }
     sendRequest('parseTransaction', { transactionBytes: data }, function (result) {
         console.log(result)
-        if (result.errorCode == null) {
-            $('#sign_message_error').text('WARNING: YOU ARE SIGNING A TRANSACTION. IF YOU WERE NOT TRYING TO SIGN A TRANSACTION MANUALLY, DO NOT GIVE THIS SIGNATURE OUT. IT COULD ALLOW OTHERS TO SPEND YOUR FUNDS.')
-            $('#sign_message_error').show()
-        }
+        let signedTransaction = ''
         const signature = signBytes(data, passphrase)
-        $('#sign_message_output').text('Signature is ' + signature + '. Your public key is ' + getPublicKey(passphrase))
+        if (result.errorCode == null) {
+            $('#sign_message_error').text($.t('warning_sign_transaction'))
+            $('#sign_message_error').show()
+            signedTransaction = data.substr(0, 192) + signature + data.substr(320)
+        }
+        $('#sign_message_output_signature').text(signature)
+        $('#sign_message_output_public_key').text(getPublicKey(passphrase))
+        $('#sign_message_output_signed_transaction').text(signedTransaction)
         $('#sign_message_output').show()
     }, false)
+    return { stop: true, hide: false }
 }
 
 export function formsVerifyMessage () {
     const isHex = $('#verify_message_data_is_hex').is(':checked')
     let data = $('#verify_message_data').val()
-    const signature = $.trim($('#verify_message_signature').val())
-    const publicKey = $.trim($('#verify_message_public_key').val())
-    if (!isHex) data = converters.stringToHexString(data)
+    const signature = $('#verify_message_signature').val().trim()
+    const publicKey = $('#verify_message_public_key').val().trim()
+    if (!isHex) {
+        data = converters.stringToHexString(data)
+    }
     const result = verifyBytes(signature, data, publicKey)
     if (result) {
         $('#verify_message_error').hide()
-        $('#verify_message_output').text('Signature is valid')
+        $('#verify_message_output').text($.t('signature_is_valid'))
         $('#verify_message_output').show()
-    } else {
-        $('#verify_message_output').hide()
-        $('#verify_message_error').text('Signature is invalid')
-        $('#verify_message_error').show()
+        return { stop: true, hide: false }
     }
+    $('#verify_message_output').hide()
+    return { error: $.t('signature_is_invalid') }
 }

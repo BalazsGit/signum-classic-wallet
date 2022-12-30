@@ -598,31 +598,15 @@ export function addEventListeners () {
     })
 
     // from brs.modals.signmessage.js
-    $('#sign_message_modal_button').click(BRS.forms.signModalButtonClicked)
-    $('#sign_message_modal').on('show.bs.modal', function (e) {
-        $('#sign_message_output, #verify_message_output').html('').hide()
-        $('#sign_message_modal_sign_message').show()
-        $('#sign_message_modal_button').text('Sign Message').data('form', 'sign_message_form')
-    })
-    $('#sign_message_modal ul.nav li').click(function (e) {
-        e.preventDefault()
-        const tab = $(this).data('tab')
-        $(this).siblings().removeClass('active')
-        $(this).addClass('active')
-        $('.sign_message_modal_content').hide()
-        const content = $('#sign_message_modal_' + tab)
-        if (tab === 'sign_message') {
-            $('#sign_message_modal_button').text('Sign Message').data('form', 'sign_message_form')
-        } else {
-            $('#sign_message_modal_button').text('Verify Message').data('form', 'verify_message_form')
-        }
-        $('#sign_message_modal .error_message').hide()
-        content.show()
-    })
+    $('#sign_message_tab').tab('show')
     $('#sign_message_modal').on('hidden.bs.modal', function (e) {
-        $(this).find('.sign_message_modal_content').hide()
-        $(this).find('ul.nav li.active').removeClass('active')
-        $('#sign_message_nav').addClass('active')
+        $('#sign_message_tab').tab('show')
+        $('#sign_message_output_signature').text('')
+        $('#sign_message_output_public_key').text('')
+        $('#sign_message_output_signed_transaction').text('')
+        $('#sign_message_output').hide()
+        $('#verify_message_output').text('')
+        $('#verify_message_output').hide()
     })
 
     // from brs.modals.subscription.js

@@ -382,7 +382,8 @@ export function formsDecryptMessages (data) {
         setDecryptionPassword(data.secretPhrase)
         reloadCurrentPage()
         return {
-            stop: true
+            stop: true,
+            hide: true
         }
     }
     let success = false
@@ -428,6 +429,7 @@ export function formsDecryptMessages (data) {
     reloadCurrentPage()
 
     return {
-        stop: true
+        stop: true,
+        hide: true
     }
 }
