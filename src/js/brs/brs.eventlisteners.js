@@ -521,8 +521,8 @@ export function addEventListeners () {
     })
     $('.modal').on('show.bs.modal', evModalOnShowBsModal)
     $('.modal').on('shown.bs.modal', function () {
-        // $(this).find('input[type=text]:first, textarea:first, input[type=password]:first').not('[readonly]').first().focus()
-        // $(this).find('input[name=converted_account_id]').val('')
+        $(this).find('input[autofocus]').trigger('focus')
+        $(this).find('input[name=converted_account_id]').val('')
         BRS.showedFormWarning = false // maybe not the best place... we assume forms are only in modals?
     })
     $('.modal').on('hidden.bs.modal', evModalOnHiddenBsModal)

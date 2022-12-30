@@ -950,18 +950,18 @@ export function translateServerError (response) {
             }).capitalize()
         }
 
-        match = response.errorDescription.match(/At least one of (.*) must be specified/i)
+        match = response.errorDescription.match(/At least one of \[(.*)\] must be specified/i)
         if (match && match[1]) {
             const fieldNames = match[1].split(',')
             const translatedFieldNames = []
 
-            $.each(fieldNames, function (fieldName) {
+            for (const fieldName of fieldNames) {
                 translatedFieldNames.push(getTranslatedFieldName(fieldName).toLowerCase())
-            })
+            }
 
             const translatedFieldNamesJoined = translatedFieldNames.join(', ')
 
-            return $.t('error_not_specified', {
+            return $.t('error_not_specified_plural', {
                 names: translatedFieldNamesJoined,
                 count: translatedFieldNames.length
             }).capitalize()
