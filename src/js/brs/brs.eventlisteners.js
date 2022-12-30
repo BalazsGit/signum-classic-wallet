@@ -122,10 +122,6 @@ import {
 } from './brs.modals.account'
 
 import {
-    evTransactionOperationsModalClick
-} from './brs.modals.advanced'
-
-import {
     evBlocksTableClick
 } from './brs.modals.block'
 
@@ -557,23 +553,6 @@ export function addEventListeners () {
         $('#account_info_name').val(BRS.accountInfo.name)
         $('#account_info_description').val(BRS.accountInfo.description)
     })
-
-    // from brs.modals.advanced.js
-    $('#transaction_operations_modal').on('show.bs.modal', function (e) {
-        $(this).find('.output_table tbody').empty()
-        $(this).find('.output').hide()
-        $(this).find('.tab_content:first').show()
-        $('#transaction_operations_modal_button').text($.t('broadcast')).data('resetText', $.t('broadcast')).data('form', 'broadcast_transaction_form')
-    })
-    $('#transaction_operations_modal').on('hidden.bs.modal', function (e) {
-        $(this).find('.tab_content').hide()
-        $(this).find('ul.nav li.active').removeClass('active')
-        $(this).find('ul.nav li:first').addClass('active')
-
-        $(this).find('.output_table tbody').empty()
-        $(this).find('.output').hide()
-    })
-    $('#transaction_operations_modal ul.nav li').click(evTransactionOperationsModalClick)
 
     // from brs.modals.block.js
     $('#blocks_table, #blocks_forged_table, #dashboard_blocks_table').on('click', 'a[data-block]', evBlocksTableClick)

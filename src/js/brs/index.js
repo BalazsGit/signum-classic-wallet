@@ -340,7 +340,6 @@ $(document).ready(function () {
         { location: 'body', path: 'html/modals/send_money.html' },
         { location: 'body', path: 'html/modals/subscription.html' },
         { location: 'body', path: 'html/modals/transaction_info.html' },
-        { location: 'body', path: 'html/modals/transaction_operations.html' },
         { location: 'body', path: 'html/modals/user_info.html' },
         { location: 'body', path: 'html/modals/sign_message.html' },
         { location: '#header_nav', path: 'html/header.html' },
