@@ -371,7 +371,7 @@ $(document).ready(function () {
             lowerCaseLng: true,
             detectLngFromLocalStorage: true,
             backend: {
-                loadPath: '/locales/__lng__.json'
+                loadPath: './locales/__lng__.json'
             },
             debug: false,
             load: 'currentOnly',

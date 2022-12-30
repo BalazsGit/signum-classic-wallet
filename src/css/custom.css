@@ -20,7 +20,7 @@
 #lockscreen {
   height: 100vh;
   overflow: auto;
-  background-image: url(../../img/bg1.svg);
+  background-image: url(../img/bg1.svg);
   background-size: cover;
   background-position: center; 
   display: flex;
