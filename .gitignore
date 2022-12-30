@@ -1,5 +1,5 @@
+node_modules
 src/js/index.dev.js
-src/js/index.js
 src/js/index.min.js
 src/locales/*.json
 src/index.dev.html
