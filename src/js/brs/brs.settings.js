@@ -17,6 +17,7 @@ export function pagesSettings () {
     $('#settings_page_size').val(String(BRS.settings.page_size))
     $('#settings_submit_on_enter').prop('checked', BRS.settings.submit_on_enter)
     $('#settings_theme_dark').prop('checked', BRS.settings.theme_dark)
+    $('#settings_small_text').prop('checked', BRS.settings.small_text)
 
     $('#settings_amount_warning').val(convertToNXT(BRS.settings.amount_warning))
     $('#settings_fee_warning').val(convertToNXT(BRS.settings.fee_warning))
@@ -93,6 +94,12 @@ function applySettings (key) {
     if (!key || key === 'theme_dark') {
         if (BRS.settings.theme_dark ^ $('body').hasClass('dark-mode')) {
             $('body').toggleClass('dark-mode')
+        }
+    }
+
+    if (!key || key === 'small_text') {
+        if (BRS.settings.small_text ^ $('body').hasClass('text-sm')) {
+            $('body').toggleClass('text-sm')
         }
     }
 

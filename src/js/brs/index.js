@@ -264,6 +264,7 @@ export const BRS = {
         amount_warning: '10000000000000',
         asset_transfer_warning: '10000',
         theme_dark: false,
+        small_text: false,
         remember_passphrase: 0,
         remember_account: 0,
         automatic_node_selection: 1,
