@@ -251,7 +251,7 @@ export const BRS = {
         { address: 'https://europe.signum.network', testnet: false },
         { address: 'https://brazil.signum.network', testnet: false },
         { address: 'https://europe1.signum.network', testnet: false },
-        { address: 'https://europe2.signum.network', testnet: false },
+        { address: 'https://ru.signum.network', testnet: false },
         { address: 'https://canada.signum.network', testnet: false },
         { address: 'https://europe3.testnet.signum.network', testnet: true },
         { address: 'http://localhost:6876', testnet: true }
