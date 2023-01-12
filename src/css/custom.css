@@ -261,3 +261,7 @@
     font-family: monospace,monospace;
     font-size:1em
 }
+
+.direct-chat-img {
+    border-radius: 4px !important;
+}

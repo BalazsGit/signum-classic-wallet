@@ -13,6 +13,8 @@
 
 /* global WebDB BigInteger */
 
+import hashicon from 'hashicon'
+
 import {
     getSettings
 } from './brs.settings'
@@ -640,6 +642,7 @@ export function getAccountInfo (firstRun, callback) {
         }
 
         if (firstRun) {
+            $('#account_avatar').attr('src', hashicon(BRS.account, { size: 40 }).toDataURL())
             $('#account_balance, #account_committed_balance, #account_nr_assets, #account_balance_sendmoney').removeClass('loading_dots')
         }
 

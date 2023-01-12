@@ -3,6 +3,7 @@
  */
 
 import converters from '../util/converters'
+import hashicon from 'hashicon'
 
 import { BRS } from '.'
 
@@ -286,14 +287,14 @@ function buildChatMessages (account_id) {
                     .replace('%pendingClass%', pendingClass)
                     .replace('%from%', $.t('you'))
                     .replace('%timestamp%', day)
-                    .replace('%imgsrc%', '') // TODO
+                    .replace('%imgsrc%', hashicon(messages[i].sender, { size: 40 }).toDataURL())
                     .replace('%message%', decoded)
             } else {
                 output += msgFromTemplate
                     .replace('%pendingClass%', pendingClass)
                     .replace('%from%', messages[i].senderRS)
                     .replace('%timestamp%', day)
-                    .replace('%imgsrc%', '') // TODO
+                    .replace('%imgsrc%', hashicon(messages[i].sender, { size: 40 }).toDataURL())
                     .replace('%message%', decoded)
             }
         }
