@@ -82,6 +82,9 @@ export function init () {
     } catch (err) {
         BRS.hasLocalStorage = false
     }
+
+    $('#neoclassic_version').html(BRS.version)
+
     // Default location for notify message (set once)
     $.notifyDefaults({
         placement: { from: 'bottom', align: 'right' },
