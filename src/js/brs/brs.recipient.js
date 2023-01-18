@@ -187,6 +187,14 @@ export function formsSendMoneyMulti (data) {
 //     })
 // }
 
+/** Checks the type of a given account. Callback will receive as argument
+ *  and object = {
+ *     type: 'danger' | 'warning' | 'info',
+ *     message: string,
+ *     publicKeyNeeded: 'needed' | 'info' | 'hide',
+ *     account: accountDetailsObject | null
+ * }
+ */
 function getAccountTypeAndMessage (accountId, callback) {
     // accountId sometimes comes with an RS-Address
     let sureItIsId = accountId
@@ -196,7 +204,8 @@ function getAccountTypeAndMessage (accountId, callback) {
             callback({
                 type: 'danger',
                 message: $.t('recipient_malformed'),
-                account: null
+                account: null,
+                publicKeyNeeded: 'hide'
             })
             return
         }
@@ -206,7 +215,7 @@ function getAccountTypeAndMessage (accountId, callback) {
             type: 'warning',
             message: $.t('recipient_burning_address'),
             account: null,
-            noPublicKey: true
+            publicKeyNeeded: 'hide'
         })
         return
     }
@@ -222,7 +231,7 @@ function getAccountTypeAndMessage (accountId, callback) {
                     valueSuffix: BRS.valueSuffix
                 }),
                 account: newResponse,
-                noPublicKey: true
+                publicKeyNeeded: 'hide'
             })
             return
         }
@@ -239,7 +248,8 @@ function getAccountTypeAndMessage (accountId, callback) {
                 callback({
                     type: 'danger',
                     message: $.t('recipient_malformed'),
-                    account: null
+                    account: null,
+                    publicKeyNeeded: 'hide'
                 })
                 return
             case 5:
@@ -247,18 +257,19 @@ function getAccountTypeAndMessage (accountId, callback) {
                     type: 'warning',
                     message: $.t('recipient_unknown_pka'),
                     account: null,
-                    noPublicKey: true
+                    publicKeyNeeded: 'needed'
                 })
                 return
             default:
                 callback({
                     type: 'danger',
                     message: $.t('recipient_problem') + ' ' + String(response.errorDescription).escapeHTML(),
-                    account: null
+                    account: null,
+                    publicKeyNeeded: 'hide'
                 })
                 return
             }
-            if (response.publicKey === undefined || response.publicKey === '0000000000000000000000000000000000000000000000000000000000000000') {
+            if (response.publicKey === undefined) {
                 callback({
                     type: 'warning',
                     message: $.t('recipient_no_public_key', {
@@ -266,7 +277,7 @@ function getAccountTypeAndMessage (accountId, callback) {
                         valueSuffix: BRS.valueSuffix
                     }),
                     account: response,
-                    noPublicKey: true
+                    publicKeyNeeded: 'needed'
                 })
                 return
             }
@@ -276,7 +287,8 @@ function getAccountTypeAndMessage (accountId, callback) {
                     burst: formatAmount(response.unconfirmedBalanceNQT, false, true),
                     valueSuffix: BRS.valueSuffix
                 }),
-                account: response
+                account: response,
+                publicKeyNeeded: 'info'
             })
         })
     })
@@ -284,6 +296,23 @@ function getAccountTypeAndMessage (accountId, callback) {
 
 export function correctAddressMistake (el) {
     $(el.target).closest('form').find('input[name=recipient],input[name=account_id]').val($(el.target).data('address')).trigger('blur')
+}
+
+function formatRecipientPublicKey (toType, modal, value) {
+    switch (toType) {
+    case 'needed':
+        modal.find('input[name=recipientPublicKey]').prop('readonly', false)
+        modal.find('.recipient_public_key').show()
+        break
+    case 'hide':
+        modal.find('input[name=recipientPublicKey]').val('').prop('readonly', false)
+        modal.find('.recipient_public_key').hide()
+        break
+    default:
+        // info
+        modal.find('input[name=recipientPublicKey]').val(value ?? '').prop('readonly', true)
+        modal.find('.recipient_public_key').show()
+    }
 }
 
 export function checkRecipient (account, modal) {
@@ -304,6 +333,7 @@ export function checkRecipient (account, modal) {
         const address = new NxtAddress(accountParts[2])
         if (address.isOk()) {
             // Account is RS Address
+            callout.html('')
             if (accountParts[3] !== undefined) {
                 // Account is extended RS Address. Verify the public key
                 const publicKey = convertPublicKeyFromBase36ToBase16(accountParts[3])
@@ -312,22 +342,21 @@ export function checkRecipient (account, modal) {
                 if (!checkRS.includes(accountParts[2])) {
                     // Public key does not match RS Address
                     callout.removeClass(classes).addClass('alert-danger').html($.t('recipient_malformed')).show()
-                } else {
-                    // Address verified
-                    callout.removeClass(classes).addClass('alert-info').html($.t('recipient_info_extended')).show()
+                    return
                 }
-            } else {
-                // Account is RS Address and it isn't extended
-                getAccountTypeAndMessage(address.getAccountId(), function (response) {
-                    modal.find('input[name=recipientPublicKey]').val('')
-                    modal.find('.recipient_public_key').hide()
-                    if (response.account && response.account.description) {
-                        checkForMerchant(response.account.description, modal)
-                    }
-                    // let message = response.message.escapeHTML();
-                    callout.removeClass(classes).addClass('alert-' + response.type).html(response.message).show()
-                })
+                // Address verified
+                callout.removeClass(classes).addClass('alert-info').html($.t('recipient_info_extended')).show()
+                modal.find('input[name=recipientPublicKey]').val(publicKey)
+                modal.find('.recipient_public_key').show()
             }
+            getAccountTypeAndMessage(address.getAccountId(), function (response) {
+                formatRecipientPublicKey(response.publicKeyNeeded, modal, response.account?.publicKey)
+                if (response.account && response.account.description) {
+                    checkForMerchant(response.account.description, modal)
+                }
+                // let message = response.message.escapeHTML();
+                callout.removeClass(classes).addClass('alert-' + response.type).append(response.message).show()
+            })
         } else {
             const guessedAddresses = address.getGuesses(BRS.prefix)
             // Account seems to be RS Address but there is an error
@@ -357,6 +386,7 @@ export function checkRecipient (account, modal) {
     if (BRS.idRegEx.test(account)) {
         // Account matches numeric ID
         getAccountTypeAndMessage(account, function (response) {
+            formatRecipientPublicKey(response.publicKeyNeeded, modal, response.account?.publicKey)
             callout.removeClass(classes).addClass('alert-' + response.type).html(response.message.escapeHTML()).show()
         })
         return
@@ -375,8 +405,7 @@ export function checkRecipient (account, modal) {
     }
     if (contact) {
         getAccountTypeAndMessage(contact.account, function (response) {
-            modal.find('input[name=recipientPublicKey]').val('')
-            modal.find('.recipient_public_key').hide()
+            formatRecipientPublicKey(response.publicKeyNeeded, modal, response.account?.publicKey)
             if (response.account && response.account.description) {
                 checkForMerchant(response.account.description, modal)
             }
@@ -423,11 +452,11 @@ function checkRecipientAlias (account, modal) {
                     if (!address.isOk()) {
                         accountInputField.val('')
                         callout.html('Invalid account alias.')
+                        return
                     }
 
                     getAccountTypeAndMessage(address.getAccountId(), function (response) {
-                        modal.find('input[name=recipientPublicKey]').val('')
-                        modal.find('.recipient_public_key').hide()
+                        formatRecipientPublicKey(response.publicKeyNeeded, modal, response.account?.publicKey)
                         if (response.account && response.account.description) {
                             checkForMerchant(response.account.description, modal)
                         }
