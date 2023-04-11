@@ -743,10 +743,12 @@ function processTransactionModalData (transaction) {
             if (BRS.account === transaction.recipient || BRS.account === transaction.sender) {
                 const fieldsToDecrypt = {}
                 if (transaction.attachment.encryptedMessage) {
-                    fieldsToDecrypt.encryptedMessage = $.t('encrypted_message')
+                    const dataType = ` (${transaction.attachment.encryptedMessage.isText ? $.t('text') : $.t('bytes')})`
+                    fieldsToDecrypt.encryptedMessage = $.t('encrypted_message') + dataType
                 }
                 if (transaction.attachment.encryptToSelfMessage && BRS.account === transaction.sender) {
-                    fieldsToDecrypt.encryptToSelfMessage = $.t('note_to_self')
+                    const dataType = ` (${transaction.attachment.encryptToSelfMessage.isText ? $.t('text') : $.t('bytes')})`
+                    fieldsToDecrypt.encryptToSelfMessage = $.t('note_to_self') + dataType
                 }
                 tryToDecrypt(transaction, fieldsToDecrypt, (transaction.recipient === BRS.account ? transaction.sender : transaction.recipient), {
                     noPadding: true,

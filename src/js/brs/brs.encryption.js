@@ -127,7 +127,8 @@ export function encryptNote (message, options, secretPhrase) {
             }
         }
 
-        const encrypted = encryptData(converters.stringToByteArray(message), options)
+        const dataToEncrypt = options.isText ? converters.stringToByteArray(message) : converters.hexStringToByteArray(message)
+        const encrypted = encryptData(dataToEncrypt, options)
 
         return {
             message: converters.byteArrayToHexString(encrypted.data),
@@ -360,11 +361,13 @@ export function tryToDecrypt (transaction, fields, account, options) {
 
             let encrypted = ''
             let nonce = ''
+            let isText = true
             const nonceField = (typeof title !== 'string' ? title.nonce : key + 'Nonce')
 
             if (key === 'encryptedMessage' || key === 'encryptToSelfMessage') {
                 encrypted = transaction.attachment[key].data
                 nonce = transaction.attachment[key].nonce
+                isText = transaction.attachment[key].isText
             } else if (transaction.attachment && transaction.attachment[key]) {
                 encrypted = transaction.attachment[key]
                 nonce = transaction.attachment[nonceField]
@@ -390,7 +393,8 @@ export function tryToDecrypt (transaction, fields, account, options) {
                     }
                     data = decryptNote(encrypted, {
                         nonce,
-                        account: destinationAccount
+                        account: destinationAccount,
+                        isText
                     })
                 } catch (err) {
                     if (err.errorCode && err.errorCode === 1) {
@@ -757,5 +761,8 @@ function decryptData (data, options) {
 
     const data2 = pako.inflate(binData)
 
-    return converters.byteArrayToString(data2)
+    if (options.isText) {
+        return converters.byteArrayToString(data2)
+    }
+    return converters.byteArrayToHexString(data2)
 }

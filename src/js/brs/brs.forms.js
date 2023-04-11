@@ -58,11 +58,14 @@ export function addMessageData (data, requestType) {
     let encrypted
     if (requestType === 'sendMessage') {
         data.add_message = true
+        data.message_is_text = 'on'
     }
 
     if (!data.add_message && !data.add_note_to_self) {
         delete data.message
         delete data.note_to_self
+        delete data.message_is_text
+        delete data.note_to_self_is_text
         delete data.encrypt_message
         delete data.add_message
         delete data.add_note_to_self
@@ -71,15 +74,20 @@ export function addMessageData (data, requestType) {
     } else if (!data.add_message) {
         delete data.message
         delete data.encrypt_message
+        delete data.message_is_text
         delete data.add_message
     } else if (!data.add_note_to_self) {
         delete data.note_to_self
+        delete data.note_to_self_is_text
         delete data.add_note_to_self
     }
 
     data._extra = {
         message: data.message,
-        note_to_self: data.note_to_self
+        note_to_self: data.note_to_self,
+        message_is_text: data.message_is_text,
+        note_to_self_is_text: data.note_to_self_is_text
+
     }
 
     if (data.add_message && data.message) {
@@ -96,33 +104,40 @@ export function addMessageData (data, requestType) {
             if (data.recipientPublicKey) {
                 options.publicKey = data.recipientPublicKey
             }
+            options.isText = data.message_is_text === 'on'
 
             encrypted = encryptNote(data.message, options, data.secretPhrase)
 
             data.encryptedMessageData = encrypted.message
             data.encryptedMessageNonce = encrypted.nonce
-            data.messageToEncryptIsText = 'true'
+            data.messageToEncryptIsText = data.message_is_text === 'on' ? 'true' : 'false'
 
             delete data.message
+            delete data.message_is_text
         } else {
-            data.messageIsText = 'true'
+            data.messageIsText = data.message_is_text === 'on' ? 'true' : 'false'
+            delete data.message_is_text
         }
     } else {
         delete data.message
+        delete data.message_is_text
     }
 
     if (data.add_note_to_self && data.note_to_self) {
         encrypted = encryptNote(data.note_to_self, {
+            isText: data.note_to_self_is_text === 'on',
             publicKey: converters.hexStringToByteArray(generatePublicKey(data.secretPhrase))
         }, data.secretPhrase)
 
         data.encryptToSelfMessageData = encrypted.message
         data.encryptToSelfMessageNonce = encrypted.nonce
-        data.messageToEncryptToSelfIsText = 'true'
+        data.messageToEncryptToSelfIsText = data.note_to_self_is_text === 'on' ? 'true' : 'false'
 
         delete data.note_to_self
+        delete data.note_to_self_is_text
     } else {
         delete data.note_to_self
+        delete data.note_to_self_is_text
     }
 
     delete data.add_message

@@ -77,6 +77,13 @@
                 <span data-i18n="encrypt_message">encrypt_message</span>
               </label>
             </div>
+            <div>
+              <label for="cancel_order_message_is_text">
+                <input type="checkbox" name="message_is_text" id="cancel_order_message_is_text" data-default="checked" checked="checked" />
+                <span data-i18n="message_is_text">message_is_text</span>
+                <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+              </label>
+            </div>
           </div>
           <div class="advanced">
             <label>
@@ -89,6 +96,18 @@
             <textarea class="form-control" id="cancel_order_note_to_self" name="note_to_self" rows="4"></textarea>
             <div>
               <span data-i18n="note_is_encrypted">This note is encrypted.</span>
+            </div>
+            <div>
+              <label for="cancel_order_note_to_self_is_text">
+                <input
+                  type="checkbox"
+                  name="note_to_self_is_text"
+                  id="cancel_order_note_to_self_is_text"
+                  data-default="checked"
+                  checked="checked" />
+                <span data-i18n="message_is_text">message_is_text</span>
+                <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+              </label>
             </div>
           </div>
           <div class="form-group advanced">
@@ -232,6 +251,13 @@
                 <span data-i18n="encrypt_message">encrypt_message</span>
               </label>
             </div>
+            <div>
+              <label for="asset_order_message_is_text">
+                <input type="checkbox" name="message_is_text" id="asset_order_message_is_text" data-default="checked" checked="checked" />
+                <span data-i18n="message_is_text">message_is_text</span>
+                <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+              </label>
+            </div>
           </div>
           <div class="advanced">
             <label>
@@ -244,6 +270,18 @@
             <textarea class="form-control" id="asset_order_note_to_self" name="note_to_self" rows="4"></textarea>
             <div>
               <span data-i18n="note_is_encrypted">This note is encrypted.</span>
+            </div>
+            <div>
+              <label for="asset_order_note_to_self_is_text">
+                <input
+                  type="checkbox"
+                  name="note_to_self_is_text"
+                  id="asset_order_note_to_self_is_text"
+                  data-default="checked"
+                  checked="checked" />
+                <span data-i18n="message_is_text">message_is_text</span>
+                <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+              </label>
             </div>
           </div>
           <div class="form-group advanced">
@@ -481,6 +519,18 @@
                     <span data-i18n="encrypt_message">Encrypt Message</span>
                   </label>
                 </div>
+                <div>
+                  <label for="transfer_asset_message_is_text">
+                    <input
+                      type="checkbox"
+                      name="message_is_text"
+                      id="transfer_asset_message_is_text"
+                      data-default="checked"
+                      checked="checked" />
+                    <span data-i18n="message_is_text">message_is_text</span>
+                    <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+                  </label>
+                </div>
               </div>
               <div class="advanced">
                 <input type="checkbox" name="add_note_to_self" id="transfer_asset_add_note_to_self" class="add_note_to_self" />
@@ -491,6 +541,18 @@
                 <textarea class="form-control" id="transfer_asset_note_to_self" name="note_to_self" rows="4"></textarea>
                 <div>
                   <span data-i18n="note_is_encrypted">This note is encrypted.</span>
+                </div>
+                <div>
+                  <label for="transfer_asset_note_to_self_is_text">
+                    <input
+                      type="checkbox"
+                      name="note_to_self_is_text"
+                      id="transfer_asset_note_to_self_is_text"
+                      data-default="checked"
+                      checked="checked" />
+                    <span data-i18n="message_is_text">message_is_text</span>
+                    <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+                  </label>
                 </div>
               </div>
 
@@ -807,18 +869,42 @@
                     <span data-i18n="encrypt_message">Encrypt Message</span>
                   </label>
                 </div>
+                <div>
+                  <label for="transfer_asset_multi_message_is_text">
+                    <input
+                      type="checkbox"
+                      name="message_is_text"
+                      id="transfer_asset_multi_message_is_text"
+                      data-default="checked"
+                      checked="checked" />
+                    <span data-i18n="message_is_text">message_is_text</span>
+                    <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+                  </label>
+                </div>
               </div>
-              <div class="form-group advanced">
-                <input type="checkbox" name="add_note_to_self" id="transfer_asset__multi_add_note_to_self" class="add_note_to_self" />
-                <label for="transfer_asset__multi_add_note_to_self">
-                  <span data-i18n="add_note_to_self_q">Add Note to Self?</span>
+              <div class="advanced">
+                <label>
+                  <input type="checkbox" name="add_note_to_self" id="EDITME_add_note_to_self" class="add_note_to_self" />
+                  <span data-i18n="add_note_to_self_q">add_note_to_self_q</span>
                 </label>
               </div>
               <div class="form-group advanced optional_note">
-                <label for="transfer_asset_multi_note_to_self" data-i18n="note_to_self">Note to Self</label>
+                <label data-i18n="note_to_self">Note to Self</label>
                 <textarea class="form-control" id="transfer_asset_multi_note_to_self" name="note_to_self" rows="4"></textarea>
                 <div>
-                  <label data-i18n="note_is_encrypted">This note is encrypted.</label>
+                  <span data-i18n="note_is_encrypted">This note is encrypted.</span>
+                </div>
+                <div>
+                  <label for="transfer_asset_multi_note_to_self_is_text">
+                    <input
+                      type="checkbox"
+                      name="note_to_self_is_text"
+                      id="transfer_asset_multi_note_to_self_is_text"
+                      data-default="checked"
+                      checked="checked" />
+                    <span data-i18n="message_is_text">message_is_text</span>
+                    <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+                  </label>
                 </div>
               </div>
               <div class="form-group advanced">
@@ -1146,6 +1232,13 @@
                 <span data-i18n="encrypt_message">encrypt_message</span>
               </label>
             </div>
+            <div>
+              <label for="issue_asset_message_is_text">
+                <input type="checkbox" name="message_is_text" id="issue_asset_message_is_text" data-default="checked" checked="checked" />
+                <span data-i18n="message_is_text">message_is_text</span>
+                <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+              </label>
+            </div>
           </div>
           <div class="advanced">
             <label>
@@ -1158,6 +1251,18 @@
             <textarea class="form-control" id="issue_asset_note_to_self" name="note_to_self" rows="4"></textarea>
             <div>
               <span data-i18n="note_is_encrypted">This note is encrypted.</span>
+            </div>
+            <div>
+              <label for="issue_asset_note_to_self_is_text">
+                <input
+                  type="checkbox"
+                  name="note_to_self_is_text"
+                  id="issue_asset_note_to_self_is_text"
+                  data-default="checked"
+                  checked="checked" />
+                <span data-i18n="message_is_text">message_is_text</span>
+                <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+              </label>
             </div>
           </div>
           <div class="form-group advanced">

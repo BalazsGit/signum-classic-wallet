@@ -10,7 +10,6 @@
       </div>
       <div class="modal-body">
         <form role="form" autocomplete="off" id="form-EDITME">
-
           <!-- asset template -->
           <label data-i18n="asset">asset</label>
           <div class="row">
@@ -176,13 +175,20 @@
                 <span data-i18n="encrypt_message">encrypt_message</span>
               </label>
             </div>
+            <div>
+              <label for="EDITME_message_is_text">
+                <input type="checkbox" name="message_is_text" id="EDITME_message_is_text" data-default="checked" checked="checked" />
+                <span data-i18n="message_is_text">message_is_text</span>
+                <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+              </label>
+            </div>
           </div>
 
           <!-- Note to Self template -->
           <div class="advanced">
             <label>
-                <input type="checkbox" name="add_note_to_self" id="EDITME_add_note_to_self" class="add_note_to_self" />
-                <span data-i18n="add_note_to_self_q">add_note_to_self_q</span>
+              <input type="checkbox" name="add_note_to_self" id="EDITME_add_note_to_self" class="add_note_to_self" />
+              <span data-i18n="add_note_to_self_q">add_note_to_self_q</span>
             </label>
           </div>
           <div class="form-group advanced optional_note">
@@ -190,6 +196,18 @@
             <textarea class="form-control" id="EDITME_note_to_self" name="note_to_self" rows="4"></textarea>
             <div>
               <span data-i18n="note_is_encrypted">This note is encrypted.</span>
+            </div>
+            <div>
+              <label for="EDITME_note_to_self_is_text">
+                <input
+                  type="checkbox"
+                  name="note_to_self_is_text"
+                  id="EDITME_note_to_self_is_text"
+                  data-default="checked"
+                  checked="checked" />
+                <span data-i18n="message_is_text">message_is_text</span>
+                <p class="help-block" data-i18n="message_is_text_help" style="margin: 0">message_is_text_help</p>
+              </label>
             </div>
           </div>
 
@@ -223,7 +241,7 @@
           <!-- ALERTS template -->
           <div class="alert alert-info account_info"></div>
           <div class="alert alert-danger error_message"></div>
-          
+
           <input type="hidden" name="request_type" value="REQUESTTYPE" />
           <input type="hidden" name="converted_account_id" value="" />
           <input type="hidden" name="merchant_info" value="" data-default="" />
