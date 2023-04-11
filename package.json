@@ -1,6 +1,6 @@
 {
   "name": "neoclassic-wallet",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Wallet for Signum cryptocurrency. Based on Signum Classic Wallet, adding better dependencies handling and refactoring a lot of code!",
   "main": "src/index.html",
   "scripts": {
