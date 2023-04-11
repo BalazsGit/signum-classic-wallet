@@ -301,16 +301,16 @@ export function correctAddressMistake (el) {
 function formatRecipientPublicKey (toType, modal, value) {
     switch (toType) {
     case 'needed':
-        modal.find('input[name=recipientPublicKey]').prop('readonly', false)
+        modal.find('input[name=recipientPublicKey]').prop('disabled', false)
         modal.find('.recipient_public_key').show()
         break
     case 'hide':
-        modal.find('input[name=recipientPublicKey]').val('').prop('readonly', false)
+        modal.find('input[name=recipientPublicKey]').val('').prop('disabled', false)
         modal.find('.recipient_public_key').hide()
         break
     default:
         // info
-        modal.find('input[name=recipientPublicKey]').val(value ?? '').prop('readonly', true)
+        modal.find('input[name=recipientPublicKey]').val(value ?? '').prop('disabled', true)
         modal.find('.recipient_public_key').show()
     }
 }
@@ -354,7 +354,6 @@ export function checkRecipient (account, modal) {
                 if (response.account && response.account.description) {
                     checkForMerchant(response.account.description, modal)
                 }
-                // let message = response.message.escapeHTML();
                 callout.removeClass(classes).addClass('alert-' + response.type).append(response.message).show()
             })
         } else {
