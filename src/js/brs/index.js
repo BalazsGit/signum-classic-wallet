@@ -118,7 +118,7 @@ import { init } from './brs'
 import { formsClearData } from './brs.modal.cleardata'
 
 export const BRS = {
-    version: '1.0.0-beta.2',
+    version: '1.0.0',
     server: '',
     state: {},
     blocks: [],
