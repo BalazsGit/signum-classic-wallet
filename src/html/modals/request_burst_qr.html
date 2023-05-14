@@ -9,7 +9,7 @@
         <span id="response"></span>
         <div class="ordinary">
           <!-- form -->
-            <div id="request_burst_div">
+          <div id="request_burst_div">
             <form role="form" autocomplete="off" name="request_burst_form">
               <div class="form-group">
                 <label for="request_burst_account_id" data-i18n="recipient">RECIPIENT</label>
@@ -42,49 +42,41 @@
               </div>
               <div class="form-group has-suggested-fee-group">
                 <label for="request_burst_fee" data-i18n="fee">FEE</label>
-                    <div class="input-group">
-                      <input
-                        type="number"
-                        name="feeNXT"
-                        id="request_burst_fee"
-                        class="form-control"
-                        step="0.01"
-                        min="0.01"
-                        placeholder="Fee"
-                        data-i18n="[placeholder]fee"
-                        data-default="0.1"
-                        value="0.1" />
-                      <span class="input-group-text" data-value-suffix=""></span>
-                    </div>
-                    <div>
-                        <span data-toggle="tooltip" data-placement="top" data-html="true" data-i18n="[title]suggested_fee_help">
-                          <i class="fa fa-info-circle" aria-hidden="true"></i> &nbsp;&nbsp;
-                        </span>
-                        <span class="suggested_fee_response"></span>
-                        <span class="suggested_fee_spinner">
-                          <i class="fa fa-spinner fa-spin fa-fw text-danger"></i>
-                        </span>
-                      </div>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    name="feeNXT"
+                    id="request_burst_fee"
+                    class="form-control"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="Fee"
+                    data-i18n="[placeholder]fee"
+                    data-default="0.1"
+                    value="0.1" />
+                  <span class="input-group-text" data-value-suffix=""></span>
+                </div>
+                <div>
+                  <span data-toggle="tooltip" data-placement="top" data-html="true" data-i18n="[title]suggested_fee_help">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i> &nbsp;&nbsp;
+                  </span>
+                  <span class="suggested_fee_response"></span>
+                  <span class="suggested_fee_spinner">
+                    <i class="fa fa-spinner fa-spin fa-fw text-danger"></i>
+                  </span>
+                </div>
               </div>
-                  <div class="form-group">
-                    <label>
-                      <input
-                        type="checkbox"
-                        name="immutable"
-                        id="request_burst_immutable"
-                        checked />
-                      <span
-                        data-i18n="immutable;[title]immutable_title"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        data-html="true"
-                        >Immutable</span
-                      >
-                    </label>
-                  </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" name="immutable" id="request_burst_immutable" checked />
+                  <span data-i18n="immutable;[title]immutable_title" data-toggle="tooltip" data-placement="top" data-html="true"
+                    >Immutable</span
+                  >
+                </label>
+              </div>
               <div class="alert alert-danger error_message" style="display: none"></div>
             </form>
-            </div>
+          </div>
           <!-- end form -->
           <!-- qr code response -->
           <div id="request_burst_response_div">
@@ -124,7 +116,9 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-default" id="new_qr_button" data-i18n="new_qr">New QR</button>
         <button type="button" class="btn btn-default" id="cancel_button" data-dismiss="modal" data-i18n="cancel">Cancel</button>
-        <button type="button" class="btn btn-primary" id="generate_qr_button" data-ignore="true" data-i18n="generate_qr">Generate QR</button>
+        <button type="button" class="btn btn-primary" id="generate_qr_button" data-ignore="true" data-i18n="generate_qr">
+          Generate QR
+        </button>
       </div>
     </div>
   </div>
