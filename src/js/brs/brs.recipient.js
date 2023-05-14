@@ -356,30 +356,22 @@ export function checkRecipient (account, modal) {
                 }
                 callout.removeClass(classes).addClass('alert-' + response.type).append(response.message).show()
             })
-        } else {
-            const guessedAddresses = address.getGuesses(BRS.prefix)
-            // Account seems to be RS Address but there is an error
-            if (guessedAddresses.length === 1) {
-                // There is only one option of error correction suggestion.
-                callout.removeClass(classes).addClass('alert-danger').html($.t('recipient_malformed_suggestion', {
-                    recipient: `<span class='malformed_address' data-address='${guessedAddresses[0]}'>${address.formatGuess(guessedAddresses[0], account)}</span>`
-                })).show()
-            } else if (guessedAddresses.length > 1) {
-                // There are many options of error correction suggestion.
-                let html = $.t('recipient_malformed_suggestion', {
-                    count: guessedAddresses.length
-                }) + '<ul>'
-                for (let i = 0; i < guessedAddresses.length; i++) {
-                    html += `<li><span clas='malformed_address' data-address='${guessedAddresses[i]}'>${address.formatGuess(guessedAddresses[i], account)} </span></li>`
-                }
-                html += '</ul>'
-                callout.removeClass(classes).addClass('alert-danger').html(html).show()
-            } else {
-                // There is no error correction suggestion
-                callout.removeClass(classes).addClass('alert-danger').html($.t('recipient_malformed')).show()
-            }
-            callout.find('.malformed_address').on('click', correctAddressMistake)
+            return
         }
+        const guessedAddresses = address.getGuesses(BRS.prefix)
+        // Account seems to be RS Address but there is an error
+        if (guessedAddresses.length > 0) {
+            let html = $.t('recipient_malformed_suggestion_plural') + '<ul>'
+            for (const guess of guessedAddresses) {
+                html += `<li><span class='malformed_address pointer' data-address='${guess}'>${address.formatGuess(guess, account)}</span></li>`
+            }
+            html += '</ul>'
+            callout.removeClass(classes).addClass('alert-danger').html(html).show()
+            callout.find('.malformed_address').on('click', correctAddressMistake)
+            return
+        }
+        // There is no error correction suggestion
+        callout.removeClass(classes).addClass('alert-danger').html($.t('recipient_malformed')).show()
         return
     }
     if (BRS.idRegEx.test(account)) {
