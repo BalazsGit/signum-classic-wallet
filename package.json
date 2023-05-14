@@ -5,12 +5,12 @@
   "main": "src/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx light-server -s dist -p 1221 --no-reload",
     "lint": "npx eslint './src/js/brs/*' && npx prettier './src/html/**/*' -w --bracket-same-line --print-width 140",
+    "dev": "./cpdev.sh && node esbuild.config.js && npm run start",
     "build": "./cpbuild.sh && node esbuild.config.js",
     "lang": "pushd ./lang && ./updateFiles.sh && popd",
-    "dev": "./cpdev.sh && npm run build",
-    "build-all": "npm run dev && npm run lang"
+    "start": "npx light-server -s dist -p 1221 --no-reload",
+    "release": "npm run build && npm run lang"
   },
   "repository": {
     "type": "git",
